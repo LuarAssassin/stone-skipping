@@ -15,10 +15,10 @@ export function createWater(){
   if(row<axesZ.length-1&&col<axesX.length-1){const vertex=row*axesX.length+col,next=vertex+axesX.length;indices.push(vertex,next,vertex+1,vertex+1,next,next+1);}
  }
  const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geometry.setAttribute('normal',new THREE.Float32BufferAttribute(normalsData,3));geometry.setIndex(indices);
- const mesh=new Water(geometry,{textureWidth:512,textureHeight:512,waterNormals:normals,sunDirection:new THREE.Vector3(.92,.37,-.13).normalize(),sunColor:0xffeedb,waterColor:0x344940,distortionScale:.35,fog:true});
+ const mesh=new Water(geometry,{textureWidth:1024,textureHeight:1024,waterNormals:normals,sunDirection:new THREE.Vector3(.92,.37,-.13).normalize(),sunColor:0xffeedb,waterColor:0x344940,distortionScale:.35,fog:true});
  mesh.rotation.x=-Math.PI/2;
  const material=mesh.material;
- const transmission=new THREE.WebGLRenderTarget(512,512,{depthTexture:new THREE.DepthTexture(512,512)});
+ const transmission=new THREE.WebGLRenderTarget(1024,1024,{depthTexture:new THREE.DepthTexture(1024,1024)});
  Object.assign(material.uniforms,{heightState:{value:state},transmission:{value:transmission.texture},transmissionDepth:{value:transmission.depthTexture},cameraRange:{value:new THREE.Vector2(.01,180)}});
  const stateGLSL=`uniform sampler2D heightState;
  float localHeight(vec2 point){vec2 coord=vec2(point.x/16.0,(point.y+4.0)/8.0);if(any(lessThan(coord,vec2(0.0)))||any(greaterThan(coord,vec2(1.0))))return 0.0;return texture2D(heightState,(coord*vec2(${width-1}.0,${depth-1}.0)+.5)/vec2(${width}.0,${depth}.0)).r;}
@@ -26,11 +26,10 @@ export function createWater(){
  material.vertexShader=material.vertexShader.replace('void main() {',stateGLSL+'varying vec4 transmissionCoord;\nvoid main() {\nvec3 displaced=position; displaced.z=localHeight(vec2(position.x,-position.y));')
  .replaceAll('vec4( position, 1.0 )','vec4( displaced, 1.0 )').replace('gl_Position = projectionMatrix * mvPosition;','gl_Position = projectionMatrix * mvPosition; transmissionCoord=gl_Position;');
  material.fragmentShader=material.fragmentShader.replace('void main() {',stateGLSL+'uniform sampler2D transmission; uniform sampler2D transmissionDepth; uniform vec2 cameraRange; varying vec4 transmissionCoord;\nvoid main() {')
- .replace('vec3 surfaceNormal = normalize( noise.xzy * vec3( 1.5, 1.0, 1.5 ) );',`float spacing=${16/511};
+ .replace('vec3 surfaceNormal = normalize( noise.xzy * vec3( 1.5, 1.0, 1.5 ) );',`vec2 spacing=vec2(${16/511},${8/255});
  vec2 point=worldPosition.xz;
- vec2 gradient=vec2(localHeight(point+vec2(spacing,0.0))-localHeight(point-vec2(spacing,0.0)),localHeight(point+vec2(0.0,spacing))-localHeight(point-vec2(0.0,spacing)))/(2.0*spacing);
- gradient*=2.6;
- gradient+=vec2(cos(point.x*13.0+point.y*7.0+time*.4),sin(point.y*19.0-point.x*6.0-time*.3))*.0012;
+ vec2 gradient=vec2(localHeight(point+vec2(spacing.x,0.0))-localHeight(point-vec2(spacing.x,0.0)),localHeight(point+vec2(0.0,spacing.y))-localHeight(point-vec2(0.0,spacing.y)))/(2.0*spacing);
+
  vec3 surfaceNormal=normalize(vec3(-gradient.x,1.0,-gradient.y));`)
  .replace('float rf0 = 0.3;','float rf0 = 0.0204;')
  .replace('100.0, 2.0, 0.5','160.0, 0.35, 0.3')
@@ -51,6 +50,6 @@ export function createWater(){
   const target=renderer.getRenderTarget();const visible=mesh.visible;mesh.visible=false;
   renderer.setRenderTarget(transmission);renderer.clear();renderer.render(scene,camera);renderer.setRenderTarget(target);mesh.visible=visible;excluded.forEach((object,index)=>object.visible=visibility[index]);
  };
- return {mesh,linkSheet(sheet:THREE.Mesh<THREE.BufferGeometry,THREE.ShaderMaterial>){excluded=[sheet];for(const name of ['mirrorSampler','transmission','transmissionDepth','cameraRange','textureMatrix'])sheet.material.uniforms[name]=material.uniforms[name];},update(field:HeightField,time:number){material.uniforms.time.value=time;for(let index=0;index<field.height.length;index++){data[index*2]=field.height[index];data[index*2+1]=field.velocity[index];}state.needsUpdate=true;}};
+ return {mesh,linkSheet(sheet:THREE.Mesh<THREE.BufferGeometry,THREE.ShaderMaterial>){excluded=[sheet];for(const name of ['mirrorSampler','transmission','transmissionDepth','cameraRange','textureMatrix'])sheet.material.uniforms[name]=material.uniforms[name];},update(field:HeightField,time:number){material.uniforms.time.value=time;for(let index=0;index<field.height.length;index++){data[index*2]=field.displayHeight(index,time);data[index*2+1]=field.velocity[index];}state.needsUpdate=true;}};
 }
 

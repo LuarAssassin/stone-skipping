@@ -1,8 +1,9 @@
 import type { Launch } from './physics';
+import { validateVisual, type VisualSettings } from './visual-variation';
 
 export const DEFAULT_TEMPERATURE=1;
 export const AMPLITUDES={speed:.035,direction:1.5,elevation:1.5,tilt:1.5,spin:.04};
-export interface ThrowSnapshot { version:1; seed:number; temperature:number; target:Launch; sampled:Launch }
+export interface ThrowSnapshot { version:1; seed:number; temperature:number; target:Launch; sampled:Launch; visual?:VisualSettings }
 export function sampleThrow(target:Launch,temperature:number,seed:number):ThrowSnapshot {
  if(!Number.isFinite(temperature)||temperature<0||temperature>2)throw new RangeError('Temperature must be 0..2');
  if(!Number.isInteger(seed)||seed<0||seed>0xffffffff)throw new RangeError('Seed must be uint32');
@@ -27,5 +28,6 @@ export function parseSnapshot(json:string):ThrowSnapshot {
  if(value.version!==1)throw new Error('Unsupported snapshot version');
  const expected=sampleThrow(value.target,value.temperature,value.seed);
  if(!value.sampled||(Object.keys(AMPLITUDES) as (keyof Launch)[]).some(key=>expected.sampled[key]!==value.sampled[key]))throw new Error('Snapshot sampled launch mismatch');
+ if(value.visual!==undefined)expected.visual=validateVisual(value.visual);
  return expected;
 }

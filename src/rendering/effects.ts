@@ -1,11 +1,12 @@
+import { VISUAL_DEFAULTS, visualHash, correlated, type VisualSettings } from '../simulation/visual-variation';
 import type { Contact } from '../simulation/physics';
 import { HeightField, type WaterSource } from './heightfield';
 export function landingTime(particle:Particle){return particle.birth+(particle.velocity[1]+Math.sqrt(particle.velocity[1]**2+19.62*particle.origin[1]))/9.81;}
 
 export const MAX_SHEETS=16;
-export interface SheetNode { time:number; x:number; z:number; vx:number; vy:number; vz:number }
-export interface Sheet { birth:number; life:number; origin:[number,number,number]; direction:[number,number]; spread:number; length:number; height:number; seed:number; contactId?:number; path?:readonly SheetNode[] }
-export function makeSheet(contact:Contact,batch:number,birth:number):Sheet {
+export interface SheetNode { time:number; x:number; z:number; vx:number; vy:number; vz:number; width:number; variationEnvelope:number; impulse:number }
+export interface Sheet { birth:number; life:number; origin:[number,number,number]; direction:[number,number]; spread:number; length:number; height:number; seed:number; variation?:number; breakup?:number; holePhase?:number; holeScale?:number; contactId?:number; path?:readonly SheetNode[] }
+export function makeSheet(contact:Contact,batch:number,birth:number,visual:VisualSettings={seed:0,...VISUAL_DEFAULTS}):Sheet {
  const speed=Math.hypot(contact.velocity.x,contact.velocity.z);
  const steep=Math.abs(contact.velocity.y)/(speed+Math.abs(contact.velocity.y)+.001);
  const impulse=contact.netImpulse;
@@ -16,40 +17,53 @@ export function makeSheet(contact:Contact,batch:number,birth:number):Sheet {
  const point=contact.centroid??contact.point;
  const tilt=Math.min(.4,Math.hypot(contact.normal?.x??0,contact.normal?.z??0));
  const area=Math.sqrt(Math.max(0,contact.maxArea)/.00377);
- return {birth,life:.24+strength*.16,origin:[point.x,.004,point.z],direction:[reactionX/norm,reactionZ/norm],spread:.65+steep*2.5+tilt*.2,length:.12+strength*.45+Math.min(1,area)*.1,height:.025+strength*(.07+steep*.23),seed:contact.id*101+batch};
+ return {birth,life:.24+strength*.16,origin:[point.x,.004,point.z],direction:[reactionX/norm,reactionZ/norm],spread:.65+steep*2.5+tilt*.2,length:.12+strength*.45+Math.min(1,area)*.1,height:.025+strength*(.07+steep*.23),seed:visual.sheet===0?0:Math.floor(visualHash(visual.seed,contact.id,1,batch)*4294967296),variation:Math.min(.3,visual.sheet*.3),breakup:visual.breakup*Math.sqrt(strength),holePhase:visual.breakup===0?0:visualHash(visual.seed,contact.id,2)*6.283185*Math.min(1,visual.breakup),holeScale:1+(visualHash(visual.seed,contact.id,3)*2-1)*Math.min(1,visual.breakup)*.25};
 }
-function makeSheetNode(contact:Contact,sheet:Sheet,time:number,velocity:{x:number;y:number;z:number}=contact.velocity):Readonly<SheetNode>{
- const point=contact.centroid??contact.point,speed=Math.hypot(velocity.x,velocity.z),forward=Math.min(5,speed*.42);
- return Object.freeze({time,x:point.x,z:point.z,vx:sheet.direction[0]*forward,vy:Math.sqrt(19.62*sheet.height)*.8,vz:sheet.direction[1]*forward});
+function makeSheetNode(contact:Contact,sheet:Sheet,time:number,velocity:{x:number;y:number;z:number}=contact.velocity,area=contact.maxArea,last?:SheetNode):Readonly<SheetNode>{
+ const point=contact.centroid??contact.point,speed=Math.hypot(velocity.x,velocity.z);
+ const wet=Math.min(1,Math.sqrt(Math.max(0,area)/.00377));
+ const incoming=Math.max(0,-(velocity.x*(contact.normal?.x??0)+velocity.y*(contact.normal?.y??1)+velocity.z*(contact.normal?.z??0)));
+ const force=Math.max(0,contact.impulse-(last?.impulse??0))/Math.max(.00025,time-(last?.time??contact.time));
+ const pressure=force/(1000*Math.max(.0001,area));
+ const pressureSpeed=3*Math.sqrt(pressure/(9+pressure));
+ const lift=Math.min(1.65,(incoming*.25+pressureSpeed*.3)*wet);
+ const forward=Math.min(5,speed*.32)*wet;
+ return Object.freeze({time,x:point.x,z:point.z,vx:sheet.direction[0]*forward,vy:lift,vz:sheet.direction[1]*forward,width:Math.min(.13,Math.sqrt(Math.max(0,area)/Math.PI)*(1+Math.min(1.5,pressureSpeed*.5))),variationEnvelope:(sheet.variation??0)*wet,impulse:contact.impulse});
 }
 export function sheetPoint(sheet:Sheet,time:number,u:number,v:number):[number,number,number] {
  const age=Math.max(0,time-sheet.birth),phase=Math.min(1,age/sheet.life);
  const lateral=(u-.5)*2;
+ const variation=sheet.variation??0;
+ const profile=1+variation*correlated(sheet.seed,10,v*3.2+u*.7);
+ const asymmetry=1+variation*lateral*correlated(sheet.seed,11,v*2.4);
  const distance=sheet.length*(.15+.85*Math.sin(phase*Math.PI/2))*v;
- const forward=distance*(1-.28*lateral*lateral)+.012*Math.sin(u*19+sheet.seed)*v*v;
+ const forward=distance*(1-.28*lateral*lateral)+.012*variation*Math.sin(u*19+sheet.seed)*v*v;
  const side=lateral*(.025+sheet.spread*.045)*(.45+.55*Math.sin(Math.PI*v*.85));
  const arch=Math.sin(v*Math.PI*.85)*sheet.height*Math.sin(Math.PI*phase)**.65*(1-.75*lateral*lateral);
- const rim=1+.13*Math.sin(u*23+sheet.seed+v*9)*v*v;
+ const rim=1+variation*Math.sin(u*23+sheet.seed+v*9)*v*v;
  const path=sheet.path;const sampleTime=path?.length?path[path.length-1].time-v*(path[path.length-1].time-path[0].time):time;
  let root=path?.[0];
  if(path)for(let index=path.length-1;index>=0;index--)if(path[index].time<=sampleTime){
   const first=path[index],second=path[index+1]??first,weight=second.time>first.time?Math.min(1,(sampleTime-first.time)/(second.time-first.time)):0;
-  root={time:first.time+(second.time-first.time)*weight,x:first.x+(second.x-first.x)*weight,z:first.z+(second.z-first.z)*weight,vx:first.vx+(second.vx-first.vx)*weight,vy:first.vy+(second.vy-first.vy)*weight,vz:first.vz+(second.vz-first.vz)*weight};break;
+  root={time:first.time+(second.time-first.time)*weight,x:first.x+(second.x-first.x)*weight,z:first.z+(second.z-first.z)*weight,vx:first.vx+(second.vx-first.vx)*weight,vy:first.vy+(second.vy-first.vy)*weight,vz:first.vz+(second.vz-first.vz)*weight,width:first.width+(second.width-first.width)*weight,variationEnvelope:first.variationEnvelope+(second.variationEnvelope-first.variationEnvelope)*weight,impulse:first.impulse+(second.impulse-first.impulse)*weight};break;
  }
  if(root){
   const travel=Math.max(0,time-root.time),attachment=Math.sin(v*Math.PI/2),lift=Math.max(0,root.vy*travel-4.905*travel*travel)*(1-.8*lateral*lateral)*Math.sin(v*Math.PI*.85);
-  const width=lateral*(.025+sheet.spread*.04)*(.5+.5*Math.sin(v*Math.PI*.8))*(1+.1*Math.sin(v*11+u*17+sheet.seed));
-  return [root.x+root.vx*travel*attachment-sheet.direction[1]*width,sheet.origin[1]+lift,root.z+root.vz*travel*attachment+sheet.direction[0]*width];
+  const split=root.variationEnvelope*correlated(sheet.seed,11,sampleTime*18);
+  const scallop=1-root.variationEnvelope*.8*(.5+.5*correlated(sheet.seed,lateral<0?31:32,sampleTime*45));
+  const width=lateral*root.width*(1+Math.sign(lateral)*split)*scallop*(.5+.5*Math.sin(v*Math.PI*.8));
+  return [root.x+root.vx*travel*attachment-sheet.direction[1]*width,sheet.origin[1]+lift*(1+variation*.5*lateral*correlated(sheet.seed,12,v*3)),root.z+root.vz*travel*attachment+sheet.direction[0]*width];
  }
- return [sheet.origin[0]+sheet.direction[0]*forward-sheet.direction[1]*side*rim,sheet.origin[1]+Math.max(0,arch-.035*phase*phase*v),sheet.origin[2]+sheet.direction[1]*forward+sheet.direction[0]*side*rim];
+ return [sheet.origin[0]+sheet.direction[0]*forward-sheet.direction[1]*side*rim*profile*asymmetry,sheet.origin[1]+Math.max(0,arch-.035*phase*phase*v),sheet.origin[2]+sheet.direction[1]*forward+sheet.direction[0]*side*rim*profile*asymmetry];
 }
 export const MAX_PARTICLES=768;
 export const MAX_CONTACTS=16;
 export const WAVE_LIFE=5;
 export interface Particle { birth:number; life:number; origin:[number,number,number]; velocity:[number,number,number]; size:number }
 export function randomAt(seed:number,index:number){let value=(seed^Math.imul(index+1,0x9e3779b9))>>>0;value=Math.imul(value^(value>>>16),0x21f0aaad);value=Math.imul(value^(value>>>15),0x735a2d97);return ((value^(value>>>15))>>>0)/4294967296;}
-export function makeParticle(contact:Contact,batch:number,index:number,birth:number):Particle {
- const rand=(offset:number)=>randomAt(contact.id+271,batch*97+index*7+offset);
+export function makeParticle(contact:Contact,batch:number,index:number,birth:number,visual:VisualSettings={seed:0,...VISUAL_DEFAULTS}):Particle {
+ const energy=Math.min(1,Math.max(.025,Math.sqrt(contact.impulse/.18)));
+ const rand=(offset:number)=>.5+(visualHash(visual.seed,contact.id,100+offset,batch*97+index)-.5)*visual.breakup*.5*energy;
  const speed=Math.hypot(contact.velocity.x,contact.velocity.z),dx=contact.velocity.x/(speed||1),dz=contact.velocity.z/(speed||1);
  const steep=Math.abs(contact.velocity.y)/(speed+Math.abs(contact.velocity.y)+.001);
  const side=(rand(0)-.5)*(.5+steep*2),forward=.35+rand(1)*Math.min(2.5,speed*.23);
@@ -62,6 +76,7 @@ export function particlePosition(particle:Particle,time:number):[number,number,n
 }
 export function waveEnvelope(age:number,strength:number){return age<0||age>=WAVE_LIFE?0:Math.min(1,strength)*Math.exp(-age*.85)*(1-age/WAVE_LIFE);}
 export class ContactEffects {
+ visual:VisualSettings={seed:0,...VISUAL_DEFAULTS};
  particles:Particle[]=[];
  sheets:Sheet[]=[];
  readonly field=new HeightField();
@@ -89,34 +104,36 @@ export class ContactEffects {
    if(time-contact.time>=WAVE_LIFE)continue;
    const previous=this.sampled.get(contact.id)??0,delta=Math.max(0,contact.impulse-previous);
    if(delta>0){const point=contact.centroid??contact.point,live=current?.id===contact.id?current:undefined,velocity=live?.velocity??contact.velocity;
-    this.source({time,x:point.x,z:point.z,radius:Math.max(.045,Math.sqrt((live?.area??contact.maxArea)/Math.PI)),strength:Math.min(.03,delta*.8),kind:'contact',angle:Math.atan2(velocity.z,velocity.x),aspect:1+Math.min(.5,Math.hypot(velocity.x,velocity.z)*.035)*Math.abs(contact.normal?.y??1)});
+    this.source({time:previous===0?contact.time:time,x:point.x,z:point.z,radius:Math.max(.045,Math.sqrt((live?.area??contact.maxArea)/Math.PI)),strength:Math.min(.03,delta*.8),kind:'contact',contactId:contact.id,angle:Math.atan2(velocity.z,velocity.x),aspect:1+Math.min(.5,Math.hypot(velocity.x,velocity.z)*.035)*Math.abs(contact.normal?.y??1)});
    }
    this.sampled.set(contact.id,contact.impulse);
    if(contact.end!==undefined&&!this.exited.has(contact.id)){
     this.exited.add(contact.id);const point=contact.centroid??contact.point;
-    this.source({time:contact.end,x:point.x,z:point.z,radius:.08,strength:-Math.min(.025,contact.impulse*.08),kind:'exit'});
+    this.source({time:contact.end,x:point.x,z:point.z,radius:.08,strength:-Math.min(.025,contact.impulse*.08),kind:'exit',contactId:contact.id});
    }
    const slot=this.sheets.findIndex(sheet=>sheet.contactId===contact.id);
    if(slot>=0&&contact.end===undefined){
     const sheet=this.sheets[slot],point=contact.centroid??contact.point,path=sheet.path??[];
     const last=path[path.length-1];
-    if(!last||Math.hypot(last.x-point.x,last.z-point.z)>.005){const next=makeSheet(contact,1,sheet.birth);this.sheets[slot]={...next,contactId:contact.id,path:[...path.slice(-63),makeSheetNode(contact,next,time,current?.id===contact.id?current.velocity:undefined)]};}
+    if(!last||Math.hypot(last.x-point.x,last.z-point.z)>.005){
+     const live=current?.id===contact.id?current:undefined;
+     const node=makeSheetNode(contact,sheet,time,live?.velocity,live?.area,last);
+     const next={...sheet,path:[...path.slice(-63),node]};this.sheets[slot]=next;
+     if(path.length%3===0)for(const side of [0,1]){
+      const birth=time+.025,origin=sheetPoint(next,birth,side,.15),later=sheetPoint(next,birth+.001,side,.15);
+      this.particles.push({birth,life:.3,origin,velocity:[(later[0]-origin[0])*1000,(later[1]-origin[1])*1000,(later[2]-origin[2])*1000],size:.0018});
+     }
+    }
    }
   }
   for(const contact of contacts.slice(-MAX_CONTACTS)) {
    if(time-contact.time>WAVE_LIFE)continue;
    const count=Math.min(48,1+Math.floor(contact.impulse/.012));
    const previous=this.batches.get(contact.id)??0;
-   for(let batch=previous;batch<count;batch++)for(let index=0;index<6;index++)this.particles.push(makeParticle(contact,batch,index,previous===0&&batch===0?contact.time:time));
+   for(let batch=previous;batch<count;batch++)for(let index=0;index<6;index++)this.particles.push(makeParticle(contact,batch,index,previous===0&&batch===0?contact.time:time,this.visual));
    if(!this.emitted.has(contact.id)&&count>1){
     this.emitted.add(contact.id);
-    const base=makeSheet(contact,1,time),sheet={...base,contactId:contact.id,path:[makeSheetNode(contact,base,time,current?.id===contact.id?current.velocity:undefined)]};this.sheets.push(sheet);
-    for(let index=0;index<12;index++){
-     const delay=sheet.life*(.4+randomAt(sheet.seed,index)*.22),birth=sheet.birth+delay;
-     const origin=sheetPoint(sheet,birth,index/11,.94);
-     const later=sheetPoint(sheet,birth+.001,index/11,.94);
-     this.particles.push({birth,life:.3+randomAt(sheet.seed,index+20)*.2,origin,velocity:[(later[0]-origin[0])*500,.15+randomAt(sheet.seed,index+40)*.4,(later[2]-origin[2])*500],size:.0015+randomAt(sheet.seed,index+60)*.002});
-    }
+    const base=makeSheet(contact,1,time,this.visual),sheet={...base,contactId:contact.id,path:[makeSheetNode(contact,base,time,current?.id===contact.id?current.velocity:undefined,current?.id===contact.id?current.area:undefined)]};this.sheets.push(sheet);
    }
    this.batches.set(contact.id,count);
   }
@@ -126,6 +143,6 @@ export class ContactEffects {
   for(const map of [this.batches,this.sampled])for(const id of map.keys())if(!live.has(id))map.delete(id);
   for(const set of [this.emitted,this.exited])for(const id of set)if(!live.has(id))set.delete(id);
  }
- private source(source:WaterSource){const frozen=Object.freeze({...source});this.sources.push(frozen);if(this.sources.length>4096)this.sources.shift();this.field.disturb(frozen);}
+ private source(source:WaterSource){const radius=source.radius*(1+this.visual.surface*.02*(correlated(Math.floor(visualHash(this.visual.seed,source.contactId??0,source.kind==='drop'?302:300)*4294967296),300,source.time*8+source.x*.2)*.5)*Math.min(1,Math.sqrt(Math.abs(source.strength)/.03)));const frozen=Object.freeze({...source,radius});this.sources.push(frozen);if(this.sources.length>4096)this.sources.shift();this.field.disturb(frozen);}
  clear(){this.particles=[];this.sheets=[];this.sources=[];this.batches.clear();this.sampled.clear();this.emitted.clear();this.exited.clear();this.landingBuckets.clear();this.landed=new WeakSet();this.field.clear();}
 }

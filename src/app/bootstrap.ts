@@ -40,7 +40,7 @@ export function boot() {
                 return;
         }
         else {
-            session.start(target, launch.temperature);
+            session.start(target, launch.temperature, launch.visual);
             document.querySelector<HTMLSelectElement>('#playback')!.value = 'normal';
         }
         const lastThrow = session.snapshot!;
@@ -90,7 +90,7 @@ export function boot() {
             document.querySelector('#pause')!.textContent = '继续';
         }
     });
-    const review={session,rig,world,feedback,errors:[] as string[],frames:[] as {raf:number;cpu:number}[],render(){feedback.update(session,false);rig.update(camera,session.sim.p,session.presentationTime,session.mode==='bullet',1,true);renderer.render(scene,camera);}};
+    const review={session,rig,world,feedback,errors:[] as string[],frames:[] as {raf:number;cpu:number}[],variant(seed:number){if(!session.snapshot)return;const time=session.visualTime;session.replay({...session.snapshot,visual:{...(session.snapshot.visual??{surface:.35,sheet:.8,breakup:1.1}),seed}});session.advance(time);session.paused=true;document.querySelector<HTMLTextAreaElement>('#snapshot')!.value=JSON.stringify(session.snapshot,null,2);document.querySelector('#launch-summary')!.textContent=`physical seed ${session.snapshot!.seed} · T=${session.snapshot!.temperature} · visual ${seed} · ${session.effects.visual.surface}/${session.effects.visual.sheet}/${session.effects.visual.breakup}`;this.render();},programs(){const gl=renderer.getContext();return renderer.info.programs?.map(program=>({name:program.name,linked:gl.getProgramParameter(program.program,gl.LINK_STATUS)}));},render(){feedback.update(session,false);rig.update(camera,session.sim.p,session.presentationTime,session.mode==='bullet',1,true);renderer.render(scene,camera);}};
     if(import.meta.env.DEV) {
         Object.assign(window,{waterReview:review});
         renderer.debug.onShaderError=(gl,program,vertex,fragment)=>{review.errors.push([gl.getProgramInfoLog(program),gl.getShaderInfoLog(vertex),gl.getShaderInfoLog(fragment)].join('\n'));if(review.errors.length>32)review.errors.shift();};
