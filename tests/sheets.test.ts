@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Vector3 } from 'three';
-import { ContactEffects, MAX_SHEETS, makeSheet, sheetPoint } from './effects';
+import { ContactEffects, MAX_SHEETS, makeSheet, sheetPoint } from '../src/rendering/effects';
 const contact=()=>({id:3,time:0,point:new Vector3(),centroid:new Vector3(1,-.01,2),normal:new Vector3(0,1,0),netImpulse:new Vector3(-.03,.12,0),velocity:new Vector3(11,-1,0),impulse:.12,maxArea:.002,bounced:false,energyIn:3});
 test('浅擦向前低矮，陡入宽展高冠，形心投影贴水',()=>{const shallow=makeSheet(contact(),1,0),steep=makeSheet({...contact(),velocity:new Vector3(2,-10,0)},1,0);assert.ok(steep.spread>shallow.spread*2);assert.ok(steep.height>shallow.height*2);assert.deepEqual(shallow.origin,[1,.004,2]);assert.equal(sheetPoint(shallow,.1,.5,0)[1],.004);assert.ok(sheetPoint(shallow,.1,.5,1)[0]>1);});
 test('液片和延迟边滴出生冻结，累计接触不能回写',()=>{const effects=new ContactEffects(),input=contact();effects.update([input],0);const first=effects.sheets[0],before=JSON.stringify(first),drops=JSON.stringify(effects.particles);input.centroid.set(99,99,99);input.normal.set(1,0,0);input.netImpulse.set(0,9,0);input.impulse=.15;effects.update([input],.001);assert.equal(JSON.stringify(first),before);assert.equal(JSON.stringify(effects.particles.slice(0,JSON.parse(drops).length)),drops);});

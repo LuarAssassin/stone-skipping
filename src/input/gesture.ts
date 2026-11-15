@@ -1,4 +1,4 @@
-import type { Launch } from './physics';
+import type { Launch } from '../simulation/physics';
 
 export interface GestureRect { left:number; top:number; width:number; height:number }
 export interface GesturePoint { pointerId:number; clientX:number; clientY:number; timeStamp:number }

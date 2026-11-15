@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ThrowGesture, normalizePoint } from './gesture';
-import { DEFAULT, Simulation } from './physics';
-import { sampleThrow, replayLaunch } from './launch-randomness';
+import { ThrowGesture, normalizePoint } from '../src/input/gesture';
+import { DEFAULT, Simulation } from '../src/simulation/physics';
+import { sampleThrow, replayLaunch } from '../src/simulation/launch-randomness';
 const rect={left:20,top:30,width:800,height:600};
 const point=(timeStamp:number,clientX=420,clientY=330,pointerId=1)=>({timeStamp,clientX,clientY,pointerId});
 function held(duration:number){const gesture=new ThrowGesture();gesture.begin(point(100),rect,DEFAULT);return gesture.release(point(100+duration))!;}

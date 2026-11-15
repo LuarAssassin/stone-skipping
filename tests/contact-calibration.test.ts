@@ -2,8 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { Quaternion, Vector3 } from 'three';
-import { calibrate } from './contact-calibration';
-import { DEFAULT, DT, Simulation, wetGeometry } from './physics';
+import { calibrate } from '../tools/contact-calibration';
+import { DEFAULT, DT, Simulation, wetGeometry } from '../src/simulation/physics';
 
 test('接触边界：亚子步入水时刻及切点形心不退回质心',()=>{
  const q=new Quaternion().setFromAxisAngle(new Vector3(0,0,1),6*Math.PI/180);
@@ -41,7 +41,7 @@ test('临界浅掠水：小于旧外步的真实接触仍被保留而非间隙�
 });
 
 test('固定24+64种子DT/半步最终回归且不覆盖已保存报告',()=>{
- const before=JSON.parse(readFileSync(new URL('../test-fixtures/contact-before.json',import.meta.url),'utf8'));
+ const before=JSON.parse(readFileSync(new URL('./fixtures/contact-before.json',import.meta.url),'utf8'));
  const after=calibrate(64);
  console.log('contact/calibration',JSON.stringify(after.summary));
  assert.ok(after.summary.controls.disagreements<=1);

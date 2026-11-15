@@ -1,4 +1,4 @@
-import type { Contact } from './physics';
+import type { Contact } from '../simulation/physics';
 
 export const MAX_SHEETS=24;
 export interface Sheet { birth:number; life:number; origin:[number,number,number]; direction:[number,number]; spread:number; length:number; height:number; seed:number }

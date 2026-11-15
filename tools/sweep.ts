@@ -1,4 +1,4 @@
-import { Simulation, DEFAULT, DT, type Launch } from './physics';
+import { Simulation, DEFAULT, DT, type Launch } from '../src/simulation/physics';
 export const CASES: Launch[] = [
  ...[4,8,11,14].flatMap(speed=>[6,10,14,20].map(tilt=>({...DEFAULT,speed,tilt}))),
  ...[35,60,85].map(tilt=>({...DEFAULT,speed:14,tilt})),

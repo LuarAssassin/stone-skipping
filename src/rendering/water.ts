@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { Contact } from './physics';
+import type { Contact } from '../simulation/physics';
 import { MAX_CONTACTS, WAVE_LIFE } from './effects';
 
 export function createWater(){

@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Vector3 } from 'three';
-import { Simulation } from './physics';
-import { ContactEffects, MAX_PARTICLES, makeParticle, particlePosition, waveEnvelope } from './effects';
+import { Simulation } from '../src/simulation/physics';
+import { ContactEffects, MAX_PARTICLES, makeParticle, particlePosition, waveEnvelope } from '../src/rendering/effects';
 const contact=()=>({id:0,time:0,point:new Vector3(),velocity:new Vector3(11,-1,0),impulse:0,maxArea:0,bounced:false,energyIn:3});
 test('已出生水滴不随累计冲量改写轨迹',()=>{const effects=new ContactEffects(),input=contact();effects.update([input],0);const first=effects.particles[0],before=particlePosition(first,.15);input.impulse=.3;effects.update([input],.02);assert.equal(first,effects.particles[0]);assert.deepEqual(particlePosition(first,.15),before);assert.ok(effects.particles.length>6);});
 test('同seed同输入产生相同水滴',()=>{assert.deepEqual(makeParticle(contact(),3,2,.1),makeParticle(contact(),3,2,.1));assert.notDeepEqual(makeParticle(contact(),3,2,.1),makeParticle({...contact(),id:1},3,2,.1));});

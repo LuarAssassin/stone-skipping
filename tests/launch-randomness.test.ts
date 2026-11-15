@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DEFAULT, Simulation } from './physics';
-import { AMPLITUDES, sampleThrow, replayLaunch, parseSnapshot } from './launch-randomness';
-import { ContactEffects } from './effects';
-import { sweep } from './variation-sweep';
+import { DEFAULT, Simulation } from '../src/simulation/physics';
+import { AMPLITUDES, sampleThrow, replayLaunch, parseSnapshot } from '../src/simulation/launch-randomness';
+import { ContactEffects } from '../src/rendering/effects';
+import { sweep } from '../tools/variation-sweep';
 const keys=Object.keys(DEFAULT) as (keyof typeof DEFAULT)[];
 test('T0严格恒等且不持有目标引用',()=>{for(let seed=0;seed<64;seed++){const target={...DEFAULT},snapshot=sampleThrow(target,0,seed);assert.deepEqual(snapshot.sampled,DEFAULT);target.speed=4;assert.deepEqual(snapshot.target,DEFAULT);}});
 test('同种子可复现，不同种子多样且T0..2有界',()=>{

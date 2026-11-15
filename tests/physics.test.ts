@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Vector3, Quaternion } from 'three';
-import { Simulation, Clock, DEFAULT, DT, wetGeometry } from './physics';
-import { CASES, compare } from './sweep';
+import { Simulation, Clock, DEFAULT, DT, wetGeometry } from '../src/simulation/physics';
+import { CASES, compare } from '../tools/sweep';
 test('连续椭圆裁剪：全干、全湿、半盘面积及真实形心',()=>{
  const area=Math.PI*.04*.03;
  for(const tilt of [0,1e-8,6,35,90,179]) {

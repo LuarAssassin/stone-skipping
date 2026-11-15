@@ -1,5 +1,5 @@
-import { DEFAULT, Simulation } from './physics';
-import { sampleThrow } from './launch-randomness';
+import { DEFAULT, Simulation } from '../src/simulation/physics';
+import { sampleThrow } from '../src/simulation/launch-randomness';
 export function stats(values:number[]){const mean=values[0]+values.reduce((sum,value)=>sum+(value-values[0]),0)/values.length;return {min:Math.min(...values),mean,max:Math.max(...values),sd:Math.sqrt(values.reduce((sum,value)=>sum+(value-mean)**2,0)/values.length)};}
 export function sweep(count:number){
  return [0,1].map(temperature=>{

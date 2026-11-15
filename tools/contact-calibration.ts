@@ -1,8 +1,8 @@
 import { writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
-import { DEFAULT, DT, Simulation, type Launch } from './physics';
+import { DEFAULT, DT, Simulation, type Launch } from '../src/simulation/physics';
 import { CASES } from './sweep';
-import { sampleThrow } from './launch-randomness';
+import { sampleThrow } from '../src/simulation/launch-randomness';
 export function contactRun(launch:Launch,dt:number) {
  const start=performance.now(),sim=new Simulation({...launch},dt).run();
  return {skips:sim.skips,distance:Math.hypot(sim.p.x,sim.p.z),time:sim.time,ms:performance.now()-start,internalSteps:sim.internalSteps,refinements:sim.refinements,minInternalDt:sim.minInternalDt,contacts:sim.contacts.map(contact=>({...contact,point:contact.point.toArray(),velocity:contact.velocity.toArray()}))};
