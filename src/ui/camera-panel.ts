@@ -5,7 +5,7 @@ export function mountCameraPanel(rig: CameraRig, session: Session) {
     section.id = 'camera-panel';
     section.innerHTML = `
     <label class="choice">观察视角 <select id="view" aria-label="观察视角">
-      <option value="overview">岸后全景 · 固定</option><option value="follow">近景跟随</option>
+      <option value="overview">岸后观察 · 固定</option><option value="follow">近景跟随</option>
     </select></label>
     <label class="choice">播放速度 <select id="playback" aria-label="播放速度">
       <option value="normal">正常 · 1×</option><option value="slow">普通慢放 · 0.25×</option>
@@ -31,10 +31,10 @@ export function mountCameraPanel(rig: CameraRig, session: Session) {
         number,
         string
     ][] = [
-        ['height', '机位高度', 2, 20, 0.5, 'm'],
-        ['distance', '岸后距离', 2, 25, 0.5, 'm'],
+        ['height', '机位高度', .5, 20, 0.1, 'm'],
+        ['distance', '岸后距离', .5, 25, 0.1, 'm'],
         ['azimuth', '观察方位', -65, 65, 1, '°'],
-        ['target', '湖面注视距离', 3, 30, 0.5, 'm'],
+        ['target', '湖面注视距离', 1, 30, 0.1, 'm'],
         ['fov', '视野 FOV', 30, 75, 1, '°'],
     ];
     for (const [key, name, min, max, step, unit] of fields) {

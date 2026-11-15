@@ -90,10 +90,17 @@ export function boot() {
             document.querySelector('#pause')!.textContent = '继续';
         }
     });
+    const review={session,rig,world,feedback,errors:[] as string[],frames:[] as {raf:number;cpu:number}[],render(){feedback.update(session,false);rig.update(camera,session.sim.p,session.presentationTime,session.mode==='bullet',1,true);renderer.render(scene,camera);}};
+    if(import.meta.env.DEV) {
+        Object.assign(window,{waterReview:review});
+        renderer.debug.onShaderError=(gl,program,vertex,fragment)=>{review.errors.push([gl.getProgramInfoLog(program),gl.getShaderInfoLog(vertex),gl.getShaderInfoLog(fragment)].join('\n'));if(review.errors.length>32)review.errors.shift();};
+    }
     let previous = performance.now();
     function frame(now: number) {
+        const cpuStart=performance.now();
         requestAnimationFrame(frame);
-        const elapsed = Math.min((now - previous) / 1000, .1);
+        const raf=now-previous;
+        const elapsed = Math.min(raf / 1000, .1);
         previous = now;
         session.tick(elapsed);
         const { sim, paused } = session;
@@ -107,6 +114,7 @@ export function boot() {
         rig.update(camera, sim.p, session.presentationTime, session.mode === 'bullet', elapsed, paused);
         updateTelemetry(session, visibleDrops);
         renderer.render(scene, camera);
+        if(import.meta.env.DEV){review.frames.push({raf,cpu:performance.now()-cpuStart});if(review.frames.length>600)review.frames.shift();}
     }
     requestAnimationFrame(frame);
 }

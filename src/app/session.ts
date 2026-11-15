@@ -49,7 +49,7 @@ export class Session {
             }
             else
                 this.visualTime += this.sim.dt;
-            this.effects.update(this.sim.contacts, this.visualTime);
+            this.effects.update(this.sim.contacts, this.visualTime, this.sim.active?{id:this.sim.active.id,area:this.sim.area,velocity:this.sim.v}:undefined);
             this.accumulator -= this.sim.dt;
         }
     }

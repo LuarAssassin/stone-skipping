@@ -8,7 +8,7 @@ export interface OverviewSettings {
     fov: number;
 }
 export const DEFAULT_VIEW: Readonly<OverviewSettings> = Object.freeze({
-    height: 9, distance: 9, azimuth: 18, target: 6, fov: 48,
+    height: 2.1, distance: 2.4, azimuth: 18, target: 2.8, fov: 42,
 });
 export interface Pose {
     position: Vector3;
