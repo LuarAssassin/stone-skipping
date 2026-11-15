@@ -1,0 +1,18 @@
+{
+  "name": "Skipping_Stone_01",
+  "dimensions_m": [
+    0.07999999821186066,
+    0.05999999865889549,
+    0.008999999612569809
+  ],
+  "mass_kg": 0.059941587830493234,
+  "density_kg_m3": 2650,
+  "mass_note": "Ellipsoid approximation, not measured rock volume. Rendering geometry is mildly irregular.",
+  "gltf_up_axis": "Y",
+  "stone_face_normal_gltf": "Y",
+  "gltf_long_axis": "X",
+  "origin": "centre",
+  "source": "Blender via Alma MCP, original asset",
+  "vertices": 1106,
+  "faces": 1152
+}
