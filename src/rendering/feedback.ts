@@ -11,7 +11,7 @@ export function createFeedback(world: ReturnType<typeof createWorld>) {
         reset() { lastTrail = 0; trailPoints = []; trailGeometry.setFromPoints([]); drops.count = 0; },
         update(session: Session, helpers: boolean) {
             const { sim, effects: effectState, visualTime } = session;
-            waterField.update(sim.contacts, visualTime);
+            waterField.update(effectState.field, visualTime);
             sheetField.update(effectState.sheets, visualTime);
             stone.position.copy(sim.p);
             stone.quaternion.copy(sim.q);
@@ -30,12 +30,16 @@ export function createFeedback(world: ReturnType<typeof createWorld>) {
                 if (age < 0 || age > particle.life || position[1] < 0)
                     continue;
                 dummy.position.set(...position);
-                dummy.scale.set(particle.size, particle.size * (1.4 + Math.max(0, particle.velocity[1] - 9.81 * age)), particle.size);
+                const variation = .5 + .5 * Math.sin(particle.birth * 1731 + particle.velocity[0] * 97 + particle.velocity[2] * 53);
+                const radius = particle.size * (.55 + variation * .55);
+                dummy.scale.set(radius, radius * (1.15 + .45 * Math.max(0, particle.velocity[1] - 9.81 * age)), radius);
+                drops.geometry.getAttribute('clarity').setX(visibleDrops, variation);
                 dummy.updateMatrix();
                 drops.setMatrixAt(visibleDrops++, dummy.matrix);
             }
             drops.count = visibleDrops;
             drops.instanceMatrix.needsUpdate = true;
+            drops.geometry.getAttribute('clarity').needsUpdate = true;
             return visibleDrops;
         }
     };
