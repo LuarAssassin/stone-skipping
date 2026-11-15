@@ -31,7 +31,7 @@ export function createWorld() {
     shore.position.set(-15.4, 0.012, 0);
     scene.add(shore);
     const sandData=new Uint8Array(128*128*4);
-    for(let index=0;index<128*128;index++){const grain=randomAt(271,index);const tone=.98+grain*.04;sandData.set([102*tone,114*tone,112*tone,255],index*4);}
+    for(let index=0;index<128*128;index++){const grain=randomAt(271,index);const col=index%128,row=Math.floor(index/128);const tone=.84+.10*Math.sin(col*.098+Math.sin(row*.049)*2)+.07*Math.cos(row*.147-col*.049)+grain*.04;sandData.set([102*tone,114*tone,112*tone,255],index*4);}
     const sand=new THREE.DataTexture(sandData,128,128);sand.wrapS=sand.wrapT=THREE.RepeatWrapping;sand.repeat.set(75,25);sand.colorSpace=THREE.SRGBColorSpace;sand.generateMipmaps=true;sand.minFilter=THREE.LinearMipmapLinearFilter;sand.magFilter=THREE.LinearFilter;sand.needsUpdate=true;
     const bed=new THREE.Mesh(new THREE.PlaneGeometry(150,50,30,10),new THREE.MeshStandardMaterial({color:0xffffff,map:sand,roughness:1}));
     bed.rotation.x=-Math.PI/2;bed.position.y=-.65;scene.add(bed);

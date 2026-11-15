@@ -1,6 +1,7 @@
 import { Clock, Simulation, type Launch } from '../simulation/physics';
 import { ContactEffects } from '../rendering/effects';
 import { replayLaunch, sampleThrow, type ThrowSnapshot } from '../simulation/launch-randomness';
+import { VISUAL_DEFAULTS, visualHash, validateVisual, type VisualSettings } from '../simulation/visual-variation';
 export type ReplayMode = 'normal' | 'slow' | 'bullet';
 export const PLAYBACK_RATE: Record<ReplayMode, number> = { normal: 1, slow: 0.25, bullet: 0.05 };
 export function presentationTick(time: number, seconds: number, paused: boolean): number {
@@ -10,6 +11,7 @@ export class Session {
     sim = new Simulation();
     private clock = new Clock(this.sim);
     private accumulator = 0;
+    private throwIndex = 0;
     effects = new ContactEffects();
     snapshot?: ThrowSnapshot;
     paused = true;
@@ -17,8 +19,9 @@ export class Session {
     visualTime = 0;
     presentationTime = 0;
     constructor(private seed = () => crypto.getRandomValues(new Uint32Array(1))[0]) { }
-    start(target: Launch, temperature = 1) {
+    start(target: Launch, temperature = 1, visual:Omit<VisualSettings,'seed'> = VISUAL_DEFAULTS) {
         this.snapshot = sampleThrow(target, temperature, this.seed());
+        this.snapshot.visual=validateVisual({seed:Math.floor(visualHash(this.snapshot.seed,this.throwIndex++,400)*4294967296),...visual});
         this.mode = 'normal';
         this.replay();
     }
@@ -29,6 +32,7 @@ export class Session {
         this.sim = new Simulation(replayLaunch(this.snapshot));
         this.clock = new Clock(this.sim);
         this.effects.clear();
+        this.effects.visual=validateVisual(this.snapshot.visual??{seed:this.snapshot.seed,...VISUAL_DEFAULTS});
         this.accumulator = 0;
         this.visualTime = 0;
         this.presentationTime = 0;
