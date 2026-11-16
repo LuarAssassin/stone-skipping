@@ -15,7 +15,7 @@ export function createWater(grid:WaterGrid=FINE_GRID){
   if(row<axesZ.length-1&&col<axesX.length-1){const next=vertex+axesX.length;indices[cursor++]=vertex;indices[cursor++]=next;indices[cursor++]=vertex+1;indices[cursor++]=vertex+1;indices[cursor++]=next;indices[cursor++]=next+1;}
  }
  const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.BufferAttribute(positions,3));geometry.setAttribute('normal',new THREE.BufferAttribute(normalsData,3));geometry.setIndex(new THREE.BufferAttribute(indices,1));
- const mesh=new Water(geometry,{textureWidth:1024,textureHeight:1024,waterNormals:normals,sunDirection:new THREE.Vector3(.58,.34,-.74).normalize(),sunColor:0xffeedb,waterColor:0x344940,distortionScale:.35,fog:true});
+ const mesh=new Water(geometry,{textureWidth:1024,textureHeight:1024,waterNormals:normals,sunDirection:new THREE.Vector3(-.45,.82,-.35).normalize(),sunColor:0xffeedb,waterColor:0x344940,distortionScale:.35,fog:true});
  mesh.rotation.x=-Math.PI/2;
  const material=mesh.material;
  const transmission=new THREE.WebGLRenderTarget(1024,1024,{depthTexture:new THREE.DepthTexture(1024,1024)});
@@ -37,9 +37,9 @@ export function createWater(grid:WaterGrid=FINE_GRID){
  float lightCosine=max(dot(surfaceNormal,sunDirection),0.0);
  float halfCosine=max(dot(surfaceNormal,halfDirection),0.0);
  float sunFresnel=.0204+.9796*pow(1.0-max(dot(eyeDirection,halfDirection),0.0),5.0);
- float distribution=422.0/(2.0*3.14159265)*pow(halfCosine,420.0);
+ float distribution=122.0/(2.0*3.14159265)*pow(halfCosine,120.0);
  float masking=min(1.0,min(2.0*halfCosine*viewCosine/max(dot(eyeDirection,halfDirection),.001),2.0*halfCosine*lightCosine/max(dot(eyeDirection,halfDirection),.001)));
- specularLight=sunColor*.5*sunFresnel*distribution*masking/(4.0*viewCosine)*step(.001,lightCosine);`)
+ specularLight=sunColor*.18*sunFresnel*distribution*masking/(4.0*viewCosine)*step(.001,lightCosine);`)
  .replace('vec3 outgoingLight = albedo;',`vec2 screenUV=transmissionCoord.xy/transmissionCoord.w*.5+.5;
  vec3 transmitted=texture2D(transmission,clamp(screenUV+surfaceNormal.xz*.012,vec2(.001),vec2(.999))).rgb;
  float bedDepth=texture2D(transmissionDepth,clamp(screenUV+surfaceNormal.xz*.012,vec2(.001),vec2(.999))).r;

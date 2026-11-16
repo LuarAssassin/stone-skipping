@@ -8,7 +8,7 @@ export function createWorld() {
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color('#bed7da');
-    const sky=new THREE.Mesh(new THREE.SphereGeometry(120,24,12),new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,vertexShader: 'varying vec3 skyDirection; void main(){skyDirection=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',fragmentShader: 'varying vec3 skyDirection; void main(){vec3 direction=normalize(skyDirection);float elevation=pow(max(0.0,direction.y),.45);vec3 color=mix(vec3(.72,.79,.77),vec3(.24,.42,.53),elevation);float cloudBand=exp(-pow((direction.y-.32)/.085,2.0));float cloudMass=smoothstep(-.35,.65,sin(direction.x*9.0+direction.z*5.0)+.35*sin(direction.z*19.0-direction.x*7.0));color=mix(color,vec3(.86,.88,.84),cloudBand*cloudMass*.75);float sun=pow(max(0.0,dot(direction,normalize(vec3(.58,.34,-.74)))),420.0);color+=vec3(1.0,.9,.7)*sun*.5;gl_FragColor=vec4(color,1.0);\n#include <tonemapping_fragment>\n#include <colorspace_fragment>\n}'}));scene.add(sky);
+    const sky=new THREE.Mesh(new THREE.SphereGeometry(120,24,12),new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,vertexShader: 'varying vec3 skyDirection; void main(){skyDirection=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',fragmentShader: 'varying vec3 skyDirection; void main(){vec3 direction=normalize(skyDirection);float elevation=pow(max(0.0,direction.y),.45);vec3 color=mix(vec3(.72,.79,.77),vec3(.24,.42,.53),elevation);float cloudBand=exp(-pow((direction.y-.32)/.085,2.0));float cloudMass=smoothstep(-.35,.65,sin(direction.x*9.0+direction.z*5.0)+.35*sin(direction.z*19.0-direction.x*7.0));color=mix(color,vec3(.86,.88,.84),cloudBand*cloudMass*.75);float sun=pow(max(0.0,dot(direction,normalize(vec3(-.45,.82,-.35)))),420.0);color+=vec3(1.0,.9,.7)*sun*.5;gl_FragColor=vec4(color,1.0);\n#include <tonemapping_fragment>\n#include <colorspace_fragment>\n}'}));scene.add(sky);
     scene.fog = new THREE.Fog('#bed7da', 35, 115);
     const camera = new THREE.PerspectiveCamera(48, 1, .01, 180);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -20,7 +20,7 @@ export function createWorld() {
     document.body.prepend(renderer.domElement);
     scene.add(new THREE.HemisphereLight(0xe6f6ff, 0x274943, 2.6));
     const sun = new THREE.DirectionalLight(0xffeed6, 3);
-    sun.position.set(11.6, 6.8, -14.8);
+    sun.position.set(-9, 16.4, -7);
     scene.add(sun);
     scene.add(waterField.mesh);
     const shore = new THREE.Mesh(
