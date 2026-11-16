@@ -1,9 +1,7 @@
 import * as THREE from 'three';
-import {FINE_GRID,validFootprint,interpolateFootprint,displacementScale,momentumSource,reactionFraction,type WaterGrid,type Footprint,type WaterTick} from '../simulation/water-grid';
+import {FINE_GRID,validFootprint,interpolateFootprint,displacementScale,displacedRim,momentumSource,reactionFraction,type WaterGrid,type Footprint,type WaterTick} from '../simulation/water-grid';
 export * from '../simulation/water-grid';
 
-// Evan Wallace MIT four-neighbour update, now parameterised in world units.
-// Optical caustics adaptation and source attribution: THIRD_PARTY_NOTICES.md.
 export class CoherentWater {
  readonly targets:THREE.WebGLRenderTarget[];
  readonly caustics=new THREE.WebGLRenderTarget(1024,512,{type:THREE.HalfFloatType,depthBuffer:false});
@@ -13,8 +11,8 @@ export class CoherentWater {
  private scene=new THREE.Scene();
  private camera=new THREE.Camera();
  private scaleCache=new Map<string,number>();
- private material=new THREE.ShaderMaterial({depthTest:false,depthWrite:false,uniforms:{state:{value:null},resolution:{value:new THREE.Vector2()},coefficients:{value:new THREE.Vector3()},oldSource:{value:new THREE.Vector4()},newSource:{value:new THREE.Vector4()},depths:{value:new THREE.Vector2()},shapes:{value:new THREE.Vector4(1,0,1,0)},scales:{value:new THREE.Vector2()},reaction:{value:new THREE.Vector4()},mode:{value:0}},vertexShader:'varying vec2 coord; void main(){coord=uv;gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:`
- uniform sampler2D state;uniform vec2 resolution,depths,scales;uniform vec3 coefficients;uniform vec4 oldSource,newSource,shapes,reaction;uniform int mode;
+ private material=new THREE.ShaderMaterial({depthTest:false,depthWrite:false,uniforms:{state:{value:null},resolution:{value:new THREE.Vector2()},coefficients:{value:new THREE.Vector3()},oldSource:{value:new THREE.Vector4()},newSource:{value:new THREE.Vector4()},depths:{value:new THREE.Vector2()},shapes:{value:new THREE.Vector4(1,0,1,0)},scales:{value:new THREE.Vector2()},rimScales:{value:new THREE.Vector2()},reaction:{value:new THREE.Vector4()},mode:{value:0}},vertexShader:'varying vec2 coord; void main(){coord=uv;gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:`
+ uniform sampler2D state;uniform vec2 resolution,depths,scales,rimScales;uniform vec3 coefficients;uniform vec4 oldSource,newSource,shapes,reaction;uniform int mode;
  float volumePoint(vec2 uv,vec4 source,float depth,vec2 shape){
   vec2 p=uv*vec2(16.,8.)-vec2(0.,4.)-source.xy;
   if(abs(p.x)>source.w*max(1.,shape.x)||abs(p.y)>source.w*max(1.,shape.x)||abs(source.z)>depth*3.)return 0.;
@@ -27,10 +25,16 @@ export class CoherentWater {
   vec2 d=.2886751345948129/resolution;
   return .25*(volumePoint(uv+d,source,depth,shape)+volumePoint(uv-d,source,depth,shape)+volumePoint(uv+vec2(d.x,-d.y),source,depth,shape)+volumePoint(uv+vec2(-d.x,d.y),source,depth,shape));
  }
+ float displacedSurface(vec2 uv,vec4 source,float depth,vec2 shape,float scale,float rimScale){
+  if(scale==0.&&rimScale==0.)return 0.;
+  vec2 offset=uv*vec2(16.,8.)-vec2(0.,4.)-source.xy;
+  if(any(greaterThan(abs(offset),vec2(source.w*2.*max(1.,shape.x))+vec2(16.,8.)/resolution)))return 0.;
+  vec4 rim=source;rim.w*=2.;
+  return (rimScale*.25*volumeCell(uv,rim,depth,shape)-scale*volumeCell(uv,source,depth,shape))*(4./3.);
+ }
  float change(vec2 uv){
   if(mode!=3)return 0.;
-  float h=0.;if(scales.x!=0.)h+=scales.x*volumeCell(uv,oldSource,depths.x,shapes.xy);
-  if(scales.y!=0.)h-=scales.y*volumeCell(uv,newSource,depths.y,shapes.zw);return h;
+  return displacedSurface(uv,newSource,depths.y,shapes.zw,scales.y,rimScales.y)-displacedSurface(uv,oldSource,depths.x,shapes.xy,scales.x,rimScales.x);
  }
  float heightAt(vec2 uv){return texture2D(state,uv).r+change(clamp(uv,vec2(.5)/resolution,vec2(1.)-vec2(.5)/resolution));}
  void main(){
@@ -76,6 +80,7 @@ export class CoherentWater {
    this.material.uniforms.oldSource.value.set(a.x,a.z,a.y,a.radius);this.material.uniforms.newSource.value.set(b.x,b.z,b.y,b.radius);
    this.material.uniforms.depths.value.set(a.depth,b.depth);this.material.uniforms.shapes.value.set(a.aspect??1,a.angle??0,b.aspect??1,b.angle??0);
    this.material.uniforms.scales.value.set(this.scale(a),this.scale(b));
+   this.material.uniforms.rimScales.value.set(this.scale(displacedRim(a)),this.scale(displacedRim(b)));
    const fraction=reactionFraction(tick.momentum,i,n);
    const m=tick.momentum&&fraction>0?{...tick.momentum,impulseY:tick.momentum.impulseY*fraction}:undefined;
    const reaction=momentumSource(m,this.grid,this.grid.dt,true);

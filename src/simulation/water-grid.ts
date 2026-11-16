@@ -1,4 +1,3 @@
-// World-unit water discretisation. No renderer imports.
 export interface Footprint { x:number; z:number; y:number; radius:number; depth:number; aspect?:number; angle?:number }
 export interface WaterMomentum { x:number; z:number; impulseY:number; wetArea?:number; from?:number; to?:number }
 export interface WaterTick { old:Footprint; next:Footprint; momentum?:WaterMomentum }
@@ -46,17 +45,25 @@ export function cellDisplacement(p:Footprint,col:number,row:number,g:WaterGrid){
 export function displacementScale(p:Footprint,g:WaterGrid){
  const target=displacedVolume(p);if(target<1e-18)return 0;
  const radius=p.radius*Math.max(1,p.aspect??1);
- if(p.x-radius<0||p.x+radius>16||p.z-radius< -4||p.z+radius>4)return 1; // Open/truncated source, not redistributed into the domain.
+ if(p.x-radius<0||p.x+radius>16||p.z-radius< -4||p.z+radius>4)return 1;
  let sampled=0;
  const left=Math.max(0,Math.floor((p.x-radius)/g.dx)),right=Math.min(g.width-1,Math.ceil((p.x+radius)/g.dx));
  const top=Math.max(0,Math.floor((p.z+4-radius)/g.dz)),bottom=Math.min(g.height-1,Math.ceil((p.z+4+radius)/g.dz));
  for(let row=top;row<=bottom;row++)for(let col=left;col<=right;col++)sampled+=cellDisplacement(p,col,row,g)*g.dx*g.dz;
  return sampled>1e-30?target/sampled:0;
 }
+export function displacedRim(p:Footprint):Footprint {
+ return {...p,radius:p.radius*2};
+}
+export function redistributedDisplacement(p:Footprint,col:number,row:number,g:WaterGrid){
+ const rim=displacedRim(p);
+ const inner=displacementScale(p,g)*cellDisplacement(p,col,row,g);
+ const outer=displacementScale(rim,g)*cellDisplacement(rim,col,row,g)/4;
+ return (outer-inner)*4/3;
+}
 export function momentumSource(m?:WaterMomentum,g:WaterGrid=BASE_GRID,dt=WATER_DT,gpuPrecision=false){
  const physicalSigma=m?.wetArea!==undefined?Math.max(.004,Math.min(.04,Math.sqrt(Math.max(0,m.wetArea)/(2*Math.PI)))):.0390625;
  const sigma=gpuPrecision?Math.fround(physicalSigma):physicalSigma;
- // Match the uploaded cell-space centre, including the domain's z origin.
  const x=gpuPrecision?Math.fround((m?.x??0)/g.dx)*g.dx:(m?.x??0);
  const z=gpuPrecision?Math.fround(((m?.z??0)+4)/g.dz)*g.dz-4:(m?.z??0);
  if(!m||![m.x,m.z,m.impulseY,sigma].every(Number.isFinite))return {x:0,z:0,sigma,increment:0,normalization:0,energy:0};

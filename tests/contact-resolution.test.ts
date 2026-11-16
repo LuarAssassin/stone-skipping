@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {BASE_GRID,FINE_GRID,WATER_DT,WATER_SPEED,WATER_DENSITY,WATER_PARTICIPATION_DEPTH,waterGrid,momentumSource,reactionFraction,displacedVolume,displacementScale,cellDisplacement,interpolateFootprint} from '../src/simulation/water-grid';
+import {BASE_GRID,FINE_GRID,WATER_DT,WATER_SPEED,WATER_DENSITY,WATER_PARTICIPATION_DEPTH,waterGrid,momentumSource,reactionFraction,displacedVolume,displacementScale,cellDisplacement,interpolateFootprint,redistributedDisplacement} from '../src/simulation/water-grid';
 import {Session} from '../src/app/session';
 import {DEFAULT} from '../src/simulation/physics';
 
@@ -45,6 +45,17 @@ test('cell-integrated kinematic source preserves analytic displaced volume as th
   const scale=displacementScale(p,g);let volume=0;
   for(let row=Math.floor((p.z+4-.04)/g.dz);row<=Math.ceil((p.z+4+.04)/g.dz);row++)for(let col=Math.floor((p.x-.04)/g.dx);col<=Math.ceil((p.x+.04)/g.dx);col++)volume+=scale*cellDisplacement(p,col,row,g)*g.dx*g.dz;
   assert.ok(Math.abs(volume-displacedVolume(p))<1e-16);
+ }
+});
+test('oriented displacement returns its cavity volume to a continuous raised rim',()=>{
+ for(const g of [BASE_GRID,FINE_GRID]){
+  const p={x:3.217,z:-.031,y:-.002,radius:.04,depth:.0045,aspect:.75,angle:.73};
+  let volume=0,low=0,high=0;
+  for(let row=Math.floor((p.z+4-.09)/g.dz);row<=Math.ceil((p.z+4+.09)/g.dz);row++)for(let col=Math.floor((p.x-.09)/g.dx);col<=Math.ceil((p.x+.09)/g.dx);col++){
+   const value=redistributedDisplacement(p,col,row,g);volume+=value*g.dx*g.dz;low=Math.min(low,value);high=Math.max(high,value);
+  }
+  assert.ok(Math.abs(volume)<1e-16);assert.ok(low<0);assert.ok(high>0);
+  assert.equal(redistributedDisplacement({...p,y:-.3},Math.floor(p.x/g.dx),Math.floor((p.z+4)/g.dz),g),0);
  }
 });
 test('substep reaction fractions sum once and do not begin before their measured interval',()=>{
