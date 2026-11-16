@@ -29,10 +29,10 @@ test('GPU source uniforms receive orientation and reject zero NaN shape commands
 });
 test('generation clears both targets once, drains queue once and keeps target resources stable',()=>{
  const water=createWater(),targets=[...water.solver.targets];let clears=0,steps=0;
- water.solver.clear=()=>{clears++;};water.solver.step=()=>{steps++;};water.solver.updateCaustics=()=>{};
+ water.solver.clear=()=>{clears++;};water.solver.step=()=>{steps++;};let normals=0,caustics=0;water.solver.updateNormals=()=>{normals++;};water.solver.updateCaustics=()=>{caustics++;};
  const queue=[{old:dryFootprint(),next:dryFootprint()}];
  water.update(null as unknown as THREE.WebGLRenderer,queue,1);water.update(null as unknown as THREE.WebGLRenderer,queue,1);
- assert.equal(queue.length,0);assert.equal(steps,1);assert.equal(clears,1);
+ assert.equal(queue.length,0);assert.equal(steps,1);assert.equal(clears,1);assert.equal(normals,1);assert.equal(caustics,1);
  water.update(null as unknown as THREE.WebGLRenderer,queue,2);assert.equal(clears,2);assert.deepEqual(water.solver.targets,targets);water.solver.dispose();
 });
 function run(groups:number[],time=2){const session=new Session(()=>271);session.start(DEFAULT,0);let index=0;while(session.visualTime<time-1e-8)session.advance(Math.min(groups[index++%groups.length],time-session.visualTime));return session;}

@@ -73,7 +73,8 @@ export class CoherentWater {
   const found=this.scaleCache.get(key);if(found!==undefined)return found;
   const value=displacementScale(p,this.grid);if(this.scaleCache.size>=64)this.scaleCache.delete(this.scaleCache.keys().next().value!);this.scaleCache.set(key,value);return value;
  }
- step(renderer:THREE.WebGLRenderer,tick:WaterTick){
+ updateNormals(renderer:THREE.WebGLRenderer){this.pass(renderer,2);}
+ step(renderer:THREE.WebGLRenderer,tick:WaterTick,updateNormals=true){
   const old=validFootprint(tick.old),next=validFootprint(tick.next),n=this.grid.substeps;
   for(let i=0;i<n;i++){
    const a=interpolateFootprint(old,next,i/n),b=interpolateFootprint(old,next,(i+1)/n);
@@ -87,7 +88,7 @@ export class CoherentWater {
    this.material.uniforms.reaction.value.set(reaction.x/this.grid.dx,(reaction.z+4)/this.grid.dz,reaction.sigma,reaction.increment);
    this.pass(renderer,3);
   }
-  this.pass(renderer,2);
+  if(updateNormals)this.updateNormals(renderer);
  }
  read(renderer:THREE.WebGLRenderer){const data=new Float32Array(this.grid.width*this.grid.height*4);renderer.readRenderTargetPixels(this.targets[this.index],0,0,this.grid.width,this.grid.height,data);return data;}
 }

@@ -57,6 +57,6 @@ export function createWater(grid:WaterGrid=FINE_GRID){
   renderer.setRenderTarget(transmission);renderer.clear();renderer.render(scene,camera);renderer.setRenderTarget(target);mesh.visible=visible;
  };
  let generation=-1;
- return {mesh,solver,update(renderer:THREE.WebGLRenderer,ticks:WaterTick[],version:number){if(version!==generation){solver.clear(renderer);generation=version;}for(const tick of ticks)solver.step(renderer,tick);solver.updateCaustics(renderer);ticks.length=0;material.uniforms.heightState.value=solver.texture;}};
+ return {mesh,solver,update(renderer:THREE.WebGLRenderer,ticks:WaterTick[],version:number){const changed=version!==generation||ticks.length>0;if(version!==generation){solver.clear(renderer);generation=version;}for(const tick of ticks)solver.step(renderer,tick,false);if(changed){solver.updateNormals(renderer);solver.updateCaustics(renderer);}ticks.length=0;material.uniforms.heightState.value=solver.texture;}};
 }
 
