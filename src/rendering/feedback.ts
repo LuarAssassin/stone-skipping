@@ -12,7 +12,7 @@ export function createFeedback(world: ReturnType<typeof createWorld>) {
         update(session: Session, helpers: boolean) {
             const { sim, effects: effectState, visualTime } = session;
             waterField.update(effectState.field, visualTime);
-            sheetField.update(effectState.sheets, visualTime);
+            sheetField.update(effectState.sheets, visualTime, effectState.field);
             stone.position.copy(sim.p);
             stone.quaternion.copy(sim.q);
             halo.position.set(sim.p.x, .006, sim.p.z);
@@ -31,8 +31,8 @@ export function createFeedback(world: ReturnType<typeof createWorld>) {
                     continue;
                 dummy.position.set(...position);
                 const variation = .5 + .5 * Math.sin(particle.birth * 1731 + particle.velocity[0] * 97 + particle.velocity[2] * 53);
-                const radius = particle.size * (.55 + variation * .55);
-                dummy.scale.set(radius, radius * (1.15 + .45 * Math.max(0, particle.velocity[1] - 9.81 * age)), radius);
+                const radius = particle.size * (particle.volume ? 1 : .55 + variation * .55);
+                dummy.scale.set(radius, radius * (particle.volume ? 1 : 1.15 + .45 * Math.max(0, particle.velocity[1] - 9.81 * age)), radius);
                 drops.geometry.getAttribute('clarity').setX(visibleDrops, variation);
                 dummy.updateMatrix();
                 drops.setMatrixAt(visibleDrops++, dummy.matrix);

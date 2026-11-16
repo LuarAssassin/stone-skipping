@@ -13,6 +13,7 @@ export class Session {
     private accumulator = 0;
     private throwIndex = 0;
     effects = new ContactEffects();
+    diagnosticContact?: number;
     snapshot?: ThrowSnapshot;
     paused = true;
     mode: ReplayMode = 'normal';
@@ -53,7 +54,7 @@ export class Session {
             }
             else
                 this.visualTime += this.sim.dt;
-            this.effects.update(this.sim.contacts, this.visualTime, this.sim.active?{id:this.sim.active.id,area:this.sim.area,velocity:this.sim.v}:undefined);
+            this.effects.update(this.diagnosticContact === undefined ? this.sim.contacts : this.sim.contacts.filter(contact => contact.id === this.diagnosticContact), this.visualTime, this.sim.active?{id:this.sim.active.id,area:this.sim.area,velocity:this.sim.v}:undefined);
             this.accumulator -= this.sim.dt;
         }
     }

@@ -49,11 +49,7 @@ export function createWorld() {
     scene.add(trail);
     const dropGeometry = new THREE.SphereGeometry(1, 10, 8);
     dropGeometry.setAttribute('clarity', new THREE.InstancedBufferAttribute(new Float32Array(MAX_PARTICLES), 1));
-    const dropMaterial = new THREE.MeshPhysicalMaterial({ color: 0x688e95, roughness: .09, metalness: 0, transparent: true, opacity: .52, depthWrite: false });
-    dropMaterial.onBeforeCompile = shader => {
-        shader.vertexShader = 'attribute float clarity; varying float dropClarity;\n' + shader.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\ndropClarity=clarity;');
-        shader.fragmentShader = 'varying float dropClarity;\n' + shader.fragmentShader.replace('#include <opaque_fragment>', 'float rim=pow(1.0-abs(dot(normal,normalize(vViewPosition))),3.0);\ndiffuseColor.a*=mix(.22,.75,dropClarity)*(.35+.65*rim);\n#include <opaque_fragment>');
-    };
+    const dropMaterial = sheetField.liquidMaterial;
     const drops = new THREE.InstancedMesh(dropGeometry, dropMaterial, MAX_PARTICLES);
     drops.frustumCulled = false;
     drops.count = 0;
