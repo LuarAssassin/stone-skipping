@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { MAX_PARTICLES, randomAt } from './effects';
+import { randomAt } from './effects';
 import { createWater } from './water';
-import { createSheets } from './sheets';
+
 export function createWorld() {
     const waterField = createWater();
-    const sheetField = createSheets();
+
     const scene = new THREE.Scene();
     scene.background = new THREE.Color('#bed7da');
     const sky=new THREE.Mesh(new THREE.SphereGeometry(120,24,12),new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,vertexShader: 'varying vec3 skyDirection; void main(){skyDirection=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',fragmentShader: 'varying vec3 skyDirection; void main(){vec3 direction=normalize(skyDirection);float elevation=pow(max(0.0,direction.y),.45);vec3 color=mix(vec3(.72,.79,.77),vec3(.24,.42,.53),elevation);float sun=pow(max(0.0,dot(direction,normalize(vec3(.92,.37,-.13)))),420.0);color+=vec3(1.0,.9,.7)*sun*.5;gl_FragColor=vec4(color,1.0);\n#include <colorspace_fragment>\n}'}));scene.add(sky);
@@ -21,8 +21,7 @@ export function createWorld() {
     const sun = new THREE.DirectionalLight(0xffeed6, 3);
     sun.position.set(18.4, 7.4, -2.6);
     scene.add(sun);
-    waterField.linkSheet(sheetField.mesh);
-    scene.add(waterField.mesh, sheetField.mesh);
+    scene.add(waterField.mesh);
     const shore = new THREE.Mesh(
         new THREE.PlaneGeometry(30, 50),
         new THREE.MeshStandardMaterial({ color: 0xa9aa8e, roughness: 1 })
@@ -31,10 +30,17 @@ export function createWorld() {
     shore.position.set(-15.4, 0.012, 0);
     scene.add(shore);
     const sandData=new Uint8Array(128*128*4);
-    for(let index=0;index<128*128;index++){const grain=randomAt(271,index);const col=index%128,row=Math.floor(index/128);const tone=.84+.10*Math.sin(col*.098+Math.sin(row*.049)*2)+.07*Math.cos(row*.147-col*.049)+grain*.04;sandData.set([102*tone,114*tone,112*tone,255],index*4);}
-    const sand=new THREE.DataTexture(sandData,128,128);sand.wrapS=sand.wrapT=THREE.RepeatWrapping;sand.repeat.set(75,25);sand.colorSpace=THREE.SRGBColorSpace;sand.generateMipmaps=true;sand.minFilter=THREE.LinearMipmapLinearFilter;sand.magFilter=THREE.LinearFilter;sand.needsUpdate=true;
+    for(let index=0;index<128*128;index++){const grain=randomAt(271,index);const col=index%128,row=Math.floor(index/128);const seam=col%32<2||row%32<2;const tone=seam?.3:((Math.floor(col/32)+Math.floor(row/32))%2?.78:1)+grain*.025;sandData.set([150*tone,181*tone,171*tone,255],index*4);}
+    const sand=new THREE.DataTexture(sandData,128,128);sand.wrapS=sand.wrapT=THREE.RepeatWrapping;sand.repeat.set(150,50);sand.colorSpace=THREE.SRGBColorSpace;sand.generateMipmaps=true;sand.minFilter=THREE.LinearMipmapLinearFilter;sand.magFilter=THREE.LinearFilter;sand.needsUpdate=true;
     const bed=new THREE.Mesh(new THREE.PlaneGeometry(150,50,30,10),new THREE.MeshStandardMaterial({color:0xffffff,map:sand,roughness:1}));
     bed.rotation.x=-Math.PI/2;bed.position.y=-.65;scene.add(bed);
+    bed.material.onBeforeCompile = shader => {
+        shader.uniforms.causticState={value:waterField.solver.caustics.texture};
+        shader.vertexShader=shader.vertexShader.replace('void main() {','varying vec3 bedPoint; void main() { bedPoint=(modelMatrix*vec4(position,1.)).xyz;');
+        shader.fragmentShader=shader.fragmentShader.replace('void main() {',`uniform sampler2D causticState; varying vec3 bedPoint;
+        void main() {`).replace('#include <dithering_fragment>',`vec2 causticUV=vec2(bedPoint.x/16.,(bedPoint.z+4.)/8.);if(all(greaterThanEqual(causticUV,vec2(0.)))&&all(lessThanEqual(causticUV,vec2(1.)))){float focus=texture2D(causticState,causticUV).r;gl_FragColor.rgb*=mix(1.,clamp(focus,.15,5.),.8);}
+        #include <dithering_fragment>`);
+    };
     const stone = new THREE.Group();
     scene.add(stone);
     const fallback = new THREE.Mesh(new THREE.SphereGeometry(1, 24, 16), new THREE.MeshStandardMaterial({ color: 0x565957, roughness: .8 }));
@@ -47,16 +53,5 @@ export function createWorld() {
     const trailGeometry = new THREE.BufferGeometry();
     const trail = new THREE.Line(trailGeometry, new THREE.LineBasicMaterial({ color: 0xffe3a1, transparent: true, opacity: .7 }));
     scene.add(trail);
-    const dropGeometry = new THREE.SphereGeometry(1, 10, 8);
-    dropGeometry.setAttribute('clarity', new THREE.InstancedBufferAttribute(new Float32Array(MAX_PARTICLES), 1));
-    const dropMaterial = new THREE.MeshPhysicalMaterial({ color: 0x688e95, roughness: .09, metalness: 0, transparent: true, opacity: .52, depthWrite: false });
-    dropMaterial.onBeforeCompile = shader => {
-        shader.vertexShader = 'attribute float clarity; varying float dropClarity;\n' + shader.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\ndropClarity=clarity;');
-        shader.fragmentShader = 'varying float dropClarity;\n' + shader.fragmentShader.replace('#include <opaque_fragment>', 'float rim=pow(1.0-abs(dot(normal,normalize(vViewPosition))),3.0);\ndiffuseColor.a*=mix(.22,.75,dropClarity)*(.35+.65*rim);\n#include <opaque_fragment>');
-    };
-    const drops = new THREE.InstancedMesh(dropGeometry, dropMaterial, MAX_PARTICLES);
-    drops.frustumCulled = false;
-    drops.count = 0;
-    scene.add(drops);
-    return { scene, camera, renderer, waterField, sheetField, stone, halo, trail, trailGeometry, drops };
+    return { scene, camera, renderer, waterField, stone, halo, trail, trailGeometry };
 }

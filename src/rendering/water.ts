@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 import { Water } from 'three/addons/objects/Water.js';
-import { WATER_GRID, type HeightField } from './heightfield';
+import { WATER_GRID } from './heightfield';
+import { CoherentWater, type WaterTick } from './coherent';
 export function createWater(){
  const {width,depth}=WATER_GRID;
- const data=new Float32Array(width*depth*2);
- const state=new THREE.DataTexture(data,width,depth,THREE.RGFormat,THREE.FloatType);
- state.minFilter=state.magFilter=THREE.LinearFilter;
+ const solver=new CoherentWater();
+ const state=solver.texture;
  const normals=new THREE.DataTexture(new Uint8Array([128,128,255,255]),1,1);normals.needsUpdate=true;
  const axesX=[-75,-30,-5,-1,...Array.from({length:width},(_,index)=>index*16/(width-1)),17,20,35,75];
  const axesZ=[-25,-10,-5,...Array.from({length:depth},(_,index)=>-4+index*8/(depth-1)),5,10,25];
@@ -42,14 +42,13 @@ export function createWater(){
  vec3 absorption=exp(-vec3(.48,.20,.12)*depth);
  vec3 bed=transmitted*absorption+vec3(.055,.14,.16)*(1.0-absorption);
  vec3 outgoingLight=mix(bed,reflectionSample,reflectance)+specularLight*.12;`);
- let excluded:THREE.Object3D[]=[];
  const reflection=mesh.onBeforeRender;
  mesh.onBeforeRender=function(renderer,scene,camera,geometry,material,group){
-  const visibility=excluded.map(object=>object.visible);excluded.forEach(object=>object.visible=false);
   reflection.call(this,renderer,scene,camera,geometry,material,group);
   const target=renderer.getRenderTarget();const visible=mesh.visible;mesh.visible=false;
-  renderer.setRenderTarget(transmission);renderer.clear();renderer.render(scene,camera);renderer.setRenderTarget(target);mesh.visible=visible;excluded.forEach((object,index)=>object.visible=visibility[index]);
+  renderer.setRenderTarget(transmission);renderer.clear();renderer.render(scene,camera);renderer.setRenderTarget(target);mesh.visible=visible;
  };
- return {mesh,linkSheet(sheet:THREE.Mesh<THREE.BufferGeometry,THREE.ShaderMaterial>){excluded=[sheet];for(const name of ['mirrorSampler','transmission','transmissionDepth','cameraRange','textureMatrix'])sheet.material.uniforms[name]=material.uniforms[name];},update(field:HeightField,time:number){material.uniforms.time.value=time;for(let index=0;index<field.height.length;index++){data[index*2]=field.displayHeight(index,time);data[index*2+1]=field.velocity[index];}state.needsUpdate=true;}};
+ let generation=-1;
+ return {mesh,solver,update(renderer:THREE.WebGLRenderer,ticks:WaterTick[],version:number){if(version!==generation){solver.clear(renderer);generation=version;}for(const tick of ticks)solver.step(renderer,tick);solver.updateCaustics(renderer);ticks.length=0;material.uniforms.heightState.value=solver.texture;}};
 }
 

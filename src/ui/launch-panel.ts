@@ -30,9 +30,10 @@ export function mountLaunchPanel() {
     document.querySelector('#controls')!.append(variation);
     document.querySelector<HTMLInputElement>('#temperature')!.oninput = event => { temperature = +(event.target as HTMLInputElement).value; document.querySelector('#temperature-value')!.textContent = String(temperature); };
     const visual={surface:.35,sheet:.8,breakup:1.1};
-    const details=document.createElement('details');details.innerHTML='<summary>水体细节扰动</summary><p class="note">仅下一次新投掷生效；0 无该层扰动，2 上限。不改变出手与跳数。</p>';
+    const details=document.createElement('details');details.innerHTML='<summary>历史水花参数（已停用）</summary><p class="note">连续高度场基线不使用旧薄片、液丝或细滴。参数仅为兼容历史快照保留，当前不生效。</p>';
     for(const [key,label] of [['surface','基础水面'],['sheet','接触水舌'],['breakup','破碎细滴']] as const){
         const control=document.createElement('label');control.className='slider';control.innerHTML=`<span>${label}<output>${visual[key]}</output></span><input type="range" min="0" max="2" step="0.05" value="${visual[key]}" aria-label="${label}扰动">`;
+        control.querySelector('input')!.disabled=true;
         control.querySelector('input')!.oninput=event=>{visual[key]=+(event.target as HTMLInputElement).value;control.querySelector('output')!.value=String(visual[key]);};details.append(control);
     }
     variation.prepend(details);
