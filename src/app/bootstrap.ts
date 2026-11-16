@@ -35,6 +35,8 @@ export function boot() {
     resizeView();
     function start(replay = false, target: Launch = parameters) {
         cancelGesture();
+        review.side=false;
+        session.diagnosticContact=undefined;
         if (replay) {
             if (!session.replay())
                 return;
@@ -90,7 +92,7 @@ export function boot() {
             document.querySelector('#pause')!.textContent = '继续';
         }
     });
-    const review={session,rig,world,feedback,errors:[] as string[],frames:[] as {raf:number;cpu:number}[],variant(seed:number){if(!session.snapshot)return;const time=session.visualTime;session.replay({...session.snapshot,visual:{...(session.snapshot.visual??{surface:.35,sheet:.8,breakup:1.1}),seed}});session.advance(time);session.paused=true;document.querySelector<HTMLTextAreaElement>('#snapshot')!.value=JSON.stringify(session.snapshot,null,2);document.querySelector('#launch-summary')!.textContent=`physical seed ${session.snapshot!.seed} · T=${session.snapshot!.temperature} · visual ${seed} · ${session.effects.visual.surface}/${session.effects.visual.sheet}/${session.effects.visual.breakup}`;this.render();},programs(){const gl=renderer.getContext();return renderer.info.programs?.map(program=>({name:program.name,linked:gl.getProgramParameter(program.program,gl.LINK_STATUS)}));},render(){feedback.update(session,false);rig.update(camera,session.sim.p,session.presentationTime,session.mode==='bullet',1,true);renderer.render(scene,camera);}};
+    const review={session,rig,world,feedback,side:false,inspect(time:number,single=true){session.diagnosticContact=single?0:undefined;session.replay();session.advance(time);session.paused=true;this.side=true;this.render();},sideCamera(){const contact=session.sim.contacts[0];if(!contact)return;const point=[contact.point.x,0,contact.point.z];camera.position.set(point[0]+.09,.115,point[2]+.48);camera.lookAt(point[0]+.09,.018,point[2]);camera.fov=38;camera.updateProjectionMatrix();},errors:[] as string[],frames:[] as {raf:number;cpu:number}[],variant(seed:number){if(!session.snapshot)return;const time=session.visualTime;session.replay({...session.snapshot,visual:{...(session.snapshot.visual??{surface:.35,sheet:.8,breakup:1.1}),seed}});session.advance(time);session.paused=true;document.querySelector<HTMLTextAreaElement>('#snapshot')!.value=JSON.stringify(session.snapshot,null,2);document.querySelector('#launch-summary')!.textContent=`physical seed ${session.snapshot!.seed} · T=${session.snapshot!.temperature} · visual ${seed} · ${session.effects.visual.surface}/${session.effects.visual.sheet}/${session.effects.visual.breakup}`;this.render();},programs(){const gl=renderer.getContext();return renderer.info.programs?.map(program=>({name:program.name,linked:gl.getProgramParameter(program.program,gl.LINK_STATUS)}));},render(){feedback.update(session,false);rig.update(camera,session.sim.p,session.presentationTime,session.mode==='bullet',1,true);if(this.side)this.sideCamera();renderer.render(scene,camera);}};
     if(import.meta.env.DEV) {
         Object.assign(window,{waterReview:review});
         renderer.debug.onShaderError=(gl,program,vertex,fragment)=>{review.errors.push([gl.getProgramInfoLog(program),gl.getShaderInfoLog(vertex),gl.getShaderInfoLog(fragment)].join('\n'));if(review.errors.length>32)review.errors.shift();};
@@ -112,6 +114,7 @@ export function boot() {
         }
         const visibleDrops = feedback.update(session, document.querySelector<HTMLInputElement>('#helpers')!.checked);
         rig.update(camera, sim.p, session.presentationTime, session.mode === 'bullet', elapsed, paused);
+        if(import.meta.env.DEV&&review.side)review.sideCamera();
         updateTelemetry(session, visibleDrops);
         renderer.render(scene, camera);
         if(import.meta.env.DEV){review.frames.push({raf,cpu:performance.now()-cpuStart});if(review.frames.length>600)review.frames.shift();}
