@@ -31,7 +31,7 @@ export function createWorld() {
     shore.position.set(-15.4, 0.012, 0);
     scene.add(shore);
     const sandData=new Uint8Array(128*128*4);
-    for(let index=0;index<128*128;index++){const grain=randomAt(271,index);const col=index%128,row=Math.floor(index/128);const seam=col%32<2||row%32<2;const tone=seam?.78:((Math.floor(col/32)+Math.floor(row/32))%2?.9:1)+grain*.015;sandData.set([150*tone,181*tone,171*tone,255],index*4);}
+    for(let index=0;index<128*128;index++){const grain=randomAt(271,index);const col=index%128,row=Math.floor(index/128);const seam=col%32<2||row%32<2;const tone=seam?.97:((Math.floor(col/32)+Math.floor(row/32))%2?.985:1)+grain*.008;sandData.set([150*tone,181*tone,171*tone,255],index*4);}
     const sand=new THREE.DataTexture(sandData,128,128);sand.wrapS=sand.wrapT=THREE.RepeatWrapping;sand.repeat.set(75,25);sand.colorSpace=THREE.SRGBColorSpace;sand.generateMipmaps=true;sand.minFilter=THREE.LinearMipmapLinearFilter;sand.magFilter=THREE.LinearFilter;sand.needsUpdate=true;
     const bed=new THREE.Mesh(new THREE.PlaneGeometry(150,50,30,10),new THREE.MeshStandardMaterial({color:0xffffff,map:sand,roughness:1}));
     bed.rotation.x=-Math.PI/2;bed.position.y=-.65;scene.add(bed);
@@ -39,7 +39,7 @@ export function createWorld() {
         shader.uniforms.causticState={value:waterField.solver.caustics.texture};
         shader.vertexShader=shader.vertexShader.replace('void main() {','varying vec3 bedPoint; void main() { bedPoint=(modelMatrix*vec4(position,1.)).xyz;');
         shader.fragmentShader=shader.fragmentShader.replace('void main() {',`uniform sampler2D causticState; varying vec3 bedPoint;
-        void main() {`).replace('#include <dithering_fragment>',`vec2 causticUV=vec2(bedPoint.x/16.,(bedPoint.z+4.)/8.);if(all(greaterThanEqual(causticUV,vec2(0.)))&&all(lessThanEqual(causticUV,vec2(1.)))){float focus=texture2D(causticState,causticUV).r;gl_FragColor.rgb*=mix(1.,clamp(focus,.5,2.),.3);}
+        void main() {`).replace('#include <dithering_fragment>',`vec2 causticUV=vec2(bedPoint.x/16.,(bedPoint.z+4.)/8.);if(all(greaterThanEqual(causticUV,vec2(0.)))&&all(lessThanEqual(causticUV,vec2(1.)))){float focus=texture2D(causticState,causticUV).r;gl_FragColor.rgb*=mix(1.,clamp(focus,.5,2.),.04);}
         #include <dithering_fragment>`);
     };
     const stone = new THREE.Group();
