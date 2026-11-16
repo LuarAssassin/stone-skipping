@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {Session,PLAYBACK_RATE,type ReplayMode} from '../src/app/session';
 import {DEFAULT} from '../src/simulation/physics';
-import {displaced,dryFootprint,CoherentWater} from '../src/rendering/coherent';
+import {displaced,dryFootprint,CoherentWater,BASE_GRID} from '../src/rendering/coherent';
 import * as THREE from 'three';
 import {createWater} from '../src/rendering/water';
 test('full sink and after-sink command replay survives normal slow bullet and irregular RAF',()=>{
@@ -19,10 +19,11 @@ test('real projected stone footprint has finite physical horizontal and vertical
  assert.ok(session.waterTicks.some(({next})=>next.aspect!<.9));
 });
 test('GPU source uniforms receive orientation and reject zero NaN shape commands',()=>{
- const solver=new CoherentWater(),captured:THREE.Vector4[]=[];
+ const solver=new CoherentWater(BASE_GRID),captured:THREE.Vector4[]=[];
  const renderer={getRenderTarget:()=>null,setRenderTarget:()=>{},render:(scene:THREE.Scene)=>{const material=(scene.children[0] as THREE.Mesh).material as THREE.ShaderMaterial;captured.push(material.uniforms.shapes.value.clone());}} as unknown as THREE.WebGLRenderer;
  solver.step(renderer,{old:dryFootprint(),next:{x:2,z:0,y:0,radius:.04,depth:.01,aspect:.5,angle:1.2}});
- assert.deepEqual(captured[0].toArray(),[1,0,.5,1.2]);
+ assert.deepEqual(captured[0].toArray().slice(0,2),[1,0]);
+ assert.deepEqual(captured[BASE_GRID.substeps].toArray().slice(2),[.5,1.2]);
  solver.step(renderer,{old:dryFootprint(),next:{x:2,z:0,y:0,radius:0,depth:NaN,aspect:0,angle:NaN}});
  assert.deepEqual(captured[3].toArray(),[1,0,1,0]);solver.dispose();
 });

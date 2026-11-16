@@ -21,6 +21,9 @@ export class Session {
     private pendingWeight = 0;
     private pendingX = 0;
     private pendingZ = 0;
+    private pendingArea = 0;
+    private pendingFirst = Infinity;
+    private pendingLast = 0;
     sim = new Simulation();
     private clock = new Clock(this.sim);
     private accumulator = 0;
@@ -49,7 +52,8 @@ export class Session {
         this.waterTicks = [];
         this.waterGeneration++;
         this.waterTime = 0;
-        this.measuredImpulseY = this.pendingImpulseY = this.pendingWeight = this.pendingX = this.pendingZ = 0;
+        this.measuredImpulseY = this.pendingImpulseY = this.pendingWeight = this.pendingX = this.pendingZ = this.pendingArea = this.pendingLast = 0;
+        this.pendingFirst = Infinity;
         this.previousSource = dryFootprint();
         this.effects.visual=validateVisual(this.snapshot.visual??{seed:this.snapshot.seed,...VISUAL_DEFAULTS});
         this.accumulator = 0;
@@ -76,6 +80,8 @@ export class Session {
                 this.pendingWeight+=Math.abs(reaction);
                 this.pendingX+=point.x*Math.abs(reaction);
                 this.pendingZ+=point.z*Math.abs(reaction);
+                this.pendingArea+=Math.max(0,this.sim.area)*Math.abs(reaction);
+                if(Math.abs(reaction)>0){this.pendingFirst=Math.min(this.pendingFirst,this.visualTime);this.pendingLast=this.visualTime+this.sim.dt;}
             }
             this.visualTime += this.sim.dt;
             if(this.visualTime+1e-10 >= this.waterTime+1/120){
@@ -83,9 +89,10 @@ export class Session {
             const xx=axes.reduce((sum,axis)=>sum+axis.x**2,0),zz=axes.reduce((sum,axis)=>sum+axis.z**2,0),xz=axes.reduce((sum,axis)=>sum+axis.x*axis.z,0);
             const spread=Math.hypot(xx-zz,2*xz),major=Math.sqrt((xx+zz+spread)/2),minor=Math.sqrt(Math.max(1e-8,(xx+zz-spread)/2));
             const source = this.mouseMode ? (this.mouse ?? dryFootprint()) : {x:this.sim.p.x,z:this.sim.p.z,y:this.sim.p.y,radius:major,aspect:minor/major,angle:.5*Math.atan2(2*xz,xx-zz),depth:Math.abs(axes[1].y)+Math.hypot(axes[0].y,axes[2].y)};
-                const momentum=!this.mouseMode&&this.pendingWeight>0?{x:this.pendingX/this.pendingWeight,z:this.pendingZ/this.pendingWeight,impulseY:this.pendingImpulseY}:undefined;
+                const momentum=!this.mouseMode&&this.pendingWeight>0?{x:this.pendingX/this.pendingWeight,z:this.pendingZ/this.pendingWeight,impulseY:this.pendingImpulseY,wetArea:this.pendingArea/this.pendingWeight,from:Math.max(0,(this.pendingFirst-this.waterTime)*120),to:Math.min(1,(this.pendingLast-this.waterTime)*120)}:undefined;
                 this.waterTicks.push({old:{...this.previousSource},next:{...source},...(momentum?{momentum}:{})});
-                this.pendingImpulseY=this.pendingWeight=this.pendingX=this.pendingZ=0;
+                this.pendingImpulseY=this.pendingWeight=this.pendingX=this.pendingZ=this.pendingArea=this.pendingLast=0;
+                this.pendingFirst=Infinity;
                 this.previousSource = {...source};
                 this.waterTime += 1/120;
             }
