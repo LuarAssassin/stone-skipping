@@ -5,7 +5,7 @@ export function mountCameraPanel(rig: CameraRig, session: Session) {
     section.id = 'camera-panel';
     section.innerHTML = `
     <label class="choice">观察视角 <select id="view" aria-label="观察视角">
-      <option value="overview">岸后观察 · 固定</option><option value="follow">近景跟随</option>
+      <option value="overview">岸后观察 · 固定</option><option value="course">长投 · 斜后中景</option><option value="follow">近景跟随</option>
     </select></label>
     <label class="choice">播放速度 <select id="playback" aria-label="播放速度">
       <option value="normal">正常 · 1×</option><option value="slow">普通慢放 · 0.25×</option>

@@ -2,13 +2,22 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { randomAt } from './effects';
 import { createWater } from './water';
+import { COURSE_GRID } from '../simulation/water-grid';
+import { createSpray } from './spray';
+import { SurfaceChurn } from './surface-churn';
 
 export function createWorld() {
-    const waterField = createWater();
+    const churn = new SurfaceChurn(COURSE_GRID);
+    const waterField = createWater(COURSE_GRID, churn.texture);
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color('#bed7da');
-    const sky=new THREE.Mesh(new THREE.SphereGeometry(120,24,12),new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,vertexShader: 'varying vec3 skyDirection; void main(){skyDirection=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',fragmentShader: 'varying vec3 skyDirection; void main(){vec3 direction=normalize(skyDirection);float elevation=pow(max(0.0,direction.y),.45);vec3 color=mix(vec3(.72,.79,.77),vec3(.24,.42,.53),elevation);float cloudBand=exp(-pow((direction.y-.32)/.085,2.0));float cloudMass=smoothstep(-.35,.65,sin(direction.x*9.0+direction.z*5.0)+.35*sin(direction.z*19.0-direction.x*7.0));color=mix(color,vec3(.86,.88,.84),cloudBand*cloudMass*.75);float sun=pow(max(0.0,dot(direction,normalize(vec3(-.45,.82,-.35)))),420.0);color+=vec3(1.0,.9,.7)*sun*.5;gl_FragColor=vec4(color,1.0);\n#include <tonemapping_fragment>\n#include <colorspace_fragment>\n}'}));scene.add(sky);
+    scene.background = new THREE.Color('#bccfd3');
+    new THREE.TextureLoader().load('/assets/lake-horizon.webp', texture => {
+        texture.colorSpace = THREE.LinearSRGBColorSpace;
+        texture.mapping = THREE.EquirectangularReflectionMapping;
+        scene.background = scene.environment = texture;
+        scene.environmentIntensity = .6;
+    });
     scene.fog = new THREE.Fog('#bed7da', 35, 115);
     const camera = new THREE.PerspectiveCamera(48, 1, .01, 180);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -23,6 +32,8 @@ export function createWorld() {
     sun.position.set(-9, 16.4, -7);
     scene.add(sun);
     scene.add(waterField.mesh);
+    const spray = createSpray(waterField.mesh.material.uniforms.heightState,COURSE_GRID);
+    scene.add(spray.mesh);
     const shore = new THREE.Mesh(
         new THREE.PlaneGeometry(30, 50),
         new THREE.MeshStandardMaterial({ color: 0xa9aa8e, roughness: 1 })
@@ -39,7 +50,7 @@ export function createWorld() {
         shader.uniforms.causticState={value:waterField.solver.caustics.texture};
         shader.vertexShader=shader.vertexShader.replace('void main() {','varying vec3 bedPoint; void main() { bedPoint=(modelMatrix*vec4(position,1.)).xyz;');
         shader.fragmentShader=shader.fragmentShader.replace('void main() {',`uniform sampler2D causticState; varying vec3 bedPoint;
-        void main() {`).replace('#include <dithering_fragment>',`vec2 causticUV=vec2(bedPoint.x/16.,(bedPoint.z+4.)/8.);if(all(greaterThanEqual(causticUV,vec2(0.)))&&all(lessThanEqual(causticUV,vec2(1.)))){float focus=texture2D(causticState,causticUV).r;gl_FragColor.rgb*=mix(1.,clamp(focus,.5,2.),.04);}
+        void main() {`).replace('#include <dithering_fragment>',`vec2 causticUV=vec2(bedPoint.x/${waterField.solver.grid.sizeX.toFixed(1)},bedPoint.z/${waterField.solver.grid.sizeZ.toFixed(1)}+.5);if(all(greaterThanEqual(causticUV,vec2(0.)))&&all(lessThanEqual(causticUV,vec2(1.)))){float focus=texture2D(causticState,causticUV).r;gl_FragColor.rgb*=mix(1.,clamp(focus,.5,2.),.04);}
         #include <dithering_fragment>`);
     };
     const stone = new THREE.Group();
@@ -52,7 +63,9 @@ export function createWorld() {
     halo.rotation.x = -Math.PI / 2;
     scene.add(halo);
     const trailGeometry = new THREE.BufferGeometry();
+    trailGeometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(2048*3),3).setUsage(THREE.DynamicDrawUsage));
+    trailGeometry.setDrawRange(0,0);
     const trail = new THREE.Line(trailGeometry, new THREE.LineBasicMaterial({ color: 0xffe3a1, transparent: true, opacity: .7 }));
-    scene.add(trail);
-    return { scene, camera, renderer, waterField, stone, halo, trail, trailGeometry };
+    trail.frustumCulled=false;scene.add(trail);
+    return { scene, camera, renderer, waterField, churn, spray, stone, halo, trail, trailGeometry };
 }

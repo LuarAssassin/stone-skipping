@@ -4,12 +4,13 @@ import type { createWorld } from './world';
 
 export function createFeedback(world: ReturnType<typeof createWorld>) {
     const { waterField, stone, halo, trail, trailGeometry } = world;
-    let trailPoints: THREE.Vector3[] = [];
+    let trailCount=0;
     let lastTrail = 0;
     return {
-        reset() { lastTrail = 0; trailPoints = []; trailGeometry.setFromPoints([]); },
+        reset() { lastTrail = 0; trailCount=0; trailGeometry.setDrawRange(0,0); },
         update(session: Session, helpers: boolean) {
             const { sim } = session;
+            world.churn.update(world.renderer,session.waterTicks,session.waterGeneration,session.visualTime);
             waterField.update(world.renderer, session.waterTicks, session.waterGeneration);
 
             stone.position.copy(sim.p);
@@ -17,12 +18,13 @@ export function createFeedback(world: ReturnType<typeof createWorld>) {
             halo.position.set(sim.p.x, .006, sim.p.z);
             halo.visible = sim.p.y > -.04 && helpers;
             trail.visible = halo.visible;
-            if (sim.time - lastTrail > .012) {
-                trailPoints.push(sim.p.clone());
+            if (sim.time - lastTrail > .012 && trailCount<2048) {
+                const positions=trailGeometry.getAttribute('position') as THREE.BufferAttribute;
+                positions.setXYZ(trailCount++,sim.p.x,sim.p.y,sim.p.z);positions.needsUpdate=true;
                 lastTrail = sim.time;
-                trailGeometry.setFromPoints(trailPoints);
+                trailGeometry.setDrawRange(0,trailCount);
             }
-            return 0;
+            return world.spray.update(session.spray,session.visualTime);
         }
     };
 }

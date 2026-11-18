@@ -8,7 +8,7 @@ export function mountLaunchPanel() {
         number,
         number,
         string
-    ][] = [['direction', '方向', -35, 35, 1, '°'], ['speed', '速度', 2, 20, .5, 'm/s'], ['elevation', '出手仰角', -12, 20, 1, '°'], ['tilt', '石面倾角', 0, 50, 1, '°'], ['spin', '自旋', 0, 30, 1, '转/s']];
+    ][] = [['direction', '方向', -35, 35, 1, '°'], ['speed', '速度', 2, 30, .5, 'm/s'], ['elevation', '出手仰角', -12, 20, 1, '°'], ['tilt', '石面倾角', 0, 50, 1, '°'], ['spin', '自旋', 0, 60, 1, '转/s']];
     const parameters = { ...DEFAULT };
     for (const [key, label, min, max, step, unit] of fields) {
         const element = document.createElement('label');
@@ -37,5 +37,5 @@ export function mountLaunchPanel() {
         control.querySelector('input')!.oninput=event=>{visual[key]=+(event.target as HTMLInputElement).value;control.querySelector('output')!.value=String(visual[key]);};details.append(control);
     }
     variation.prepend(details);
-    return { parameters, fields, syncControls, visual, get temperature() { return temperature; } };
+    return { parameters, fields, syncControls, visual, get temperature() { return temperature; }, set temperature(value:number) { temperature=value;document.querySelector<HTMLInputElement>('#temperature')!.value=String(value);document.querySelector('#temperature-value')!.textContent=String(value); } };
 }

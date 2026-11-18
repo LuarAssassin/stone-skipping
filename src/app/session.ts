@@ -1,9 +1,10 @@
 import { Vector3 } from 'three';
+import { ContactSpray } from '../simulation/spray';
 import { Clock, Simulation, type Launch } from '../simulation/physics';
 import { ContactEffects } from '../rendering/effects';
 import { replayLaunch, sampleThrow, type ThrowSnapshot } from '../simulation/launch-randomness';
 import { VISUAL_DEFAULTS, visualHash, validateVisual, type VisualSettings } from '../simulation/visual-variation';
-import { dryFootprint, type Footprint, type WaterTick } from '../rendering/coherent';
+import { COURSE_GRID, dryFootprint, type Footprint, type WaterTick } from '../simulation/water-grid';
 export type ReplayMode = 'normal' | 'slow' | 'bullet';
 export const PLAYBACK_RATE: Record<ReplayMode, number> = { normal: 1, slow: 0.25, bullet: 0.05 };
 export function presentationTick(time: number, seconds: number, paused: boolean): number {
@@ -16,7 +17,9 @@ export class Session {
     mouseMode = false;
     private previousSource = dryFootprint();
     private waterTime = 0;
-    private measuredImpulseY = 0;
+    private measuredImpulse = new Vector3();
+    private totalImpulse = new Vector3();
+    private pendingSlip = new Vector3();
     private pendingImpulseY = 0;
     private pendingWeight = 0;
     private pendingX = 0;
@@ -29,6 +32,7 @@ export class Session {
     private accumulator = 0;
     private throwIndex = 0;
     effects = new ContactEffects();
+    spray = new ContactSpray();
     diagnosticContact?: number;
     snapshot?: ThrowSnapshot;
     paused = true;
@@ -49,10 +53,13 @@ export class Session {
         this.sim = new Simulation(replayLaunch(this.snapshot));
         this.clock = new Clock(this.sim);
         this.effects.clear();
+        this.spray.reset();
         this.waterTicks = [];
         this.waterGeneration++;
         this.waterTime = 0;
-        this.measuredImpulseY = this.pendingImpulseY = this.pendingWeight = this.pendingX = this.pendingZ = this.pendingArea = this.pendingLast = 0;
+        this.measuredImpulse.set(0,0,0);
+        this.pendingSlip.set(0,0,0);
+        this.pendingImpulseY = this.pendingWeight = this.pendingX = this.pendingZ = this.pendingArea = this.pendingLast = 0;
         this.pendingFirst = Infinity;
         this.previousSource = dryFootprint();
         this.effects.visual=validateVisual(this.snapshot.visual??{seed:this.snapshot.seed,...VISUAL_DEFAULTS});
@@ -72,9 +79,14 @@ export class Session {
         while (this.accumulator + 1e-12 >= this.sim.dt) {
             if (!this.sim.ended && !this.mouseMode) {
                 this.clock.advance(this.sim.dt);
-                const total=this.sim.contacts.reduce((sum,contact)=>sum+(contact.netImpulse?.y??0),0);
-                const reaction=-(total-this.measuredImpulseY);
-                this.measuredImpulseY=total;
+                this.spray.sample(this.sim,this.snapshot?.seed??0);
+                if(this.sim.p.x<-.4||this.sim.p.x>COURSE_GRID.sizeX||Math.abs(this.sim.p.z)>COURSE_GRID.sizeZ/2)this.sim.finish('离开水域');
+                this.totalImpulse.set(0,0,0);
+                for(const contact of this.sim.contacts)if(contact.netImpulse)this.totalImpulse.add(contact.netImpulse);
+                const reaction=this.measuredImpulse.y-this.totalImpulse.y;
+                this.pendingSlip.x+=this.measuredImpulse.x-this.totalImpulse.x;
+                this.pendingSlip.z+=this.measuredImpulse.z-this.totalImpulse.z;
+                this.measuredImpulse.copy(this.totalImpulse);
                 const point=this.sim.contacts.at(-1)?.centroid??this.sim.p;
                 this.pendingImpulseY+=reaction;
                 this.pendingWeight+=Math.abs(reaction);
@@ -89,9 +101,11 @@ export class Session {
             const xx=axes.reduce((sum,axis)=>sum+axis.x**2,0),zz=axes.reduce((sum,axis)=>sum+axis.z**2,0),xz=axes.reduce((sum,axis)=>sum+axis.x*axis.z,0);
             const spread=Math.hypot(xx-zz,2*xz),major=Math.sqrt((xx+zz+spread)/2),minor=Math.sqrt(Math.max(1e-8,(xx+zz-spread)/2));
             const source = this.mouseMode ? (this.mouse ?? dryFootprint()) : {x:this.sim.p.x,z:this.sim.p.z,y:this.sim.p.y,radius:major,aspect:minor/major,angle:.5*Math.atan2(2*xz,xx-zz),depth:Math.abs(axes[1].y)+Math.hypot(axes[0].y,axes[2].y)};
-                const momentum=!this.mouseMode&&this.pendingWeight>0?{x:this.pendingX/this.pendingWeight,z:this.pendingZ/this.pendingWeight,impulseY:this.pendingImpulseY,wetArea:this.pendingArea/this.pendingWeight,from:Math.max(0,(this.pendingFirst-this.waterTime)*120),to:Math.min(1,(this.pendingLast-this.waterTime)*120)}:undefined;
-                this.waterTicks.push({old:{...this.previousSource},next:{...source},...(momentum?{momentum}:{})});
+                const momentum=!this.mouseMode&&this.pendingWeight>0?{x:this.pendingX/this.pendingWeight,z:this.pendingZ/this.pendingWeight,impulseY:this.pendingImpulseY,impulseX:this.pendingSlip.x,impulseZ:this.pendingSlip.z,wetArea:this.pendingArea/this.pendingWeight,from:Math.max(0,(this.pendingFirst-this.waterTime)*120),to:Math.min(1,(this.pendingLast-this.waterTime)*120)}:undefined;
+                const impacts=this.spray.advance(this.visualTime,this.waterTime);
+                this.waterTicks.push({...(impacts.length?{impacts}:{}),old:{...this.previousSource},next:{...source},...(momentum?{momentum}:{})});
                 this.pendingImpulseY=this.pendingWeight=this.pendingX=this.pendingZ=this.pendingArea=this.pendingLast=0;
+                this.pendingSlip.set(0,0,0);
                 this.pendingFirst=Infinity;
                 this.previousSource = {...source};
                 this.waterTime += 1/120;

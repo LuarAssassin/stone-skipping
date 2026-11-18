@@ -21,6 +21,10 @@ export function boot() {
     mountCameraPanel(rig, session);
     const launch = mountLaunchPanel();
     const { parameters, fields, syncControls } = launch;
+    const longLaunch={speed:24,elevation:2,tilt:10,spin:36.7,direction:0};
+    const longButton=document.createElement('button');longButton.textContent='长投练习 · 无扰动';longButton.id='long-throw';
+    document.querySelector('.actions')!.append(longButton);
+    longButton.onclick=()=>{Object.assign(parameters,longLaunch);launch.temperature=0;syncControls();rig.view='course';document.querySelector<HTMLSelectElement>('#view')!.value='course';start();};
     const gesture = new ThrowGesture();
     const canvas = renderer.domElement;
     canvas.setAttribute("aria-label", "湖面投掷区域");
@@ -72,6 +76,8 @@ export function boot() {
         document.querySelector<HTMLTextAreaElement>('#snapshot')!.value = JSON.stringify(session.snapshot, null, 2);
         document.querySelector('#launch-summary')!.textContent = `本次 seed ${lastThrow.seed} · T=${lastThrow.temperature}\n目标 → 实际出手\n` + fields.map(([key, label, , , , unit]) => `${label} ${lastThrow.target[key].toFixed(3)} → ${lastThrow.sampled[key].toFixed(3)} ${unit}`).join('\n');
         feedback.reset();
+        rig.beginThrow(session.sim.p,session.mode==='bullet',lastThrow.sampled.direction,camera.aspect);
+        if(import.meta.env.DEV)review.frames=[];
         document.querySelector('#pause')!.textContent = '暂停';
     }
     document.querySelector<HTMLButtonElement>('#throw')!.onclick = () => start();
@@ -115,10 +121,30 @@ export function boot() {
             document.querySelector('#pause')!.textContent = '继续';
         }
     });
-    const review={session,rig,world,feedback,side:false,inspect(time:number,single=true){session.diagnosticContact=single?0:undefined;session.replay();session.advance(time);session.paused=true;this.side=true;this.render();},sideCamera(){const contact=session.sim.contacts[0];if(!contact)return;const point=[contact.point.x,0,contact.point.z];camera.position.set(point[0]+.09,.115,point[2]+.48);camera.lookAt(point[0]+.09,.018,point[2]);camera.fov=38;camera.updateProjectionMatrix();},errors:[] as string[],frames:[] as {raf:number;cpu:number}[],variant(seed:number){if(!session.snapshot)return;const time=session.visualTime;session.replay({...session.snapshot,visual:{...(session.snapshot.visual??{surface:.35,sheet:.8,breakup:1.1}),seed}});session.advance(time);session.paused=true;document.querySelector<HTMLTextAreaElement>('#snapshot')!.value=JSON.stringify(session.snapshot,null,2);document.querySelector('#launch-summary')!.textContent=`physical seed ${session.snapshot!.seed} · T=${session.snapshot!.temperature} · visual ${seed} · ${session.effects.visual.surface}/${session.effects.visual.sheet}/${session.effects.visual.breakup}`;this.render();},programs(){const gl=renderer.getContext();return renderer.info.programs?.map(program=>({name:program.name,linked:gl.getProgramParameter(program.program,gl.LINK_STATUS)}));},render(){feedback.update(session,false);rig.update(camera,session.sim.p,session.presentationTime,session.mode==='bullet',1,true);if(this.side)this.sideCamera();renderer.render(scene,camera);}};
+    const review={session,rig,world,feedback,side:false,inspect(time:number,single=true){session.diagnosticContact=single?0:undefined;session.replay();session.advance(time);session.paused=true;this.side=true;this.render();},sideCamera(){const contact=session.sim.contacts[0];if(!contact)return;const point=[contact.point.x,0,contact.point.z];camera.position.set(point[0]+.09,.115,point[2]+.48);camera.lookAt(point[0]+.09,.018,point[2]);camera.fov=38;camera.updateProjectionMatrix();},errors:[] as string[],frames:[] as {raf:number;cpu:number}[],variant(seed:number){if(!session.snapshot)return;const time=session.visualTime;session.replay({...session.snapshot,visual:{...(session.snapshot.visual??{surface:.35,sheet:.8,breakup:1.1}),seed}});session.advance(time);session.paused=true;document.querySelector<HTMLTextAreaElement>('#snapshot')!.value=JSON.stringify(session.snapshot,null,2);document.querySelector('#launch-summary')!.textContent=`physical seed ${session.snapshot!.seed} · T=${session.snapshot!.temperature} · visual ${seed} · ${session.effects.visual.surface}/${session.effects.visual.sheet}/${session.effects.visual.breakup}`;this.render();},programs(){const gl=renderer.getContext();return renderer.info.programs?.map(program=>({name:program.name,linked:gl.getProgramParameter(program.program,gl.LINK_STATUS)}));},render(){feedback.update(session,false);rig.update(camera,session.sim.p,session.presentationTime,session.mode==='bullet',1,true,session.sim.contacts);if(this.side)this.sideCamera();renderer.render(scene,camera);}};
     if(import.meta.env.DEV) {
         Object.assign(window,{waterReview:Object.assign(review,{surfaceOnly(enabled:boolean){world.waterField.mesh.material.uniforms.surfaceInspection.value=enabled?1:0;}})});
         renderer.debug.onShaderError=(gl,program,vertex,fragment)=>{review.errors.push([gl.getProgramInfoLog(program),gl.getShaderInfoLog(vertex),gl.getShaderInfoLog(fragment)].join('\n'));if(review.errors.length>32)review.errors.shift();};
+    }
+    // Reproducible reference views for visual review, available only in development.
+    if(import.meta.env.DEV){
+        const query=new URLSearchParams(location.search),time=Number(query.get('reference'));
+        if(query.has('reference')&&Number.isFinite(time)&&time>=0&&time<=6){
+            session.start(query.has('long')?longLaunch:parameters,0);session.replay({...session.snapshot!,seed:271});
+            if(query.has('grouped')){const groups=[.003,.031,.007];let i=0;while(session.visualTime<time-1e-8){session.advance(Math.min(groups[i++%groups.length],time-session.visualTime));feedback.update(session,false);}}else session.advance(time);
+            session.paused=true;review.side=true;
+            world.spray.mesh.visible=query.get('spray')!=='off';
+            if(query.get('sheet')==='off')world.spray.sheets.visible=false;
+            review.sideCamera=()=>{const c=query.has('long')?session.sim.contacts.at(-1):session.sim.contacts[0];if(!c)return;camera.position.set(c.point.x+.3,.32,c.point.z+1.6);camera.lookAt(c.point.x+.3,.045,c.point.z);camera.fov=48;camera.updateProjectionMatrix();};
+        }
+    }
+    if(import.meta.env.DEV&&new URLSearchParams(location.search).has('audit')){
+        review.render();
+        const g=world.waterField.solver.grid,data=world.waterField.solver.read(renderer);
+        let peak=0,farPeak=0,finite=true,hash=2166136261;
+        for(const byte of new Uint8Array(data.buffer))hash=Math.imul(hash^byte,16777619)>>>0;
+        for(let i=0;i<data.length;i+=4){const h=data[i];finite=finite&&Number.isFinite(h);peak=Math.max(peak,Math.abs(h));if((i/4%g.width+.5)*g.dx>16)farPeak=Math.max(farPeak,Math.abs(h));}
+        const node=document.createElement('script');node.type='application/json';node.id='water-audit';node.textContent=JSON.stringify({grid:g,hash,peak,farPeak,finite,glError:renderer.getContext().getError(),programs:review.programs(),errors:review.errors,skips:session.sim.skips,position:session.sim.p.toArray(),ribbons:session.spray.ribbons.length,drops:session.spray.drops.length});document.body.append(node);
     }
     let previous = performance.now();
     function frame(now: number) {
@@ -136,11 +162,17 @@ export function boot() {
             document.querySelector<HTMLElement>('#aim-arrow')!.style.transform = `rotate(${preview.target.direction}deg)`;
         }
         const visibleDrops = feedback.update(session, document.querySelector<HTMLInputElement>('#helpers')!.checked);
-        rig.update(camera, sim.p, session.presentationTime, session.mode === 'bullet', elapsed, paused);
+        rig.update(camera, sim.p, session.presentationTime, session.mode === 'bullet', elapsed, paused, sim.contacts);
         if(import.meta.env.DEV&&review.side)review.sideCamera();
         updateTelemetry(session, visibleDrops);
         renderer.render(scene, camera);
-        if(import.meta.env.DEV){review.frames.push({raf,cpu:performance.now()-cpuStart});if(review.frames.length>600)review.frames.shift();}
+        if(import.meta.env.DEV){
+            review.frames.push({raf,cpu:performance.now()-cpuStart});if(review.frames.length>600)review.frames.shift();
+            if(new URLSearchParams(location.search).has('benchmark')&&session.sim.ended){
+                let node=document.querySelector<HTMLScriptElement>('#water-performance');
+                if(!node){node=document.createElement('script');node.type='application/json';node.id='water-performance';document.body.append(node);const values=review.frames.map(f=>f.raf).sort((a,b)=>a-b);node.textContent=JSON.stringify({frames:values.length,mean:values.reduce((a,b)=>a+b,0)/values.length,p95:values[Math.floor(values.length*.95)],max:values.at(-1),skips:session.sim.skips,distance:Math.hypot(session.sim.p.x,session.sim.p.z)});}
+            }
+        }
     }
     requestAnimationFrame(frame);
 }
