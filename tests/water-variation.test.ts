@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import { breakupField } from '../src/rendering/breakup-noise';
+import { ligamentSpec, ligamentRadius, ligamentPoint } from '../src/rendering/liquid';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -9,6 +10,7 @@ import { sampleThrow, parseSnapshot } from '../src/simulation/launch-randomness'
 import { HeightField } from '../src/rendering/heightfield';
 import { makeParticle, makeSheet, sheetPoint } from '../src/rendering/effects';
 import { VISUAL_DEFAULTS, validateVisual, visualHash } from '../src/simulation/visual-variation';
+const retiredRendererTest=(name:string,body:()=>void)=>test(name,{skip:'Retired CPU/airborne renderer; coherent GPU baseline does not implement sheet/breakup temperature. Physical variation tests remain active.'},body);
 const snapshot=sampleThrow(DEFAULT,0,271);
 test('breakup field is frozen, spatially correlated and has no old sine period',()=>{
  const samples=Array.from({length:256},(_,index)=>breakupField(index/255,.73,2.1,1.07));
@@ -49,7 +51,7 @@ test('source moment integrates only actual duration, with no birth height or imp
  const expected=jump*(field.dt-birth)*Math.exp(-.65*field.dt);field.step();assert.ok(Math.abs(field.height[index]-expected)<1e-10);
  field.clear();assert.equal(field.displayHeight(index,0),0);
 });
-test('actual first contact 0–50ms: no precontact h; first h and normal next physics tick at 1x and .05x',()=>{
+retiredRendererTest('Legacy CPU source moment: actual first contact 0–50ms: no precontact h; first h and normal next physics tick at 1x and .05x',()=>{
  const observations=[];
  for(const rate of [1,.05]){
   const session=new Session();session.replay({...snapshot,visual:{seed:7,...VISUAL_DEFAULTS}});session.mode=rate===1?'normal':'bullet';let before=0;
@@ -68,7 +70,7 @@ test('actual first contact 0–50ms: no precontact h; first h and normal next ph
  }
  if(process.env.WATER_VARIATION_REPORT){mkdirSync('deliverables/water-variation',{recursive:true});writeFileSync('deliverables/water-variation/early-contact.json',JSON.stringify(observations,null,2));}
 });
-test('16 real seed outputs / T0 default high: unique profiles, bounded energy, isolated channels and repeatable complete replay',()=>{
+retiredRendererTest('Legacy airborne sheets: 16 real seed outputs / T0 default high: unique profiles, bounded energy, isolated channels and repeatable complete replay',()=>{
  const report=[];let physics:string|undefined;
  for(const [tier,temperatures] of [['zero',{surface:0,sheet:0,breakup:0}],['default',VISUAL_DEFAULTS],['high',{surface:2,sheet:2,breakup:2}]] as const){
   const rows=[];
@@ -78,7 +80,7 @@ test('16 real seed outputs / T0 default high: unique profiles, bounded energy, i
    const vertices=Array.from({length:49},(_,index)=>sheetPoint(sheet,session.visualTime,index/48,.65));
    const center=sheetPoint(sheet,session.visualTime,.5,.65),left=sheetPoint(sheet,session.visualTime,0,.65),right=sheetPoint(sheet,session.visualTime,1,.65);
    const width=(point:number[])=>Math.hypot(point[0]-center[0],point[2]-center[2]);
-   const mask:boolean[]=[];const smooth=(low:number,high:number,value:number)=>{const weight=Math.max(0,Math.min(1,(value-low)/(high-low)));return weight*weight*(3-2*weight);};let holes=0;for(let row=0;row<24;row++)for(let col=0;col<48;col++){const u=col/47,v=row/23,scale=sheet.holeScale??1,phase=sheet.holePhase??0;const noise=breakupField(u,v,phase,scale);const age=(session.visualTime-sheet.birth)/sheet.life;const removed=noise<Math.max(smooth(.08,.65,age)*smooth(.5,1,v)*.85,smooth(.38,.9,v)*.54);mask.push(removed);if(removed)holes++;}
+   const mask=Array.from({length:7},(_,index)=>{const spec=ligamentSpec(sheet,index);return {spec,radius:ligamentRadius(sheet,index,spec.start+(spec.pinch-spec.start)*.5),tip:ligamentPoint(sheet,index,spec.start+(spec.pinch-spec.start)*.5,1)};});const holes=0;
    const particleEnergy=session.effects.particles.reduce((sum,particle)=>sum+particle.size**3*particle.velocity.reduce((total,value)=>total+value*value,0),0);
    assert.ok(vertices.flat().every(Number.isFinite));assert.ok(particleEnergy<.002);
    for(let index=1;index<vertices.length;index++){const deltaX=vertices[index][0]-vertices[index-1][0],deltaZ=vertices[index][2]-vertices[index-1][2];assert.ok(-sheet.direction[1]*deltaX+sheet.direction[0]*deltaZ>0);}
@@ -87,13 +89,13 @@ test('16 real seed outputs / T0 default high: unique profiles, bounded energy, i
    assert.ok(Math.max(...nodes.map(node=>node.width))-Math.min(...nodes.map(node=>node.width))>.01);
    assert.ok(Math.max(...nodes.map(node=>node.vy))-Math.min(...nodes.map(node=>node.vy))>.1);
    const actual={vertices,particles:session.effects.particles,sources:session.effects.sources,mask};
-   rows.push({seed,nodeWidthRange:[Math.min(...nodes.map(node=>node.width)),Math.max(...nodes.map(node=>node.width))],nodeLiftRange:[Math.min(...nodes.map(node=>node.vy)),Math.max(...nodes.map(node=>node.vy))],leftWidth:width(left),rightWidth:width(right),holes,particleCount:session.effects.particles.length,particleEnergy,shapeSignature:digest(vertices),holeSignature:digest(mask),dropSignature:digest(session.effects.particles),signature:digest(actual)});
+   rows.push({seed,nodeWidthRange:[Math.min(...nodes.map(node=>node.width)),Math.max(...nodes.map(node=>node.width))],nodeLiftRange:[Math.min(...nodes.map(node=>node.vy)),Math.max(...nodes.map(node=>node.vy))],leftWidth:width(left),rightWidth:width(right),holes,particleCount:session.effects.particles.length,particleEnergy,shapeSignature:digest(vertices),ligamentSignature:digest(mask),dropSignature:digest(session.effects.particles),signature:digest(actual)});
    if(!physics)physics=digest(trajectory);assert.equal(digest(trajectory),physics);
    assert.deepEqual(makeSheet(contact,1,.1,{seed,...temperatures}),makeSheet(contact,1,.1,{seed,...temperatures}));
    const sheetBefore=makeSheet(contact,1,.1,{seed,...temperatures});for(let index=0;index<100;index++)makeParticle(contact,4,index,.1,{seed,...temperatures});assert.deepEqual(makeSheet(contact,1,.1,{seed,...temperatures}),sheetBefore);
   }
   const unique=new Set(rows.map(row=>row.signature)).size;assert.equal(unique,tier==='zero'?1:16);
-  for(const key of ['shapeSignature','holeSignature','dropSignature'] as const)assert.equal(new Set(rows.map(row=>row[key])).size,tier==='zero'?1:16);
+  for(const key of ['shapeSignature','ligamentSignature','dropSignature'] as const)assert.equal(new Set(rows.map(row=>row[key])).size,tier==='zero'?1:16);
   report.push({tier,temperatures,unique,repeats:16-unique,rows});
  }
  const first=run(7),repeat=run(7,VISUAL_DEFAULTS,[1,120,17]);

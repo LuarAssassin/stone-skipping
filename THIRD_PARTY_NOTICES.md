@@ -2,13 +2,26 @@
 
 This notice applies to the dependencies and adaptations identified below. It does not assign a license to the Stone Skipping project as a whole.
 
+## Evan Wallace — WebGL Water (MIT)
+
+Copyright 2011 Evan Wallace. Upstream source headers explicitly release WebGL Water under MIT. Retained `public/third-party/evanw-water/water.js` and `renderer.js` are reference source, not separately loaded scripts. Source revision: `73eda8be832b649367b25ea5690c1f0181bb56ad`.
+
+- https://github.com/evanw/webgl-water/blob/73eda8be832b649367b25ea5690c1f0181bb56ad/water.js
+- https://github.com/evanw/webgl-water/blob/73eda8be832b649367b25ea5690c1f0181bb56ad/renderer.js
+- https://madebyevan.com/webgl-water/
+- Full MIT text retained at `public/third-party/evanw-water/LICENSE`, fetched from Evan's https://github.com/evanw/lightgl.js/blob/master/LICENSE (the water repository has MIT headers but no standalone LICENSE).
+
+Adaptations in `src/rendering/coherent.ts`: `updateShader` four-neighbour height/velocity propagation, parameterised by metre-scale cell spacing and CFL-safe substeps, with .995 damping per 1/120 s distributed across substeps; `normalShader` gradient normals; `moveSphereShader` old-volume return/new-volume removal with an oriented elliptical, finite-depth source replacing the sphere. `renderer.js` caustics vertex refraction and fragment derivative-area focusing are adapted in the caustic material. Pool dimensions, light, source kernel, framebuffer plumbing and Three integration differ. The project-authored `Session` contact-impulse accumulator and `momentumSource` discrete-normalized Gaussian reaction injection are not upstream Evan algorithms; they use N·s inputs, 1000 kg/m³ water density and an empirical 0.04 m participating depth, as implemented in `src/simulation/water-grid.ts` and `src/rendering/coherent.ts`. World-unit source support, cell-integrated displacement normalisation, substep source interpolation and matched cell-space upload precision are project-authored adaptations. No upstream license text has been changed. `src/rendering/water.ts` combines these state textures with Three Water reflection, custom screen-space transmission and absorption; this is not Evan's full raytraced pool renderer.
+
+No upstream tile or cubemap photographs are used. The calibration bed is generated locally in `world.ts` with deterministic arithmetic/noise, and the sky is a local procedural gradient/sun shader. The stone asset is the project's existing Blender asset. No license is assigned to the whole project here.
+
 ## Three.js (MIT)
 
-Three.js 0.180.x is used through the npm dependency `three`. `src/rendering/water.ts` imports `three/examples/jsm/objects/Water.js` through `three/addons/objects/Water.js`. Its planar reflection camera, clipping plane, render target, projective coordinates, and shader are reused; the application adapts that shader at runtime to add CPU-state vertex displacement, state-derived normals, scene transmission and depth absorption. `GLTFLoader` is also used from Three.js examples. The upstream implementation is not represented as original project work.
+Three.js 0.180.x is used through the npm dependency `three`. `src/rendering/water.ts` imports `three/examples/jsm/objects/Water.js` through `three/addons/objects/Water.js`. Its planar reflection camera, clipping plane, render target, projective coordinates, and shader are reused; the application adapts that shader at runtime to add GPU-state vertex displacement, state-derived normals, scene transmission and depth absorption. `GLTFLoader` is also used from Three.js examples. The upstream implementation is not represented as original project work.
 
 Upstream: https://github.com/mrdoob/three.js/tree/r180
 
-The installed Water.js documentation identifies these references: Slayvin's flat mirror (https://github.com/Slayvin), Lee Stemkoski's water shader based on that mirror (https://home.adelphi.edu/~stemkoski/), and Jonas Wagner's WebGL water shader explanations (http://29a.ch/slides/2012/webglwater/). No Evan Wallace or MLS-MPM source is copied into this project.
+The installed Water.js documentation identifies these references: Slayvin's flat mirror (https://github.com/Slayvin), Lee Stemkoski's water shader based on that mirror (https://home.adelphi.edu/~stemkoski/), and Jonas Wagner's WebGL water shader explanations (http://29a.ch/slides/2012/webglwater/). No MLS-MPM source is copied into this project. Evan Wallace shader algorithms are adapted as detailed above.
 
 The MIT License
 

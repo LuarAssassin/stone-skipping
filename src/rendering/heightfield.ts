@@ -14,6 +14,12 @@ export class HeightField {
  }}
  time=0;
  readonly dt=1/120;
+ sample(x:number,z:number,time=this.time){
+  const col=Math.max(0,Math.min(this.width-1,x/this.sizeX*(this.width-1))),row=Math.max(0,Math.min(this.depth-1,(z/this.sizeZ+.5)*(this.depth-1)));
+  const left=Math.floor(col),top=Math.floor(row),right=Math.min(this.width-1,left+1),bottom=Math.min(this.depth-1,top+1),u=col-left,v=row-top;
+  const a=this.displayHeight(top*this.width+left,time),b=this.displayHeight(top*this.width+right,time),c=this.displayHeight(bottom*this.width+left,time),d=this.displayHeight(bottom*this.width+right,time);
+  return u+v<=1?a+(b-a)*u+(c-a)*v:d+(c-d)*(1-u)+(b-d)*(1-v);
+ }
  disturb(source:WaterSource){
   const spacing=this.sizeX/(this.width-1),radius=Math.max(spacing*1.3,source.radius);
   const extent=radius*3*(source.aspect??1);

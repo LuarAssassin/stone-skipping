@@ -120,3 +120,37 @@ test('同snapshot在1x/0.25x/0.05x下的终态、接触及跳数一致', () => {
     assert.equal(results[0], results[1]);
     assert.equal(results[1], results[2]);
 });
+
+test('高速长投的相机平滑不累积世界坐标追赶延迟',()=>{
+ const rig=new CameraRig(),camera=new PerspectiveCamera(48,1,.01,180);rig.view='follow';
+ rig.update(camera,new Vector3(),0,false,10,false);
+ const before=camera.position.clone();
+ rig.update(camera,new Vector3(24,0,0),1,false,1,false);
+ assert.ok(camera.position.clone().sub(before).distanceTo(new Vector3(24,0,0))<1e-10);
+ camera.updateMatrixWorld();const projected=new Vector3(24,0,0).project(camera);
+ assert.ok(Math.abs(projected.x)<1&&Math.abs(projected.y)<1);
+});
+
+test('长投中景在横屏、竖屏和斜向投掷时同时框入石子与前几跳', () => {
+    const stone = new Vector3(32, .035, -2);
+    for (const aspect of [980 / 688, 390 / 524]) {
+        for (const direction of [-35, 0, 47]) {
+            const angle = direction * Math.PI / 180;
+            const along = new Vector3(Math.cos(angle), 0, Math.sin(angle));
+            const contacts = [3.4, 2.2, 1.1, .24].map(distance => ({
+                point: stone.clone().addScaledVector(along, -distance).setY(0),
+            }));
+            const rig = new CameraRig();
+            const camera = new PerspectiveCamera(46, aspect, .01, 180);
+            rig.view = 'course';
+            rig.beginThrow(stone, false, direction, aspect);
+            rig.update(camera, stone, 2, false, 2, false, contacts);
+            camera.updateMatrixWorld();
+            const projected = [...contacts.map(c => c.point), stone].map(p => p.clone().project(camera));
+            for (const p of projected) {
+                assert.ok(Math.abs(p.x) < 1 && Math.abs(p.y) < 1 && Math.abs(p.z) < 1);
+            }
+            assert.ok(projected.at(-1)!.x - projected[0].x > .6);
+        }
+    }
+});

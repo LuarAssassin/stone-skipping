@@ -29,7 +29,8 @@ export class Simulation {
  time=0; ticks=0; skips=0; ended=false; reason='飞行'; submerged=false;
  internalSteps=0; refinements=0; minInternalDt=Infinity;
  contacts:Contact[]=[]; active?:Contact; area=0; force=new Vector3(); omega=new Vector3();
- constructor(public launch:Launch={...DEFAULT},public dt=DT,public water=true,public air=true) {
+ constructor(public launch:Launch={...DEFAULT},public dt=DT,public water=true,public air=true,public contactSubsteps=4) {
+  if(!Number.isInteger(contactSubsteps)||contactSubsteps<1||contactSubsteps>64)throw new RangeError('Invalid contact substeps');
   const rad=Math.PI/180, direction=launch.direction*rad, elevation=launch.elevation*rad;
   this.v=new Vector3(Math.cos(direction)*Math.cos(elevation),Math.sin(elevation),Math.sin(direction)*Math.cos(elevation)).multiplyScalar(launch.speed);
   this.q=new Quaternion().setFromAxisAngle(new Vector3(0,1,0),-direction).multiply(new Quaternion().setFromAxisAngle(new Vector3(0,0,1),launch.tilt*rad));
@@ -41,7 +42,7 @@ export class Simulation {
   if(this.ended)return;
   const start=this.time;
   const clearance=wetGeometry(this.p.y,this.q).lowest;
-  const substeps=!this.water||clearance>2*(this.v.length()+.04*this.omega.length()+9.81*this.dt)*this.dt?1:4;
+  const substeps=!this.water||clearance>2*(this.v.length()+.04*this.omega.length()+9.81*this.dt)*this.dt?1:this.contactSubsteps;
   for(let substep=0;substep<substeps&&!this.ended;substep++)this.integrate(this.dt/substeps,start+substep*this.dt/substeps);
   this.ticks++;
  }
@@ -133,6 +134,7 @@ export class Simulation {
   this.reason=this.submerged?'沉水':touching?'接触':'飞行';
   if(this.water&&(this.p.y<-.3||this.time>=15||Math.abs(this.p.x)>75||Math.abs(this.p.z)>25)) {this.ended=true;this.reason=this.p.y<-.3?'已沉水':this.time>=15?'超时结束':'离开水域';if(this.active){this.active.end=this.time;this.active.energyOut=this.energy();this.active=undefined;}}
  }
+ finish(reason:string){this.ended=true;this.reason=reason;if(this.active){this.active.end=this.time;this.active.energyOut=this.energy();this.active=undefined;}}
  run() {while(!this.ended&&this.time<15)this.step();return this;}
 }
 export class Clock {
