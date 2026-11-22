@@ -15,13 +15,15 @@ import { CinemaAudioEngine } from '../audio/engine';
 import { formatStoneDimensions, StoneBox, type StoneSpec } from '../simulation/stones';
 import { createStonePreviewStage } from '../rendering/stone-mesh';
 import { mountStoneDrawer } from '../ui/stone-drawer';
+import { setupDevReview } from './dev-review';
 
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
+const SHORE_ORIGIN = new THREE.Vector3(0, 0.24, 0);
 
 export function boot() {
     mountUI();
     const world = createWorld();
-    const { scene, camera, renderer } = world;
+    const { camera, renderer } = world;
     const feedback = createFeedback(world);
     const bounceMarkers = createBounceMarkers();
     const audio = new CinemaAudioEngine();
@@ -122,7 +124,6 @@ export function boot() {
     stageCanvas.addEventListener('pointerup', endStageDrag);
     stageCanvas.addEventListener('pointercancel', endStageDrag);
 
-    // Keep hand panel chips synced whenever Lab sliders change
     document.querySelector('#controls')!.addEventListener('input', syncHandPanel);
     document.querySelector('#posture')!.addEventListener('input', syncHandPanel);
 
@@ -142,10 +143,10 @@ export function boot() {
     window.addEventListener('keydown', unlockAudioOnce, { passive: true });
 
     function syncQuickHud() {
-        for (const btn of Array.from(document.querySelectorAll<HTMLButtonElement>('.dock-group [data-view]'))) {
+        for (const btn of document.querySelectorAll<HTMLButtonElement>('.dock-group [data-view]')) {
             btn.classList.toggle('active', btn.dataset.view === rig.view);
         }
-        for (const btn of Array.from(document.querySelectorAll<HTMLButtonElement>('.dock-group [data-rate]'))) {
+        for (const btn of document.querySelectorAll<HTMLButtonElement>('.dock-group [data-rate]')) {
             btn.classList.toggle('active', btn.dataset.rate === session.mode);
         }
         const label = session.paused ? '继续' : '暂停';
@@ -161,14 +162,14 @@ export function boot() {
     labToggle.onclick = () => setLabOpen(!document.body.classList.contains('lab-open'));
     document.querySelector<HTMLButtonElement>('#lab-close')!.onclick = () => setLabOpen(false);
 
+    // Long-throw practice uses T=0 for this throw only, without locking user's global temperature to 0
     function triggerLongThrow() {
         Object.assign(parameters, longLaunch);
-        launch.temperature = 0;
         syncControls();
         syncHandPanel();
         rig.view = 'course';
         viewSelect.value = 'course';
-        start();
+        start(false, longLaunch, 0);
     }
 
     longButton.onclick = triggerLongThrow;
@@ -178,13 +179,10 @@ export function boot() {
     document.querySelector<HTMLButtonElement>('#result-replay')!.onclick = () => start(true);
     document.querySelector<HTMLButtonElement>('#result-bullet')!.onclick = () => {
         if (!session.snapshot) return;
-        start(true);
-        session.mode = 'bullet';
-        playbackSelect.value = 'bullet';
-        syncQuickHud();
+        start(true, parameters, launch.temperature, 'bullet');
     };
 
-    for (const btn of Array.from(document.querySelectorAll<HTMLButtonElement>('.dock-group [data-view]'))) {
+    for (const btn of document.querySelectorAll<HTMLButtonElement>('.dock-group [data-view]')) {
         btn.onclick = () => {
             const view = btn.dataset.view as ViewMode;
             rig.view = view;
@@ -192,7 +190,7 @@ export function boot() {
             syncQuickHud();
         };
     }
-    for (const btn of Array.from(document.querySelectorAll<HTMLButtonElement>('.dock-group [data-rate]'))) {
+    for (const btn of document.querySelectorAll<HTMLButtonElement>('.dock-group [data-rate]')) {
         btn.onclick = () => {
             const mode = btn.dataset.rate as ReplayMode;
             session.mode = mode;
@@ -301,13 +299,6 @@ export function boot() {
         syncHandPanel();
     }, { passive: false });
 
-    for (const input of Array.from(document.querySelectorAll<HTMLInputElement>('input'))) {
-        if (/sheet|breakup/i.test(input.id)) {
-            input.disabled = true;
-            input.title = '连续水面基线暂不启用旧版空中水花模型';
-        }
-    }
-
     function resizeView() {
         cancelGesture();
         const rect = canvas.getBoundingClientRect();
@@ -321,12 +312,23 @@ export function boot() {
     window.addEventListener('resize', resizeView);
     resizeView();
 
+    const dev = setupDevReview({
+        session, rig, world, feedback,
+        setMarkersEnabled: enabled => bounceMarkers.setEnabled(enabled),
+        parameters, longLaunch,
+    });
+
     let resultShownForThrow = false;
     let lastFinishedDuration: number | undefined;
     let heardContacts = 0;
     let heardSink = false;
 
-    function start(replay = false, target: Launch = parameters, effectiveTemperature = launch.temperature) {
+    function start(
+        replay = false,
+        target: Launch = parameters,
+        effectiveTemperature = launch.temperature,
+        overrideMode?: ReplayMode
+    ) {
         cancelGesture();
         mouseMode.checked = false;
         gestureHud.style.display = '';
@@ -337,7 +339,7 @@ export function boot() {
         heardSink = false;
         session.mouseMode = false;
         session.mouse = undefined;
-        review.side = false;
+        dev.review.side = false;
         session.diagnosticContact = undefined;
         if (replay) {
             if (!session.replay()) return;
@@ -347,6 +349,10 @@ export function boot() {
             session.start(target, effectiveTemperature, launch.visual, equipped);
             stoneDrawer.consumeEphemeralAfterThrow();
             playbackSelect.value = 'normal';
+        }
+        if (overrideMode) {
+            session.mode = overrideMode;
+            playbackSelect.value = overrideMode;
         }
         const lastThrow = session.snapshot!;
         const activeStone = session.sim.stone;
@@ -362,7 +368,7 @@ export function boot() {
         audio.unlock();
         audio.updatePlaybackState(session.mode, false);
         audio.playThrow(lastThrow.sampled.speed);
-        if (import.meta.env.DEV) review.frames = [];
+        dev.resetFrames();
         syncQuickHud();
     }
 
@@ -462,124 +468,14 @@ export function boot() {
         }
     });
 
-    const review = {
-        session, rig, world, feedback, side: false,
-        inspect(time: number, single = true) {
-            session.diagnosticContact = single ? 0 : undefined;
-            session.replay();
-            session.advance(time);
-            session.paused = true;
-            this.side = true;
-            this.render();
-        },
-        sideCamera() {
-            const contact = session.sim.contacts[0];
-            if (!contact) return;
-            const point = [contact.point.x, 0, contact.point.z];
-            camera.position.set(point[0] + .09, .115, point[2] + .48);
-            camera.lookAt(point[0] + .09, .018, point[2]);
-            camera.fov = 38;
-            camera.updateProjectionMatrix();
-        },
-        errors: [] as string[],
-        frames: [] as { raf: number; cpu: number }[],
-        variant(seed: number) {
-            if (!session.snapshot) return;
-            const time = session.visualTime;
-            session.replay({ ...session.snapshot, visual: { ...(session.snapshot.visual ?? { surface: .35, sheet: .8, breakup: 1.1 }), seed } });
-            session.advance(time);
-            session.paused = true;
-            document.querySelector<HTMLTextAreaElement>('#snapshot')!.value = JSON.stringify(session.snapshot, null, 2);
-            document.querySelector('#launch-summary')!.textContent = `physical seed ${session.snapshot!.seed} · T=${session.snapshot!.temperature} · visual ${seed} · ${session.effects.visual.surface}/${session.effects.visual.sheet}/${session.effects.visual.breakup}`;
-            this.render();
-        },
-        programs() {
-            const gl = renderer.getContext();
-            return renderer.info.programs?.map(program => ({ name: program.name, linked: gl.getProgramParameter(program.program, gl.LINK_STATUS) }));
-        },
-        render() {
-            feedback.update(session, false);
-            world.waterField.setTime(session.presentationTime);
-            world.sunset.update(session.presentationTime);
-            rig.update(camera, session.sim.p, session.presentationTime, session.mode === 'bullet', 1, true, session.sim.contacts);
-            if (this.side) this.sideCamera();
-            world.post.render(session.presentationTime);
-        },
-    };
-    if (import.meta.env.DEV) {
-        Object.assign(window, {
-            waterReview: Object.assign(review, {
-                surfaceOnly(enabled: boolean) {
-                    world.waterField.mesh.material.uniforms.surfaceInspection.value = enabled ? 1 : 0;
-                    world.post.setBypass(enabled);
-                    bounceMarkers.setEnabled(!enabled);
-                },
-                calibrationBed(enabled: boolean) {
-                    world.setCalibrationBed(enabled);
-                },
-            }),
-        });
-        renderer.debug.onShaderError = (gl, program, vertex, fragment) => {
-            review.errors.push([gl.getProgramInfoLog(program), gl.getShaderInfoLog(vertex), gl.getShaderInfoLog(fragment)].join('\n'));
-            if (review.errors.length > 32) review.errors.shift();
-        };
-    }
-
-    // Reproducible reference views for visual review, available only in development.
-    let isReferenceMode = false;
-    if (import.meta.env.DEV) {
-        const query = new URLSearchParams(location.search), time = Number(query.get('reference'));
-        if (query.has('reference') && Number.isFinite(time) && time >= 0 && time <= 6) {
-            isReferenceMode = true;
-            document.body.classList.add('reference-mode');
-            bounceMarkers.setEnabled(false);
-            session.start(query.has('long') ? longLaunch : parameters, 0);
-            session.replay({ ...session.snapshot!, seed: 271 });
-            if (query.has('grouped')) {
-                const groups = [.003, .031, .007];
-                let i = 0;
-                while (session.visualTime < time - 1e-8) {
-                    session.advance(Math.min(groups[i++ % groups.length], time - session.visualTime));
-                    feedback.update(session, false);
-                }
-            } else session.advance(time);
-            session.paused = true;
-            review.side = true;
-            world.spray.mesh.visible = query.get('spray') !== 'off';
-            if (query.get('sheet') === 'off') world.spray.sheets.visible = false;
-            review.sideCamera = () => {
-                const c = query.has('long') ? session.sim.contacts.at(-1) : session.sim.contacts[0];
-                if (!c) return;
-                camera.position.set(c.point.x + .3, .32, c.point.z + 1.6);
-                camera.lookAt(c.point.x + .3, .045, c.point.z);
-                camera.fov = 48;
-                camera.updateProjectionMatrix();
-            };
-        }
-    }
-    if (import.meta.env.DEV && new URLSearchParams(location.search).has('audit')) {
-        review.render();
-        const g = world.waterField.solver.grid, data = world.waterField.solver.read(renderer);
-        let peak = 0, farPeak = 0, finite = true, hash = 2166136261;
-        for (const byte of new Uint8Array(data.buffer)) hash = Math.imul(hash ^ byte, 16777619) >>> 0;
-        for (let i = 0; i < data.length; i += 4) {
-            const h = data[i];
-            finite = finite && Number.isFinite(h);
-            peak = Math.max(peak, Math.abs(h));
-            if ((i / 4 % g.width + .5) * g.dx > 16) farPeak = Math.max(farPeak, Math.abs(h));
-        }
-        const node = document.createElement('script');
-        node.type = 'application/json';
-        node.id = 'water-audit';
-        node.textContent = JSON.stringify({ grid: g, hash, peak, farPeak, finite, glError: renderer.getContext().getError(), programs: review.programs(), errors: review.errors, skips: session.sim.skips, position: session.sim.p.toArray(), ribbons: session.spray.ribbons.length, drops: session.spray.drops.length });
-        document.body.append(node);
-    }
-
     syncQuickHud();
     syncHandPanel();
 
     let previous = performance.now();
     let ambientTime = 0;
+    let previewAccum = 0;
+    let wasAiming = false;
+
     function frame(now: number) {
         const cpuStart = performance.now();
         requestAnimationFrame(frame);
@@ -590,7 +486,8 @@ export function boot() {
         session.tick(elapsed);
         const { sim, paused } = session;
         const preview = gesture.preview(now);
-        gestureHud.classList.toggle('charging', Boolean(preview));
+        const isAiming = Boolean(preview);
+        gestureHud.classList.toggle('charging', isAiming);
         gestureHud.classList.toggle('in-sweet', Boolean(preview && preview.sweetQuality > 0.45));
         if (preview) {
             document.querySelector<HTMLProgressElement>('#power')!.value = preview.power;
@@ -603,24 +500,42 @@ export function boot() {
         } else {
             world.aimGuide.hide();
         }
+
         const visibleDrops = feedback.update(session, document.querySelector<HTMLInputElement>('#helpers')!.checked);
         world.setStoneWet(sim.contacts.length > 0);
-        const envTime = isReferenceMode ? session.presentationTime : ambientTime;
+        const envTime = dev.isReferenceMode ? session.presentationTime : ambientTime;
         world.waterField.setTime(envTime);
         world.sunset.update(envTime);
-        rig.update(camera, sim.p, session.presentationTime, session.mode === 'bullet', elapsed, paused, sim.contacts);
-        if (import.meta.env.DEV && review.side) review.sideCamera();
+
+        // When pulling back to aim after a far throw, smoothly return camera to shore so the golden aim guide is framed!
+        const aimAtShore = isAiming && (sim.ended || sim.p.x > 2.5);
+        if (aimAtShore && !wasAiming) {
+            rig.beginThrow(SHORE_ORIGIN, false, preview!.target.direction, camera.aspect);
+        }
+        wasAiming = aimAtShore;
+        if (aimAtShore) {
+            rig.update(camera, SHORE_ORIGIN, session.presentationTime, false, elapsed, false, []);
+        } else {
+            rig.update(camera, sim.p, session.presentationTime, session.mode === 'bullet', elapsed, paused, sim.contacts);
+        }
+        dev.applySideCamera(camera);
         updateTelemetry(session, visibleDrops);
 
-        if (!isReferenceMode) {
-            stonePreview.render(parameters.tilt, parameters.roll ?? 0, parameters.spin, elapsed);
+        // Throttle handheld 3D preview to ~20fps during active stone flight to keep GPU headroom for water
+        if (!dev.isReferenceMode) {
+            previewAccum += elapsed;
+            const inFlight = !paused && !sim.ended && !stageDrag && !isAiming;
+            if (!inFlight || previewAccum >= 0.05) {
+                stonePreview.render(parameters.tilt, parameters.roll ?? 0, parameters.spin, previewAccum);
+                previewAccum = 0;
+            }
         }
 
         const rect = canvas.getBoundingClientRect();
         bounceMarkers.update(sim.contacts, camera, rect.width, rect.height, session.visualTime);
 
         audio.updatePlaybackState(session.mode, paused || document.hidden);
-        if (!paused && !session.mouseMode && !isReferenceMode) {
+        if (!paused && !session.mouseMode && !dev.isReferenceMode) {
             while (heardContacts < sim.contacts.length) {
                 const idx = heardContacts++;
                 const contact = sim.contacts[idx];
@@ -635,7 +550,7 @@ export function boot() {
             }
         }
 
-        if (sim.ended && !resultShownForThrow && !session.mouseMode && !isReferenceMode && session.snapshot) {
+        if (sim.ended && !resultShownForThrow && !session.mouseMode && !dev.isReferenceMode && session.snapshot) {
             resultShownForThrow = true;
             lastFinishedDuration = sim.time;
             rig.setBulletSpanFromDuration(sim.time);
@@ -649,21 +564,7 @@ export function boot() {
         }
 
         world.post.render(envTime);
-        if (import.meta.env.DEV) {
-            review.frames.push({ raf, cpu: performance.now() - cpuStart });
-            if (review.frames.length > 600) review.frames.shift();
-            if (new URLSearchParams(location.search).has('benchmark') && session.sim.ended) {
-                let node = document.querySelector<HTMLScriptElement>('#water-performance');
-                if (!node) {
-                    node = document.createElement('script');
-                    node.type = 'application/json';
-                    node.id = 'water-performance';
-                    document.body.append(node);
-                    const values = review.frames.map(f => f.raf).sort((a, b) => a - b);
-                    node.textContent = JSON.stringify({ frames: values.length, mean: values.reduce((a, b) => a + b, 0) / values.length, p95: values[Math.floor(values.length * .95)], max: values.at(-1), skips: session.sim.skips, distance: Math.hypot(session.sim.p.x, session.sim.p.z) });
-                }
-            }
-        }
+        dev.recordFrame(raf, performance.now() - cpuStart);
     }
     requestAnimationFrame(frame);
 }

@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { randomAt } from './effects';
 import { createWater } from './water';
 import { COURSE_GRID } from '../simulation/water-grid';
 import { createSpray } from './spray';
@@ -9,6 +8,13 @@ import { createPostPipeline } from './post';
 import { STANDARD_STONE, type StoneSpec } from '../simulation/stones';
 import { populateStoneGroup, setStoneWetness } from './stone-mesh';
 import { createAimGuide } from './aim-guide';
+
+function bedNoise(seed: number, index: number): number {
+    let v = (Math.imul(seed ^ 0x9e3779b9, 0x85ebca6b) ^ Math.imul(index + 1, 0xc2b2ae35)) >>> 0;
+    v = Math.imul(v ^ (v >>> 16), 0x21f0aaad);
+    v = Math.imul(v ^ (v >>> 15), 0x735a2d97);
+    return ((v ^ (v >>> 15)) >>> 0) / 4294967296;
+}
 
 function createNaturalBedTexture(): THREE.DataTexture {
     const size = 256;
@@ -21,7 +27,7 @@ function createNaturalBedTexture(): THREE.DataTexture {
             // Seamless organic sand ripples + warm river pebble variation
             const ripple = 0.5 + 0.5 * Math.sin(u * 6 + Math.sin(v * 3) * 0.9);
             const patch = 0.5 + 0.5 * Math.sin(u * 2 - v * 2 + 1.1) * Math.cos(u * 3 + v * 4);
-            const grain = randomAt(271, idx);
+            const grain = bedNoise(271, idx);
             const pebble = grain > 0.92 ? 0.82 : grain < 0.08 ? 1.12 : 0.96 + grain * 0.08;
             const tone = (0.78 + ripple * 0.14 + patch * 0.08) * pebble;
             data.set([
@@ -46,7 +52,7 @@ function createNaturalBedTexture(): THREE.DataTexture {
 function createCalibrationBedTexture(): THREE.DataTexture {
     const sandData = new Uint8Array(128 * 128 * 4);
     for (let index = 0; index < 128 * 128; index++) {
-        const grain = randomAt(271, index);
+        const grain = bedNoise(271, index);
         const col = index % 128, row = Math.floor(index / 128);
         const seam = col % 32 < 2 || row % 32 < 2;
         const tone = seam ? .97 : ((Math.floor(col / 32) + Math.floor(row / 32)) % 2 ? .985 : 1) + grain * .008;
@@ -97,6 +103,8 @@ export function createWorld() {
     scene.add(waterField.mesh);
     const spray = createSpray(waterField.mesh.material.uniforms.heightState, COURSE_GRID);
     scene.add(spray.mesh);
+    // Underwater refraction pass only needs submerged riverbed & stone; skip sky, distant mountains & airborne spray
+    waterField.setTransmissionHidden([sunset.skyMesh, sunset.mountains, spray.mesh]);
 
     // Natural gently-sloping riverbed (shallow warm pebble bank near shore -> deeper twilight basin)
     const naturalBedTex = createNaturalBedTexture();

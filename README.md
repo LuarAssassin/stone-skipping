@@ -8,12 +8,12 @@ Web-first 物理打水漂模拟与风格化小游戏（TypeScript / Three.js / V
 ## 核心特性
 
 ### 1. 真实米制刚体与接触物理
-- **4000 Hz 固定外步 + 自适应二分 RK4**（[src/simulation/physics.ts](src/simulation/physics.ts)）：解析椭圆平面裁剪计算连续湿面积与压力形心，入水/离水/受压跃迁自动二分细化，完整保留三维姿态演化与陀螺进动。
+- **4000 Hz 零分配标量 RK4 物理**（[src/simulation/physics.ts](src/simulation/physics.ts)）：解析椭圆平面裁剪计算连续湿面积与压力形心，入水/离水/受压跃迁自动二分细化，完整保留三维姿态演化与陀螺进动（全量 24+64 种子校准回归提速 ~4.7×）。
 - **全自由度出手参数**：水平方向 `direction`、初速 `speed`、出手抛角 `elevation`、石面攻角 `tilt`、左右侧倾 `roll`（自然产生侧向弧线轨迹）、正负自旋 `spin`，以及显式 seed 的有界随机温度与 v1 JSON 确定性快照重放。
 - **8 种参差不齐的物理石子**（[src/simulation/stones.ts](src/simulation/stones.ts)、[docs/STONE_DESIGN.md](docs/STONE_DESIGN.md)）：从厚重砸水的圆滚鹅卵石、棱角碎石到轻薄页岩、玄武重圆饼、柳叶长扁石与溪磨黑曜圆盘；每块石子的尺寸 `(a, b, h)`、质量、密度、水阻与重心偏心直接联动物理轨迹、GPU 排水深度、水花能量预算与声音响度/音高。
 
 ### 2. 64×32 m 连续 GPU 高度场与水幕闭环
-- **固定全域 GPU 水波求解**（[src/rendering/coherent.ts](src/rendering/coherent.ts)、[src/simulation/water-grid.ts](src/simulation/water-grid.ts)）：`4096×1024 RGBA32F` 双缓冲，120 Hz 水时钟独立于屏幕帧率；四点 Gauss 体积归一椭球排水 + 守恒外缘回填、双点 Gauss 掠水竖直反冲量、水平滑移偶极源与水底焦散。
+- **固定全域 GPU 水波求解 + Cauchy–Poisson 色散多环涟漪**（[src/rendering/coherent.ts](src/rendering/coherent.ts)、[src/simulation/water-grid.ts](src/simulation/water-grid.ts)、[src/simulation/ripples.ts](src/simulation/ripples.ts)）：`4096×1024 RGBA32F` 双缓冲负责近场压坑、滑移尾迹、落滴次级波、鼠标拨水与焦散；叠加真实接触冲量驱动的深水色散多环波包（波速 `0.46–0.74 m/s`，360° 全向扩散带前向动量加强，持续 6–9 秒无网格锯齿）。
 - **连续水幕 → 细滴 → 回落次级波**（[src/simulation/spray.ts](src/simulation/spray.ts)、[src/rendering/spray.ts](src/rendering/spray.ts)）：按接触做功预算生成短寿命连续 `WaterRibbon`，沿同一速度场无缝脱滴并在水滴解析穿水时回注至多 4 簇次级动量源；辅以沿湿迹沉积的微气泡尾迹层（[src/rendering/surface-churn.ts](src/rendering/surface-churn.ts)）。
 - **落日电影光影与后处理**（[src/rendering/sunset-env.ts](src/rendering/sunset-env.ts)、[src/rendering/water.ts](src/rendering/water.ts)、[src/rendering/post.ts](src/rendering/post.ts)）：偏侧低角度黄金时刻程序化大气穹顶、PMREM 环境反射、层叠远山剪影、曲面湿润岸沿与风摆芦苇、自然渐深卵石河床、双瓣碎金高光与选择性 Bloom/暗角调色。
 
@@ -67,14 +67,14 @@ npm run build
 ```text
 src/
   main.ts                 # 极简启动入口
-  app/                    # Session 双时钟/120Hz 水命令打包、应用编排 (bootstrap.ts)
-  simulation/             # 纯物理引擎 (physics.ts)、8 种石子与石匣 (stones.ts)、水网数学、飞溅与随机快照
+  app/                    # Session 双时钟/120Hz 水命令打包、应用编排 (bootstrap.ts) 与开发审查 (dev-review.ts)
+  simulation/             # 零分配物理引擎 (physics.ts)、8 种石子与石匣 (stones.ts)、色散波包 (ripples.ts)、水网数学、飞溅与随机快照
   rendering/              # GPU 高度场 (coherent.ts)、水体光学、落日环境、后处理、程序化石子、水幕与瞄准引导
   audio/                  # Web Audio + 离线采样混合电影声学引擎 (engine.ts)
   camera/                 # 岸后全景、高速长投航道、近景跟随与缓慢微转 (15°–30°) 子弹回放相机
   input/                  # 湖面回拉甩投 (pull-gesture.ts) 与原手势状态机 (gesture.ts)
   ui/                     # 全屏电影 HUD、岸边拣石石匣抽屉、水面空间跳数微标与实验室面板
-tests/                    # 18 个测试文件（物理收敛、水场守恒、石子/手势/音频/镜头回放）
+tests/                    # 13 个现役测试文件（零跳过，物理收敛、水场守恒、色散涟漪、石子/手势/音频/镜头回放）
 tools/                    # 资产恢复 (prepare-assets.mjs)、物理扫描、接触校准与浏览器抓图脚本
 public/assets/            # 原始石子 GLB 编码源与离线生成的暮色湖畔/水花音频
 docs/                     # 架构、石子 Blender 建模规范、物理模型、水体研究与阶段进展
@@ -94,6 +94,6 @@ deliverables/             # 历史水体与接触解析的浏览器验证截图�
 
 ## 当前验证状态与已知限制
 
-- **自动化验证**：106 项测试（96 通过 / 0 失败 / 10 项已退役旧渲染器用例显式跳过），`tsc --noEmit` 与 Vite 生产构建通过，GitHub Actions CI (`verify`) 自动运行。
+- **自动化验证**：全量测试 0 失败 / 0 跳过（已彻底清理历史退役渲染器与跳过用例），`tsc --noEmit` 与 Vite 生产构建通过，GitHub Actions CI (`verify`) 自动运行。
 - **长投基准**：桌面长投练习预设（`24 m/s`、`2°`、`10°`、`36.7 r/s`）可稳定跑出 **55 跳 / 45.8 m**；更高频的 **90 跳**实拍标定在步长加密下仍存在亚毫米接触收敛敏感性，尚未宣称达标（见 [docs/LONG_COURSE_WATER.md](docs/LONG_COURSE_WATER.md)）。
 - **流体与硬件边界**：水场为线性高度场 + 经验动量源的单向耦合，非三维体积守恒多相流体；`4096×1024 RGBA32F` 状态双缓冲约占 `128 MiB` 显存，尚未做移动端真机分级优化。项目整体未另授予开源许可证。

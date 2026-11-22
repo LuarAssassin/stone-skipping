@@ -35,7 +35,7 @@ export function createSpray(surfaceHeight: THREE.IUniform, grid: WaterGrid) {
         shader.vertexShader='attribute vec3 sheetOptics; varying vec2 lip; varying vec3 vSheetWorldPos; varying vec3 vSheetWorldNormal; uniform sampler2D surfaceHeight; uniform vec2 domain;\n'+shader.vertexShader
             .replace('#include <begin_vertex>',`#include <begin_vertex>
                 vec2 uvWater=vec2(position.x/domain.x,position.z/domain.y+.5);
-                transformed.y+=sheetOptics.z*texture2D(surfaceHeight,uvWater).r;
+                if(all(greaterThanEqual(uvWater,vec2(0.0)))&&all(lessThanEqual(uvWater,vec2(1.0))))transformed.y+=sheetOptics.z*texture2D(surfaceHeight,uvWater).r;
                 lip=sheetOptics.xy;`)
             .replace('#include <project_vertex>',`#include <project_vertex>
                 vSheetWorldPos=(modelMatrix*vec4(transformed,1.0)).xyz;

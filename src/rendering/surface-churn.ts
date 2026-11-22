@@ -89,6 +89,7 @@ export class SurfaceChurn {
         this.time=time;
         for (const tick of ticks) { this.deposit(tick); this.tickTime+=WATER_DT; }
         this.patches=this.patches.filter(p=>time-p.birth<lifetime);
+        if (this.patches.length>capacity) this.patches=this.patches.slice(-capacity);
         if (!reset && !this.patches.length && !this.wasVisible) return;
         for (let i=0;i<this.patches.length;i++) {
             const p=this.patches[i], age=Math.max(0,time-p.birth);

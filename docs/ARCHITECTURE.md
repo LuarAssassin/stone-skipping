@@ -13,10 +13,12 @@ src/
   main.ts                 # 只加载样式并调用 boot（4行）
   app/
     bootstrap.ts          # 生命周期、键鼠/石匣/音频接线、resize、RAF编排
+    dev-review.ts         # 开发期 waterReview / ?reference / ?audit / ?benchmark 钩子
     session.ts            # 投掷快照、重放、暂停、播放倍率、120Hz 水命令打包与双时钟
   simulation/
-    physics.ts            # 4000Hz 耦合RK4刚体水动力、解析椭圆湿几何、roll/signed spin 与 StoneSpec
+    physics.ts            # 4000Hz 零分配标量RK4刚体水动力、解析椭圆湿几何、roll/signed spin 与 StoneSpec
     stones.ts             # 8种物理石子图鉴、岸边随机刷石与本地持久化8格石匣 (StoneBox)
+    ripples.ts            # 真实Contact驱动的Cauchy-Poisson深水色散多环波包提取与CPU解析校验
     launch-randomness.ts  # 显式seed抽样、roll/stone 快照校验
     visual-variation.ts   # 纯视觉快照schema、校验与确定性hash工具
     water-grid.ts         # 纯数学网格参数、四点Gauss排水归一与冲量/滑移源计算
@@ -26,21 +28,18 @@ src/
     sunset-env.ts         # 程序化Rayleigh/Mie落日天空穹顶、PMREM、远山剪影、自然岸沿与风摆芦苇
     post.ts               # EffectComposer + 选择性UnrealBloom + 电影暗角/冷暖调色 + OutputPass
     coherent.ts           # GPU RGBA32F 双缓冲高度场与焦散求解器
-    water.ts              # Three Water 反射/透射、高度场位移法线、暮色双瓣高光与尾迹微沫
+    water.ts              # Three Water 反射/裁剪透射、高度场位移、解析色散涟漪与暮色双瓣高光
     surface-churn.ts      # 沿湿迹沉积的微气泡/白沫光学厚度纹理
     spray.ts              # 逆光水幕网格 (WaterRibbon) 与毛细缩颈细滴 (SprayDrop)
     stone-mesh.ts         # 程序化多形态米制石子网格、Blender GLB热插拔、触水变湿与3D握石预览台
     aim-guide.ts          # 回拉瞄准时的淡金色第一落水点引导弧与着水环
-    feedback.ts           # 石子、轨迹、水面与飞溅的逐帧同步
-    effects.ts / sheets.ts / heightfield.ts / liquid.ts / sheet-shape.ts / breakup-noise.ts
-                          # 历史确定性结构实验模块（保留供专项回归测试）
+    feedback.ts           # 石子、轨迹、水面、色散波包与飞溅的逐帧同步
   audio/
     engine.ts             # Web Audio + 离线采样混合电影声学引擎（物理沉水、3D衰减、慢放滤波）
   camera/rig.ts           # 岸后全景、高速长投航道、近景跟随与缓慢微转 (15°–30°) 子弹时间镜头
   input/
     pull-gesture.ts       # 湖面回拉蓄力、方向瞄准与手腕切旋甜蜜区状态机
     gesture.ts            # 原纯按住手势状态机（保留兼容测试）
-    bind.ts               # PointerEvent 绑定辅助
   ui/
     panel.ts              # 全屏电影HUD、左下角握石台与可折叠实验室抽屉骨架
     stone-drawer.ts       # 岸边拣石与8格随身石匣交互浮层
@@ -50,10 +49,10 @@ src/
     telemetry.ts          # 个人最佳纪录持久化、跳数动画与SI诊断
     style.css             # 暮色磨砂玻璃全屏样式与移动端响应式
 tests/
-  *.test.ts               # 18个测试文件（共106项：96通过/0失败/10历史跳过）
+  *.test.ts               # 13个现役测试文件（0失败 / 0历史跳过）
   fixtures/contact-before.json
 tools/                    # 资产恢复、物理扫描、接触校准与浏览器采集脚本
-public/assets/            # 原始GLB编码源、湖景与离线生成的7条音频素材
+public/assets/            # 原始GLB编码源与离线生成的7条音频素材
 ```
 
 不引入ECS、容器或DI框架。Session只依赖确定性物理/效果；CameraRig只接收位置、播放状态和独立展示时间，不回写物理。输入控件不会修改飞行中的Launch。app编排各层，不把原main全文换名塞进另一文件。
