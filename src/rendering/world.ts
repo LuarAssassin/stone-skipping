@@ -1,58 +1,164 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { randomAt } from './effects';
 import { createWater } from './water';
+import { COURSE_GRID } from '../simulation/water-grid';
+import { createSpray } from './spray';
+import { SurfaceChurn } from './surface-churn';
+import { createSunsetEnvironment, FOG_COLOR, SUN_COLOR, SUN_DIRECTION } from './sunset-env';
+import { createPostPipeline } from './post';
+import { STANDARD_STONE, type StoneSpec } from '../simulation/stones';
+import { populateStoneGroup, setStoneWetness } from './stone-mesh';
+import { createAimGuide } from './aim-guide';
+
+function createNaturalBedTexture(): THREE.DataTexture {
+    const size = 256;
+    const data = new Uint8Array(size * size * 4);
+    for (let row = 0; row < size; row++) {
+        for (let col = 0; col < size; col++) {
+            const idx = row * size + col;
+            const u = col / size * Math.PI * 2;
+            const v = row / size * Math.PI * 2;
+            // Seamless organic sand ripples + warm river pebble variation
+            const ripple = 0.5 + 0.5 * Math.sin(u * 6 + Math.sin(v * 3) * 0.9);
+            const patch = 0.5 + 0.5 * Math.sin(u * 2 - v * 2 + 1.1) * Math.cos(u * 3 + v * 4);
+            const grain = randomAt(271, idx);
+            const pebble = grain > 0.92 ? 0.82 : grain < 0.08 ? 1.12 : 0.96 + grain * 0.08;
+            const tone = (0.78 + ripple * 0.14 + patch * 0.08) * pebble;
+            data.set([
+                Math.min(255, Math.round(138 * tone)),
+                Math.min(255, Math.round(118 * tone)),
+                Math.min(255, Math.round(100 * tone)),
+                255,
+            ], idx * 4);
+        }
+    }
+    const tex = new THREE.DataTexture(data, size, size);
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(36, 14);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.generateMipmaps = true;
+    tex.minFilter = THREE.LinearMipmapLinearFilter;
+    tex.magFilter = THREE.LinearFilter;
+    tex.needsUpdate = true;
+    return tex;
+}
+
+function createCalibrationBedTexture(): THREE.DataTexture {
+    const sandData = new Uint8Array(128 * 128 * 4);
+    for (let index = 0; index < 128 * 128; index++) {
+        const grain = randomAt(271, index);
+        const col = index % 128, row = Math.floor(index / 128);
+        const seam = col % 32 < 2 || row % 32 < 2;
+        const tone = seam ? .97 : ((Math.floor(col / 32) + Math.floor(row / 32)) % 2 ? .985 : 1) + grain * .008;
+        sandData.set([150 * tone, 181 * tone, 171 * tone, 255], index * 4);
+    }
+    const sand = new THREE.DataTexture(sandData, 128, 128);
+    sand.wrapS = sand.wrapT = THREE.RepeatWrapping;
+    sand.repeat.set(75, 25);
+    sand.colorSpace = THREE.SRGBColorSpace;
+    sand.generateMipmaps = true;
+    sand.minFilter = THREE.LinearMipmapLinearFilter;
+    sand.magFilter = THREE.LinearFilter;
+    sand.needsUpdate = true;
+    return sand;
+}
 
 export function createWorld() {
-    const waterField = createWater();
+    const churn = new SurfaceChurn(COURSE_GRID);
+    const waterField = createWater(COURSE_GRID, churn.texture);
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color('#bed7da');
-    const sky=new THREE.Mesh(new THREE.SphereGeometry(120,24,12),new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,vertexShader: 'varying vec3 skyDirection; void main(){skyDirection=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',fragmentShader: 'varying vec3 skyDirection; void main(){vec3 direction=normalize(skyDirection);float elevation=pow(max(0.0,direction.y),.45);vec3 color=mix(vec3(.72,.79,.77),vec3(.24,.42,.53),elevation);float cloudBand=exp(-pow((direction.y-.32)/.085,2.0));float cloudMass=smoothstep(-.35,.65,sin(direction.x*9.0+direction.z*5.0)+.35*sin(direction.z*19.0-direction.x*7.0));color=mix(color,vec3(.86,.88,.84),cloudBand*cloudMass*.75);float sun=pow(max(0.0,dot(direction,normalize(vec3(-.45,.82,-.35)))),420.0);color+=vec3(1.0,.9,.7)*sun*.5;gl_FragColor=vec4(color,1.0);\n#include <tonemapping_fragment>\n#include <colorspace_fragment>\n}'}));scene.add(sky);
-    scene.fog = new THREE.Fog('#bed7da', 35, 115);
-    const camera = new THREE.PerspectiveCamera(48, 1, .01, 180);
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    scene.background = FOG_COLOR.clone();
+    scene.fog = new THREE.Fog(FOG_COLOR, 34, 148);
+
+    const camera = new THREE.PerspectiveCamera(48, 1, .01, 220);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     renderer.setSize(innerWidth, innerHeight, false);
-    renderer.setClearColor('#bed7da');
+    renderer.setClearColor(FOG_COLOR);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.06;
     document.body.prepend(renderer.domElement);
-    scene.add(new THREE.HemisphereLight(0xe6f6ff, 0x274943, 2.6));
-    const sun = new THREE.DirectionalLight(0xffeed6, 3);
-    sun.position.set(-9, 16.4, -7);
+
+    const sunset = createSunsetEnvironment(renderer, scene);
+    const post = createPostPipeline(renderer, scene, camera);
+
+    // Cinematic sunset lighting: cool twilight zenith sky + warm amber reflected bounce + low golden directional sun
+    scene.add(new THREE.HemisphereLight(0x7084ae, 0x4b2f24, 1.35));
+    const sun = new THREE.DirectionalLight(SUN_COLOR, 3.6);
+    sun.position.copy(SUN_DIRECTION).multiplyScalar(60);
     scene.add(sun);
+    // Subtle cool sky fill from opposite side so shadowed stone faces stay legible
+    const fill = new THREE.DirectionalLight(0x526b94, 0.55);
+    fill.position.set(-18, 14, 22);
+    scene.add(fill);
+
     scene.add(waterField.mesh);
-    const shore = new THREE.Mesh(
-        new THREE.PlaneGeometry(30, 50),
-        new THREE.MeshStandardMaterial({ color: 0xa9aa8e, roughness: 1 })
-    );
-    shore.rotation.x = -Math.PI / 2;
-    shore.position.set(-15.4, 0.012, 0);
-    scene.add(shore);
-    const sandData=new Uint8Array(128*128*4);
-    for(let index=0;index<128*128;index++){const grain=randomAt(271,index);const col=index%128,row=Math.floor(index/128);const seam=col%32<2||row%32<2;const tone=seam?.97:((Math.floor(col/32)+Math.floor(row/32))%2?.985:1)+grain*.008;sandData.set([150*tone,181*tone,171*tone,255],index*4);}
-    const sand=new THREE.DataTexture(sandData,128,128);sand.wrapS=sand.wrapT=THREE.RepeatWrapping;sand.repeat.set(75,25);sand.colorSpace=THREE.SRGBColorSpace;sand.generateMipmaps=true;sand.minFilter=THREE.LinearMipmapLinearFilter;sand.magFilter=THREE.LinearFilter;sand.needsUpdate=true;
-    const bed=new THREE.Mesh(new THREE.PlaneGeometry(150,50,30,10),new THREE.MeshStandardMaterial({color:0xffffff,map:sand,roughness:1}));
-    bed.rotation.x=-Math.PI/2;bed.position.y=-.65;scene.add(bed);
+    const spray = createSpray(waterField.mesh.material.uniforms.heightState, COURSE_GRID);
+    scene.add(spray.mesh);
+
+    // Natural gently-sloping riverbed (shallow warm pebble bank near shore -> deeper twilight basin)
+    const naturalBedTex = createNaturalBedTexture();
+    const calibrationBedTex = createCalibrationBedTexture();
+    const bedGeometry = new THREE.PlaneGeometry(150, 52, 48, 16);
+    bedGeometry.rotateX(-Math.PI / 2);
+    const bedPos = bedGeometry.attributes.position as THREE.BufferAttribute;
+    for (let i = 0; i < bedPos.count; i++) {
+        const x = bedPos.getX(i) + 55;
+        const z = bedPos.getZ(i);
+        const shallowFactor = THREE.MathUtils.smoothstep(x, -1.0, 11.5);
+        const depth = -0.22 - shallowFactor * 0.72 + Math.sin(x * 0.35 + z * 0.28) * 0.035;
+        bedPos.setXYZ(i, x, depth, z);
+    }
+    bedGeometry.computeVertexNormals();
+    const bedMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, map: naturalBedTex, roughness: 0.96 });
+    const bed = new THREE.Mesh(bedGeometry, bedMaterial);
+    scene.add(bed);
     bed.material.onBeforeCompile = shader => {
-        shader.uniforms.causticState={value:waterField.solver.caustics.texture};
-        shader.vertexShader=shader.vertexShader.replace('void main() {','varying vec3 bedPoint; void main() { bedPoint=(modelMatrix*vec4(position,1.)).xyz;');
-        shader.fragmentShader=shader.fragmentShader.replace('void main() {',`uniform sampler2D causticState; varying vec3 bedPoint;
-        void main() {`).replace('#include <dithering_fragment>',`vec2 causticUV=vec2(bedPoint.x/16.,(bedPoint.z+4.)/8.);if(all(greaterThanEqual(causticUV,vec2(0.)))&&all(lessThanEqual(causticUV,vec2(1.)))){float focus=texture2D(causticState,causticUV).r;gl_FragColor.rgb*=mix(1.,clamp(focus,.5,2.),.04);}
+        shader.uniforms.causticState = { value: waterField.solver.caustics.texture };
+        shader.vertexShader = shader.vertexShader.replace('void main() {', 'varying vec3 bedPoint; void main() { bedPoint=(modelMatrix*vec4(position,1.)).xyz;');
+        shader.fragmentShader = shader.fragmentShader.replace('void main() {', `uniform sampler2D causticState; varying vec3 bedPoint;
+        void main() {`).replace('#include <dithering_fragment>', `vec2 causticUV=vec2(bedPoint.x/${waterField.solver.grid.sizeX.toFixed(1)},bedPoint.z/${waterField.solver.grid.sizeZ.toFixed(1)}+.5);if(all(greaterThanEqual(causticUV,vec2(0.)))&&all(lessThanEqual(causticUV,vec2(1.)))){float focus=texture2D(causticState,causticUV).r;float shallow=smoothstep(-0.95,-0.20,bedPoint.y);gl_FragColor.rgb*=mix(vec3(1.),vec3(1.12,0.96,0.78)*clamp(focus,.55,2.2),.06+.09*shallow);}
         #include <dithering_fragment>`);
     };
+
     const stone = new THREE.Group();
     scene.add(stone);
-    const fallback = new THREE.Mesh(new THREE.SphereGeometry(1, 24, 16), new THREE.MeshStandardMaterial({ color: 0x565957, roughness: .8 }));
-    fallback.scale.set(.04, .0045, .03);
-    stone.add(fallback);
-    new GLTFLoader().load('/assets/stone.glb', gltf => { stone.remove(fallback); fallback.geometry.dispose(); (fallback.material as THREE.Material).dispose(); stone.add(gltf.scene); document.querySelector('#asset')!.textContent = '✓ Blender 原始 GLB · 真实米制尺寸'; }, undefined, () => { document.querySelector('#asset')!.textContent = '模型加载失败，使用同尺寸椭球'; });
-    const halo = new THREE.Mesh(new THREE.RingGeometry(.065, .075, 40), new THREE.MeshBasicMaterial({ color: 0xffe3a1, side: THREE.DoubleSide, transparent: true, opacity: .7 }));
+    let currentStoneKey = '';
+    function setStoneMesh(spec: StoneSpec) {
+        const key = `${spec.id}:${spec.a}:${spec.b}:${spec.h}:${spec.seed}`;
+        if (key === currentStoneKey) return;
+        currentStoneKey = key;
+        stone.userData.wet = false;
+        populateStoneGroup(stone, spec, text => {
+            const el = document.querySelector('#asset');
+            if (el) el.textContent = text;
+        });
+    }
+    setStoneMesh(STANDARD_STONE);
+
+    const aimGuide = createAimGuide(scene);
+
+    const halo = new THREE.Mesh(new THREE.RingGeometry(.065, .075, 40), new THREE.MeshBasicMaterial({ color: 0xffd28a, side: THREE.DoubleSide, transparent: true, opacity: .78 }));
     halo.rotation.x = -Math.PI / 2;
     scene.add(halo);
     const trailGeometry = new THREE.BufferGeometry();
-    const trail = new THREE.Line(trailGeometry, new THREE.LineBasicMaterial({ color: 0xffe3a1, transparent: true, opacity: .7 }));
+    trailGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(2048 * 3), 3).setUsage(THREE.DynamicDrawUsage));
+    trailGeometry.setDrawRange(0, 0);
+    const trail = new THREE.Line(trailGeometry, new THREE.LineBasicMaterial({ color: 0xffd28a, transparent: true, opacity: .72 }));
+    trail.frustumCulled = false;
     scene.add(trail);
-    return { scene, camera, renderer, waterField, stone, halo, trail, trailGeometry };
+
+    return {
+        scene, camera, renderer, post, sunset, waterField, churn, spray, stone, halo, trail, trailGeometry, aimGuide,
+        setStoneMesh,
+        setStoneWet(wet: boolean) {
+            setStoneWetness(stone, wet);
+        },
+        setCalibrationBed(enabled: boolean) {
+            bedMaterial.map = enabled ? calibrationBedTex : naturalBedTex;
+            bedMaterial.needsUpdate = true;
+        },
+    };
 }

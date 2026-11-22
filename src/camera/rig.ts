@@ -1,5 +1,5 @@
 import { PerspectiveCamera, Vector3 } from 'three';
-export type ViewMode = 'overview' | 'follow';
+export type ViewMode = 'overview' | 'follow' | 'course';
 export interface OverviewSettings {
     height: number;
     distance: number;
@@ -15,20 +15,46 @@ export interface Pose {
     target: Vector3;
     fov: number;
 }
-export function cameraPose(view: ViewMode, settings: OverviewSettings, stone: Vector3, orbit?: number): Pose {
+interface CourseFraming { direction: number; aspect: number; earlier?: Vector3; bulletSpan?: number }
+
+/** Maximum total camera pan during a bullet-time replay (~24°, comfortably inside 15°–30°). */
+export const BULLET_MAX_SWEEP_RAD = 24 * Math.PI / 180;
+
+export function cameraPose(view: ViewMode, settings: OverviewSettings, stone: Vector3, orbit?: number, course?: CourseFraming): Pose {
     if (orbit !== undefined) {
-        const angle = orbit * 0.65 + Math.PI * 0.8;
-        const radius = 0.9 + 0.15 * Math.sin(orbit * 0.4);
+        const dirRad = (course?.direction ?? 0) * Math.PI / 180;
+        // Scale time constant with expected throw length so both short (~40s) and long (~75s)
+        // bullet replays glide smoothly through ~18°–24° total instead of spinning continuously.
+        const tau = Math.max(18, (course?.bulletSpan ?? 40) * 0.72);
+        const progress = Math.tanh(Math.max(0, orbit) / tau);
+        const angle = dirRad + Math.PI * 0.80 - BULLET_MAX_SWEEP_RAD * progress;
+        const radius = 0.96 + 0.14 * progress;
         return {
-            position: new Vector3(stone.x + Math.cos(angle) * radius, Math.max(0.16, stone.y + 0.22 + 0.07 * Math.sin(orbit * 0.7)), stone.z + Math.sin(angle) * radius),
+            position: new Vector3(
+                stone.x + Math.cos(angle) * radius,
+                Math.max(0.16, stone.y + 0.21 + 0.06 * progress),
+                stone.z + Math.sin(angle) * radius
+            ),
             target: new Vector3(stone.x, Math.max(0.025, stone.y), stone.z),
             fov: 44,
         };
     }
+    if (view === 'course') {
+        const angle=(course?.direction??0)*Math.PI/180;
+        const along=new Vector3(Math.cos(angle),0,Math.sin(angle));
+        const earlier=course?.earlier;
+        const span=earlier ? Math.max(2.2,Math.min(7,along.dot(stone.clone().sub(earlier)))) : 3.8;
+        const side=new Vector3(-along.z,0,along.x);
+        const target=stone.clone().addScaledVector(along,-.46*span).setY(.035+.16*Math.max(0,stone.y));
+        const distance=(1.65+.76*span)*Math.max(1,1.25/Math.max(.4,course?.aspect??1.4));
+        const position=target.clone().addScaledVector(along,-.59*distance).addScaledVector(side,.81*distance);
+        position.y=.28+.26*distance;
+        return {position,target,fov:46};
+    }
     if (view === 'follow')
         return {
             position: new Vector3(stone.x - 1.4, Math.max(0.4, stone.y + 0.8), stone.z + 1.8),
-            target: new Vector3(stone.x + 0.5, Math.max(0.03, stone.y), stone.z),
+            target: new Vector3(stone.x + 0.2, Math.max(0.03, stone.y), stone.z),
             fov: 48,
         };
     const angle = settings.azimuth * Math.PI / 180;
@@ -52,15 +78,42 @@ export class CameraRig {
     private pose = cameraPose(this.view, this.settings, new Vector3());
     private bulletStart?: number;
     private wasBullet = false;
+    private lastStone?:Vector3;
+    private tracking=false;
+    private direction=0;
+    private bulletSpan=40;
+    beginThrow(stone:Vector3,bullet=false,direction=0,aspect=1.4,estimatedSimSeconds=2.0){
+        this.direction=direction;
+        this.bulletSpan=Math.max(24,Math.min(90,estimatedSimSeconds/0.05));
+        this.tracking=bullet||this.view!=='overview';
+        this.lastStone=stone.clone();
+        if(this.tracking)this.pose=cameraPose(this.view,this.settings,stone,bullet?0:undefined,{direction,aspect,bulletSpan:this.bulletSpan});
+    }
+    setBulletSpanFromDuration(simSeconds:number){
+        if(Number.isFinite(simSeconds)&&simSeconds>0.2){
+            this.bulletSpan=Math.max(20,Math.min(100,simSeconds/0.05));
+        }
+    }
     reset() { this.settings = { ...DEFAULT_VIEW }; }
-    update(camera: PerspectiveCamera, stone: Vector3, time: number, bullet: boolean, seconds: number, paused: boolean) {
+    update(camera: PerspectiveCamera, stone: Vector3, time: number, bullet: boolean, seconds: number, paused: boolean, contacts: readonly {point: Vector3}[] = []) {
         if (bullet && !this.wasBullet)
             this.bulletStart = time;
         if (bullet && time < (this.bulletStart ?? 0))
             this.bulletStart = time;
         const changed = bullet !== this.wasBullet;
         this.wasBullet = bullet;
-        const goal = cameraPose(this.view, this.settings, stone, bullet ? time - (this.bulletStart ?? time) : undefined);
+        const tracking=bullet||this.view!=='overview';
+        // Smooth the relative camera offset, not the stone's world translation.
+        // Otherwise a 24 m/s throw leaves a 4.8 m chase lag at smoothing rate 5.
+        if(tracking&&this.tracking&&this.lastStone){
+            const translation=stone.clone().sub(this.lastStone);
+            if(this.view==='course'&&!bullet)translation.y=0;
+            this.pose.position.add(translation);this.pose.target.add(translation);
+        }
+        this.lastStone=stone.clone();this.tracking=tracking;
+        const earlier=contacts[Math.max(0,contacts.length-4)]?.point;
+        const goal = cameraPose(this.view, this.settings, stone, bullet ? time - (this.bulletStart ?? time) : undefined,
+            {direction:this.direction,aspect:camera.aspect,earlier,bulletSpan:this.bulletSpan});
         this.pose = blendPose(this.pose, goal, paused && bullet && !changed ? 0 : seconds);
         this.pose.position.y = Math.max(0.12, this.pose.position.y);
         camera.position.copy(this.pose.position);
