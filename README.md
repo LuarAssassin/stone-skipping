@@ -1,44 +1,99 @@
 # 掠水 · Stone Skipping
 
-> 2026-11-17 后续优化：主场景水场扩至64×32m，新增短连续水幕→细滴→回落次级波，并修正高速跟随镜头。可点“长投练习 · 无扰动”；桌面实测一投55跳/45.8m。**90跳尚未校准成功**。当前实现、分辨率代价与验收见 [长投水体](docs/LONG_COURSE_WATER.md)；下面较早的16×8m记录为历史基线。
+Web-first 物理打水漂模拟与风格化小游戏（TypeScript / Three.js / Vite）。  
+不预设跳数、不画死抛物线：真实米制石子在 4000 Hz 定步长刚体水动力与 `64×32 m` 连续 GPU 高度场之间自然演化飞行、擦水、飞溅、声景与沉水。
 
-> 2026-11-17：按五张实拍参考建立约90跳/50m的理想校准目标，当前尚未达成。新增接触做功限制的透射细滴层，连续液片和长域水场仍待实现；45组物理扫描及局限见 [真实案例对齐](docs/REAL_REFERENCE_ALIGNMENT.md)。以下水场记录为此前基线，旧薄片系统仍停用。
+---
 
-> 本轮优化：实图消融确认并移开中央太阳反光，连续排水增加守体积的定向椭圆回填边缘，合并重复法线更新。真实1×播放与前后截图已复查；首跳反馈仍细，腾空水花仍未实现。不是完整流体，也不以测试数量代替画面验收。最新证据与限制见 `docs/CONTACT_RESOLUTION.md` 顶部。
+## 核心特性
 
-Web-first TypeScript / Three.js / Vite打水漂。真实米制石头80×60×9mm、约60g；轨迹、自旋、姿态及续跳由固定步模拟产生，不预设分数。石头物理/出手采样保持不变。
+### 1. 真实米制刚体与接触物理
+- **4000 Hz 固定外步 + 自适应二分 RK4**（[src/simulation/physics.ts](src/simulation/physics.ts)）：解析椭圆平面裁剪计算连续湿面积与压力形心，入水/离水/受压跃迁自动二分细化，完整保留三维姿态演化与陀螺进动。
+- **全自由度出手参数**：水平方向 `direction`、初速 `speed`、出手抛角 `elevation`、石面攻角 `tilt`、左右侧倾 `roll`（自然产生侧向弧线轨迹）、正负自旋 `spin`，以及显式 seed 的有界随机温度与 v1 JSON 确定性快照重放。
+- **8 种参差不齐的物理石子**（[src/simulation/stones.ts](src/simulation/stones.ts)、[docs/STONE_DESIGN.md](docs/STONE_DESIGN.md)）：从厚重砸水的圆滚鹅卵石、棱角碎石到轻薄页岩、玄武重圆饼、柳叶长扁石与溪磨黑曜圆盘；每块石子的尺寸 `(a, b, h)`、质量、密度、水阻与重心偏心直接联动物理轨迹、GPU 排水深度、水花能量预算与声音响度/音高。
 
-## 当前实现
+### 2. 64×32 m 连续 GPU 高度场与水幕闭环
+- **固定全域 GPU 水波求解**（[src/rendering/coherent.ts](src/rendering/coherent.ts)、[src/simulation/water-grid.ts](src/simulation/water-grid.ts)）：`4096×1024 RGBA32F` 双缓冲，120 Hz 水时钟独立于屏幕帧率；四点 Gauss 体积归一椭球排水 + 守恒外缘回填、双点 Gauss 掠水竖直反冲量、水平滑移偶极源与水底焦散。
+- **连续水幕 → 细滴 → 回落次级波**（[src/simulation/spray.ts](src/simulation/spray.ts)、[src/rendering/spray.ts](src/rendering/spray.ts)）：按接触做功预算生成短寿命连续 `WaterRibbon`，沿同一速度场无缝脱滴并在水滴解析穿水时回注至多 4 簇次级动量源；辅以沿湿迹沉积的微气泡尾迹层（[src/rendering/surface-churn.ts](src/rendering/surface-churn.ts)）。
+- **落日电影光影与后处理**（[src/rendering/sunset-env.ts](src/rendering/sunset-env.ts)、[src/rendering/water.ts](src/rendering/water.ts)、[src/rendering/post.ts](src/rendering/post.ts)）：偏侧低角度黄金时刻程序化大气穹顶、PMREM 环境反射、层叠远山剪影、曲面湿润岸沿与风摆芦苇、自然渐深卵石河床、双瓣碎金高光与选择性 Bloom/暗角调色。
 
-- 一个连续、固定16×8m水场，2048×1024 RGBA32F双缓冲，格距7.8125mm；不是跟随石头重置的移动补丁。表面顶点与坡度使用同一cell-centre空间。
-- 120Hz命令，每命令5传播子步，dt=1/600s、CFL=.8；保持c≈2.65165m/s和每秒阻尼。状态/网格开销明显上升。
-- 定向石头排水代理沿子步连续运动，四点Gauss采样及域内解析体积归一；竖直真实反冲量按实测湿面积定义米制核，离散归一后进入水面速度。不是固定1.25格核，也没有放大石头/法线或加装饰水花。
-- 默认无旧薄片、粗管、杆球/金针菇；鼠标与石头仍走同一水场。计分结束后水面继续演化。历史视觉metadata保留，未用的水花温度控件明确禁用；出手温度有效。
-- 场景反射、屏幕空间透射、近似聚光；这是Evan算法的**部分适配**，不是上游完整解析泳池渲染器。天空/校准床程序自绘，MIT来源见[第三方说明](THIRD_PARTY_NOTICES.md)。
+### 3. 混合电影声景（ElevenLabs 采样 + Web Audio 物理混音）
+- **零延迟物理声学引擎**（[src/audio/engine.ts](src/audio/engine.ts)）：解码时自动检测采样瞬态起音点，结合 3D 距离衰减、空气高频低通吸收、开阔湖面混响与耳机左右声像。
+- **物理联动层次**：第一跳清脆拍水，后续连跳切换柔和水面掠滑采样并随跳数渐收；沉水声与**入水角、竖直速度、石子质量及已跳次数**挂钩（直接砸水饱满“咕咚”，多跳浅滑落水几乎无声）；切换 `0.25×` / `0.05×` 子弹时间自动压低主总线滤波并拉慢环境音。
 
-## 运行和体验
+### 4. 直觉键鼠体验、岸边拣石与实验室双态
+- **全屏沉浸玩家态 + `Tab` 实验室抽屉**：默认全屏暮色湖面与悬浮玻璃 HUD；按 `Tab` 或点击右上角「实验室」呼出完整参数滑块、SI 接触诊断、JSON 快照与鼠标拨水验证。
+- **岸边拣石与 8 格随身石匣**（[src/ui/stone-drawer.ts](src/ui/stone-drawer.ts)）：按 `F` 俯身在岸滩刷出 5 块天然石块，端详轮廓与侧厚后可「顺手试投」或「收入石匣」永久练习。
+- **手边 3D 握石调姿 + 湖面回拉甩投**：左下角独立 3D 视口实时展示手中石子姿态并支持直接拖拽旋转；湖面向下拉蓄力（`6.5–25.5 m/s`）、左右瞄准（淡金色第一落水点引导弧，不剧透后续跳数）并配合手腕切旋甜蜜区游标。
 
-Node.js20.19+或22.12+。
+---
+
+## 快速开始
+
+需要 Node.js 20.19+ 或 22.x：
 
 ```sh
 npm ci
 npm run dev -- --port 5173
-npm test
+```
+
+本地完整验证：
+
+```sh
 npm run typecheck
+npm test
 npm run build
 ```
 
-湖面按住约0.7秒、拖动、松手投石；横拖改方向、上下拖改仰角。勾选操作区「鼠标拨水验证」可直接拨水，点「投出石子」恢复投石。保留暂停、单步、岸后/跟随、0.25x慢放和0.05x环绕、旧v1 JSON快照重放。
+---
 
-在预览打开[实际接触与细化对照](deliverables/contact-resolution/index.html)。同快照.26675/.270s实际触水，.28025s已离水，.300s仅用于观察后方余波，不能把余波滞后误判为贴石失败。开发模式`waterReview.surfaceOnly(true/false)`可独立检查水面，排除床纹/水下焦散；大竖亮带是静态日光反射，不是水花。
+## 操作指南
 
-## 当前检查与限制
+| 操作 | 功能 |
+| :--- | :--- |
+| **湖面按住向下拉 + 左右移 + 松手** | 回拉蓄力（`6.5–25.5 m/s`）+ 瞄准方向 + 松手甩出（金色甜蜜区强化切旋与稳度） |
+| **拖动左下角 3D 石子** | 直接旋转调整石面攻角（上下）与左右侧倾（左右） |
+| **鼠标滚轮 / `Shift + 滚轮`** | 快捷调整石面攻角 `tilt` / 左右侧倾 `roll` |
+| **`W` / `S` · `A` / `D` · `Q` / `E`** | 调整出手抛角 `elevation` · 左右侧倾 `roll` · 切换逆/顺自旋方向 |
+| **`F` · `1`–`8`** | 打开岸边拣石与随身石匣 · 快捷切换石匣中已收藏的石子 |
+| **`Space` · `R` · `M` · `Tab`** | 暂停/继续 · 重投 · 静音切换 · 展开/收起物理实验室抽屉 |
 
-- 86项：76通过、0失败、10项明确停用的旧渲染器测试；物理、出手和快照断言仍执行。typecheck/build通过，实际program全链接、无GL错误。
-- GPU真实湿区在512/1024/2048宽度有5/18/74支持单元；冲量误差均低于1.31e−9N·s。两级细网格.2s后环带能量峰半径差10mm，不是连续误差为零。完整4秒正常/慢放/子弹不规则分组的所有RGBA状态完全一致。
-- 最终桌面3秒短测约33FPS平均、RAF p95 63ms，出现过224ms尾帧；不保证稳定60FPS，未测实体手机。没有GPU timer-query毫秒数据。状态约64MiB、表面几何约97MiB，非VRAM总占用实测。
-- 独立实图确认波纹和离水尾迹改善，关闭水下调制仍可辨；压水体积/波脊仍弱。没有水平流体动量、翻卷、液片撕裂或腾空水花；线性场保留已知平均水量偏移、经验参与深度和有限空间边界。120Hz水面命令暂无专门显示插值，极慢放也有局限。
+> 开发模式调试入口：`window.waterReview.surfaceOnly(true/false)`、`window.waterReview.calibrationBed(true/false)`，以及 URL 审计参数 `?reference=0.28`、`?reference=1.8&long=1&audit=1`、`?benchmark=1`。
 
-实现/单位/精确验收见[接触解析](docs/CONTACT_RESOLUTION.md)。原始实验留在各deliverables目录；[旧入口历史](docs/README_HISTORY.md)、[物理模型](docs/PHYSICS_MODEL.md)、[研究](docs/RESEARCH.md)、[后续交互目标](docs/UX_ALIGNMENT_NEXT.md)保留。`src/main.ts`只启动；simulation含纯水网格数学，rendering含GPU求解/场景，app/input/camera/ui维持职责分层。
+---
 
-公开候选分支沿用[草稿PR #5](https://github.com/LuarAssassin/stone-skipping/pull/5)，未经视觉接受不合入main。PR #4仅为已退役的结构实验。研究/截图/完整日志不上传公开源码。项目整体未另授予开源许可证。
+## 项目结构与文档导航
+
+```text
+src/
+  main.ts                 # 极简启动入口
+  app/                    # Session 双时钟/120Hz 水命令打包、应用编排 (bootstrap.ts)
+  simulation/             # 纯物理引擎 (physics.ts)、8 种石子与石匣 (stones.ts)、水网数学、飞溅与随机快照
+  rendering/              # GPU 高度场 (coherent.ts)、水体光学、落日环境、后处理、程序化石子、水幕与瞄准引导
+  audio/                  # Web Audio + 离线采样混合电影声学引擎 (engine.ts)
+  camera/                 # 岸后全景、高速长投航道、近景跟随与缓慢微转 (15°–30°) 子弹回放相机
+  input/                  # 湖面回拉甩投 (pull-gesture.ts) 与原手势状态机 (gesture.ts)
+  ui/                     # 全屏电影 HUD、岸边拣石石匣抽屉、水面空间跳数微标与实验室面板
+tests/                    # 18 个测试文件（物理收敛、水场守恒、石子/手势/音频/镜头回放）
+tools/                    # 资产恢复 (prepare-assets.mjs)、物理扫描、接触校准与浏览器抓图脚本
+public/assets/            # 原始石子 GLB 编码源与离线生成的暮色湖畔/水花音频
+docs/                     # 架构、石子 Blender 建模规范、物理模型、水体研究与阶段进展
+deliverables/             # 历史水体与接触解析的浏览器验证截图、JSON 读数与对比页
+```
+
+主要文档：
+- [docs/STONE_DESIGN.md](docs/STONE_DESIGN.md) — 8 种石子图鉴、Blender 建模/导出规范与拣石收集设计
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — 模块边界、时序与测试命令
+- [docs/LONG_COURSE_WATER.md](docs/LONG_COURSE_WATER.md) — `64×32 m` 长域水场、水幕与性能/分辨率权衡
+- [docs/PHYSICS_MODEL.md](docs/PHYSICS_MODEL.md) — 刚体水动力与数值积分模型
+- [docs/PROGRESS.md](docs/PROGRESS.md) — 分阶段演进记录
+- [CONTRIBUTING.md](CONTRIBUTING.md) — 分支、PR 流程与本地验证约定
+- [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) — 第三方算法改编与资源许可说明
+
+---
+
+## 当前验证状态与已知限制
+
+- **自动化验证**：106 项测试（96 通过 / 0 失败 / 10 项已退役旧渲染器用例显式跳过），`tsc --noEmit` 与 Vite 生产构建通过，GitHub Actions CI (`verify`) 自动运行。
+- **长投基准**：桌面长投练习预设（`24 m/s`、`2°`、`10°`、`36.7 r/s`）可稳定跑出 **55 跳 / 45.8 m**；更高频的 **90 跳**实拍标定在步长加密下仍存在亚毫米接触收敛敏感性，尚未宣称达标（见 [docs/LONG_COURSE_WATER.md](docs/LONG_COURSE_WATER.md)）。
+- **流体与硬件边界**：水场为线性高度场 + 经验动量源的单向耦合，非三维体积守恒多相流体；`4096×1024 RGBA32F` 状态双缓冲约占 `128 MiB` 显存，尚未做移动端真机分级优化。项目整体未另授予开源许可证。
