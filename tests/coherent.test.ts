@@ -49,7 +49,6 @@ test('complete snapshot shared source commands replay identically across frame g
  const first=run([1/60]),second=run([.003,.031,.007]);assert.deepEqual(first.waterTicks,second.waterTicks);assert.deepEqual(first.sim.p,second.sim.p);
  const before=structuredClone(first.waterTicks);first.paused=true;first.tick(2);assert.deepEqual(first.waterTicks,before);
  const snapshot=structuredClone(first.snapshot!);first.replay(snapshot);assert.equal(first.waterTicks.length,0);first.advance(2);assert.deepEqual(first.waterTicks,before);
- assert.equal(first.effects.sheets.length,0);assert.equal(first.effects.particles.length,0);
 });
 test('water remains scheduled through real final sinking and scoring end',()=>{
  const session=run([.02],4);assert.ok(session.sim.ended);assert.ok(session.sim.skips>0);
@@ -58,7 +57,6 @@ test('water remains scheduled through real final sinking and scoring end',()=>{
  const last=wet.at(-1)!;assert.ok(last.next.y<0);
  const before=session.waterTicks.length;session.advance(1);assert.equal(session.waterTicks.length-before,120);
  assert.ok(session.waterTicks.slice(before).every(tick=>tick.next.y<-.1));
- assert.equal(session.effects.sources.length,0);
 });
 test('mouse movement and release use the same displacement command type, not independent splashes',()=>{
  const session=new Session(()=>271);session.start(DEFAULT,0);session.mouseMode=true;
@@ -66,5 +64,5 @@ test('mouse movement and release use the same displacement command type, not ind
  session.mouse={...session.mouse,x:2.4};session.advance(.1);session.mouse=undefined;session.advance(.1);
  assert.ok(session.waterTicks.some(tick=>tick.old.x===2&&tick.next.x===2.4));
  assert.ok(session.waterTicks.some(tick=>tick.old.x===2.4&&tick.next.y===1));
- assert.equal(session.sim.time,0);assert.equal(session.effects.sheets.length,0);
+ assert.equal(session.sim.time,0);
 });

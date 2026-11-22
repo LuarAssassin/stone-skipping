@@ -67,7 +67,7 @@ export class ContactSpray {
    if(!nearest&&clusters.length<4){clusters.push({...impact});continue;}
    nearest??=clusters.reduce((a,b)=>Math.hypot(a.x-impact.x,a.z-impact.z)<Math.hypot(b.x-impact.x,b.z-impact.z)?a:b);
    const a=Math.abs(nearest.impulseY),b=Math.abs(impact.impulseY),w=a+b;
-   nearest.x=(nearest.x*a+impact.x*b)/w;nearest.z=(nearest.z*a+impact.z*b)/w;
+   if(w>1e-12){nearest.x=(nearest.x*a+impact.x*b)/w;nearest.z=(nearest.z*a+impact.z*b)/w;}
    nearest.impulseY+=impact.impulseY;nearest.wetArea=(nearest.wetArea??0)+(impact.wetArea??0);
    nearest.from=Math.min(nearest.from??0,impact.from??0);nearest.to=Math.max(nearest.to??1,impact.to??1);
   }

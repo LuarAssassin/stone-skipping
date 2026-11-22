@@ -1,7 +1,6 @@
 import { Vector3 } from 'three';
 import { ContactSpray } from '../simulation/spray';
 import { Clock, Simulation, type Launch } from '../simulation/physics';
-import { ContactEffects } from '../rendering/effects';
 import { replayLaunch, sampleThrow, type ThrowSnapshot } from '../simulation/launch-randomness';
 import { VISUAL_DEFAULTS, visualHash, validateVisual, type VisualSettings } from '../simulation/visual-variation';
 import { COURSE_GRID, dryFootprint, type Footprint, type WaterTick } from '../simulation/water-grid';
@@ -32,7 +31,6 @@ export class Session {
     private clock = new Clock(this.sim);
     private accumulator = 0;
     private throwIndex = 0;
-    effects = new ContactEffects();
     spray = new ContactSpray();
     diagnosticContact?: number;
     snapshot?: ThrowSnapshot;
@@ -54,7 +52,6 @@ export class Session {
         const stone = this.snapshot.stone ?? STANDARD_STONE;
         this.sim = new Simulation(replayLaunch(this.snapshot), undefined, true, true, 4, stone);
         this.clock = new Clock(this.sim);
-        this.effects.clear();
         this.spray.reset();
         this.waterTicks = [];
         this.waterGeneration++;
@@ -64,7 +61,6 @@ export class Session {
         this.pendingImpulseY = this.pendingWeight = this.pendingX = this.pendingZ = this.pendingArea = this.pendingLast = 0;
         this.pendingFirst = Infinity;
         this.previousSource = dryFootprint();
-        this.effects.visual = validateVisual(this.snapshot.visual ?? { seed: this.snapshot.seed, ...VISUAL_DEFAULTS });
         this.accumulator = 0;
         this.visualTime = 0;
         this.presentationTime = 0;

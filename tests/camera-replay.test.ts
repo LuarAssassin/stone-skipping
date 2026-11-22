@@ -96,7 +96,7 @@ test('新投掷恢复正常1x与默认T1，重放不抽seed且快照隔离', () 
     assert.deepEqual(session.snapshot, snapshot);
     assert.equal(session.presentationTime, 0);
     assert.equal(session.visualTime, 0);
-    assert.equal(session.effects.particles.length, 0);
+    assert.equal(session.spray.drops.length, 0);
     const external = structuredClone(snapshot);
     session.replay(external);
     external.target.speed = 2;
