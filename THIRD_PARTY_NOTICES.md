@@ -48,3 +48,7 @@ THE SOFTWARE.
 ## Lake environment
 
 The local lake-horizon.webp uses the sky and distant bank from Greg Zaal’s CC0 *Bell Park Pier*. The upper hemisphere was tone-mapped and mirrored below the horizon for environment lighting. The water surface is rendered live. [Source and license](https://polyhaven.com/a/bell_park_pier)
+
+## Offline-generated audio assets
+
+The static MP3 files in `public/assets/audio/` (`sunset-lake-ambience.mp3`, `skip-heavy.mp3`, `skip-light.mp3`, `skip-skim-1.mp3`, `skip-skim-2.mp3`, `sink-plop.mp3`, `throw-whoosh.mp3`) were generated offline using ElevenLabs Sound Generation (`eleven_text_to_sound_v2`) and are mixed locally in the browser via the Web Audio API (`src/audio/engine.ts`). No API keys or runtime network calls are included in the application.

@@ -6,43 +6,54 @@
 
 主会话最终重新跑43/43测试、类型检查、构建，全部通过；预览保持localhost:5173可操作。
 
-## 目录职责
+## 目录职责（当前主线）
 
 ```text
 src/
   main.ts                 # 只加载样式并调用 boot（4行）
   app/
-    bootstrap.ts          # 生命周期、控件接线、resize、RAF编排
-    session.ts            # 投掷快照、重放、暂停、播放倍率与两种时钟
+    bootstrap.ts          # 生命周期、键鼠/石匣/音频接线、resize、RAF编排
+    session.ts            # 投掷快照、重放、暂停、播放倍率、120Hz 水命令打包与双时钟
   simulation/
-    physics.ts            # 原物理积分、接触、计数；不依赖DOM/相机
-    launch-randomness.ts   # 原seed抽样、快照校验；算法未改
-    visual-variation.ts    # 纯视觉快照schema、校验、默认值与寻址seed/hash工具
+    physics.ts            # 4000Hz 耦合RK4刚体水动力、解析椭圆湿几何、roll/signed spin 与 StoneSpec
+    stones.ts             # 8种物理石子图鉴、岸边随机刷石与本地持久化8格石匣 (StoneBox)
+    launch-randomness.ts  # 显式seed抽样、roll/stone 快照校验
+    visual-variation.ts   # 纯视觉快照schema、校验与确定性hash工具
+    water-grid.ts         # 纯数学网格参数、四点Gauss排水归一与冲量/滑移源计算
+    spray.ts              # 接触做功预算驱动的连续水幕条、脱滴弹道与解析回落聚合
   rendering/
-    world.ts              # Three场景、资产、纯视觉岸沿
-    feedback.ts           # 石子、轨迹、实例水滴与效果场的逐帧同步
-    effects.ts            # 原确定性接触效果状态
-    water.ts              # 原水面shader与波包
-    sheets.ts             # 原薄片网格
-  camera/rig.ts            # 纯机位计算、平滑过渡、固定/跟随/低机位环绕
+    world.ts              # Three场景、落日灯光、自然渐深河床、焦散与石子/瞄准引导接线
+    sunset-env.ts         # 程序化Rayleigh/Mie落日天空穹顶、PMREM、远山剪影、自然岸沿与风摆芦苇
+    post.ts               # EffectComposer + 选择性UnrealBloom + 电影暗角/冷暖调色 + OutputPass
+    coherent.ts           # GPU RGBA32F 双缓冲高度场与焦散求解器
+    water.ts              # Three Water 反射/透射、高度场位移法线、暮色双瓣高光与尾迹微沫
+    surface-churn.ts      # 沿湿迹沉积的微气泡/白沫光学厚度纹理
+    spray.ts              # 逆光水幕网格 (WaterRibbon) 与毛细缩颈细滴 (SprayDrop)
+    stone-mesh.ts         # 程序化多形态米制石子网格、Blender GLB热插拔、触水变湿与3D握石预览台
+    aim-guide.ts          # 回拉瞄准时的淡金色第一落水点引导弧与着水环
+    feedback.ts           # 石子、轨迹、水面与飞溅的逐帧同步
+    effects.ts / sheets.ts / heightfield.ts / liquid.ts / sheet-shape.ts / breakup-noise.ts
+                          # 历史确定性结构实验模块（保留供专项回归测试）
+  audio/
+    engine.ts             # Web Audio + 离线采样混合电影声学引擎（物理沉水、3D衰减、慢放滤波）
+  camera/rig.ts           # 岸后全景、高速长投航道、近景跟随与缓慢微转 (15°–30°) 子弹时间镜头
   input/
-    gesture.ts            # 原纯手势状态机
-    bind.ts               # PointerEvent接线、捕获与各种取消路径
+    pull-gesture.ts       # 湖面回拉蓄力、方向瞄准与手腕切旋甜蜜区状态机
+    gesture.ts            # 原纯按住手势状态机（保留兼容测试）
+    bind.ts               # PointerEvent 绑定辅助
   ui/
-    panel.ts              # 页面骨架与手势HUD
-    launch-panel.ts       # 投掷目标与温度开发控件
-    camera-panel.ts       # 视角、播放倍率、全景参数与重置
-    telemetry.ts          # 中文状态与诊断
-    style.css             # 桌面/手机响应式布局
+    panel.ts              # 全屏电影HUD、左下角握石台与可折叠实验室抽屉骨架
+    stone-drawer.ts       # 岸边拣石与8格随身石匣交互浮层
+    bounce-markers.ts     # 水面空间跳数微标投影层
+    launch-panel.ts       # 实验室投掷参数（含roll/signed spin）与快照控件
+    camera-panel.ts       # 视角、播放倍率与全景参数控件
+    telemetry.ts          # 个人最佳纪录持久化、跳数动画与SI诊断
+    style.css             # 暮色磨砂玻璃全屏样式与移动端响应式
 tests/
-  *.test.ts               # 原36项 + 镜头/回放7项
+  *.test.ts               # 18个测试文件（共106项：96通过/0失败/10历史跳过）
   fixtures/contact-before.json
-tools/
-  prepare-assets.mjs
-  sweep.ts
-  variation-sweep.ts
-  contact-calibration.ts
-public/assets/            # 运行资产及可恢复GLB编码源
+tools/                    # 资产恢复、物理扫描、接触校准与浏览器采集脚本
+public/assets/            # 原始GLB编码源、湖景与离线生成的7条音频素材
 ```
 
 不引入ECS、容器或DI框架。Session只依赖确定性物理/效果；CameraRig只接收位置、播放状态和独立展示时间，不回写物理。输入控件不会修改飞行中的Launch。app编排各层，不把原main全文换名塞进另一文件。
