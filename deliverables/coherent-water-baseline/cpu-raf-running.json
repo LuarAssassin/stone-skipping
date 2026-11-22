@@ -1,0 +1,19 @@
+{
+  "context": "Three-second real default-game after-sink water-running sample in follow view (visual time ~2.54 to 5.68). CPU includes water scheduling and rendering submission, not GPU execution; this is not a full-flight physics benchmark.",
+  "cpuMs": {
+    "count": 152,
+    "max": 3,
+    "mean": 1.296052631578708,
+    "p50": 1,
+    "p95": 2
+  },
+  "gpuTimerQueryUsed": false,
+  "rafMs": {
+    "count": 152,
+    "max": 75,
+    "mean": 20.605263157894736,
+    "p50": 17,
+    "p95": 61
+  },
+  "visualTime": 5.67525000000119
+}

@@ -1,0 +1,137 @@
+From 2d51e5b34d15d1c08b06bbcfd0acfb9bc5eb86e9 Mon Sep 17 00:00:00 2001
+From: sugarsopenclaw <258971782+sugarsopenclaw@users.noreply.github.com>
+Date: Mon, 16 Nov 2026 00:46:18 -0800
+Subject: [PATCH 1/5] feat(water): return displaced volume to an oriented
+ surface rim
+
+---
+ src/rendering/coherent.ts        | 19 ++++++++++++-------
+ src/simulation/water-grid.ts     | 13 ++++++++++---
+ tests/contact-resolution.test.ts | 13 ++++++++++++-
+ 3 files changed, 34 insertions(+), 11 deletions(-)
+
+diff --git a/src/rendering/coherent.ts b/src/rendering/coherent.ts
+index e6f38eb..a76dc2c 100644
+--- a/src/rendering/coherent.ts
++++ b/src/rendering/coherent.ts
+@@ -1,9 +1,7 @@
+ import * as THREE from 'three';
+-import {FINE_GRID,validFootprint,interpolateFootprint,displacementScale,momentumSource,reactionFraction,type WaterGrid,type Footprint,type WaterTick} from '../simulation/water-grid';
++import {FINE_GRID,validFootprint,interpolateFootprint,displacementScale,displacedRim,momentumSource,reactionFraction,type WaterGrid,type Footprint,type WaterTick} from '../simulation/water-grid';
+ export * from '../simulation/water-grid';
+ 
+-// Evan Wallace MIT four-neighbour update, now parameterised in world units.
+-// Optical caustics adaptation and source attribution: THIRD_PARTY_NOTICES.md.
+ export class CoherentWater {
+  readonly targets:THREE.WebGLRenderTarget[];
+  readonly caustics=new THREE.WebGLRenderTarget(1024,512,{type:THREE.HalfFloatType,depthBuffer:false});
+@@ -13,8 +11,8 @@ export class CoherentWater {
+  private scene=new THREE.Scene();
+  private camera=new THREE.Camera();
+  private scaleCache=new Map<string,number>();
+- private material=new THREE.ShaderMaterial({depthTest:false,depthWrite:false,uniforms:{state:{value:null},resolution:{value:new THREE.Vector2()},coefficients:{value:new THREE.Vector3()},oldSource:{value:new THREE.Vector4()},newSource:{value:new THREE.Vector4()},depths:{value:new THREE.Vector2()},shapes:{value:new THREE.Vector4(1,0,1,0)},scales:{value:new THREE.Vector2()},reaction:{value:new THREE.Vector4()},mode:{value:0}},vertexShader:'varying vec2 coord; void main(){coord=uv;gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:`
+- uniform sampler2D state;uniform vec2 resolution,depths,scales;uniform vec3 coefficients;uniform vec4 oldSource,newSource,shapes,reaction;uniform int mode;
++ private material=new THREE.ShaderMaterial({depthTest:false,depthWrite:false,uniforms:{state:{value:null},resolution:{value:new THREE.Vector2()},coefficients:{value:new THREE.Vector3()},oldSource:{value:new THREE.Vector4()},newSource:{value:new THREE.Vector4()},depths:{value:new THREE.Vector2()},shapes:{value:new THREE.Vector4(1,0,1,0)},scales:{value:new THREE.Vector2()},rimScales:{value:new THREE.Vector2()},reaction:{value:new THREE.Vector4()},mode:{value:0}},vertexShader:'varying vec2 coord; void main(){coord=uv;gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:`
++ uniform sampler2D state;uniform vec2 resolution,depths,scales,rimScales;uniform vec3 coefficients;uniform vec4 oldSource,newSource,shapes,reaction;uniform int mode;
+  float volumePoint(vec2 uv,vec4 source,float depth,vec2 shape){
+   vec2 p=uv*vec2(16.,8.)-vec2(0.,4.)-source.xy;
+   if(abs(p.x)>source.w*max(1.,shape.x)||abs(p.y)>source.w*max(1.,shape.x)||abs(source.z)>depth*3.)return 0.;
+@@ -27,10 +25,16 @@ export class CoherentWater {
+   vec2 d=.2886751345948129/resolution;
+   return .25*(volumePoint(uv+d,source,depth,shape)+volumePoint(uv-d,source,depth,shape)+volumePoint(uv+vec2(d.x,-d.y),source,depth,shape)+volumePoint(uv+vec2(-d.x,d.y),source,depth,shape));
+  }
++ float displacedSurface(vec2 uv,vec4 source,float depth,vec2 shape,float scale,float rimScale){
++  if(scale==0.&&rimScale==0.)return 0.;
++  vec2 offset=uv*vec2(16.,8.)-vec2(0.,4.)-source.xy;
++  if(any(greaterThan(abs(offset),vec2(source.w*2.*max(1.,shape.x))+vec2(16.,8.)/resolution)))return 0.;
++  vec4 rim=source;rim.w*=2.;
++  return (rimScale*.25*volumeCell(uv,rim,depth,shape)-scale*volumeCell(uv,source,depth,shape))*(4./3.);
++ }
+  float change(vec2 uv){
+   if(mode!=3)return 0.;
+-  float h=0.;if(scales.x!=0.)h+=scales.x*volumeCell(uv,oldSource,depths.x,shapes.xy);
+-  if(scales.y!=0.)h-=scales.y*volumeCell(uv,newSource,depths.y,shapes.zw);return h;
++  return displacedSurface(uv,newSource,depths.y,shapes.zw,scales.y,rimScales.y)-displacedSurface(uv,oldSource,depths.x,shapes.xy,scales.x,rimScales.x);
+  }
+  float heightAt(vec2 uv){return texture2D(state,uv).r+change(clamp(uv,vec2(.5)/resolution,vec2(1.)-vec2(.5)/resolution));}
+  void main(){
+@@ -76,6 +80,7 @@ export class CoherentWater {
+    this.material.uniforms.oldSource.value.set(a.x,a.z,a.y,a.radius);this.material.uniforms.newSource.value.set(b.x,b.z,b.y,b.radius);
+    this.material.uniforms.depths.value.set(a.depth,b.depth);this.material.uniforms.shapes.value.set(a.aspect??1,a.angle??0,b.aspect??1,b.angle??0);
+    this.material.uniforms.scales.value.set(this.scale(a),this.scale(b));
++   this.material.uniforms.rimScales.value.set(this.scale(displacedRim(a)),this.scale(displacedRim(b)));
+    const fraction=reactionFraction(tick.momentum,i,n);
+    const m=tick.momentum&&fraction>0?{...tick.momentum,impulseY:tick.momentum.impulseY*fraction}:undefined;
+    const reaction=momentumSource(m,this.grid,this.grid.dt,true);
+diff --git a/src/simulation/water-grid.ts b/src/simulation/water-grid.ts
+index ae9cd42..f84b762 100644
+--- a/src/simulation/water-grid.ts
++++ b/src/simulation/water-grid.ts
+@@ -1,4 +1,3 @@
+-// World-unit water discretisation. No renderer imports.
+ export interface Footprint { x:number; z:number; y:number; radius:number; depth:number; aspect?:number; angle?:number }
+ export interface WaterMomentum { x:number; z:number; impulseY:number; wetArea?:number; from?:number; to?:number }
+ export interface WaterTick { old:Footprint; next:Footprint; momentum?:WaterMomentum }
+@@ -46,17 +45,25 @@ export function cellDisplacement(p:Footprint,col:number,row:number,g:WaterGrid){
+ export function displacementScale(p:Footprint,g:WaterGrid){
+  const target=displacedVolume(p);if(target<1e-18)return 0;
+  const radius=p.radius*Math.max(1,p.aspect??1);
+- if(p.x-radius<0||p.x+radius>16||p.z-radius< -4||p.z+radius>4)return 1; // Open/truncated source, not redistributed into the domain.
++ if(p.x-radius<0||p.x+radius>16||p.z-radius< -4||p.z+radius>4)return 1;
+  let sampled=0;
+  const left=Math.max(0,Math.floor((p.x-radius)/g.dx)),right=Math.min(g.width-1,Math.ceil((p.x+radius)/g.dx));
+  const top=Math.max(0,Math.floor((p.z+4-radius)/g.dz)),bottom=Math.min(g.height-1,Math.ceil((p.z+4+radius)/g.dz));
+  for(let row=top;row<=bottom;row++)for(let col=left;col<=right;col++)sampled+=cellDisplacement(p,col,row,g)*g.dx*g.dz;
+  return sampled>1e-30?target/sampled:0;
+ }
++export function displacedRim(p:Footprint):Footprint {
++ return {...p,radius:p.radius*2};
++}
++export function redistributedDisplacement(p:Footprint,col:number,row:number,g:WaterGrid){
++ const rim=displacedRim(p);
++ const inner=displacementScale(p,g)*cellDisplacement(p,col,row,g);
++ const outer=displacementScale(rim,g)*cellDisplacement(rim,col,row,g)/4;
++ return (outer-inner)*4/3;
++}
+ export function momentumSource(m?:WaterMomentum,g:WaterGrid=BASE_GRID,dt=WATER_DT,gpuPrecision=false){
+  const physicalSigma=m?.wetArea!==undefined?Math.max(.004,Math.min(.04,Math.sqrt(Math.max(0,m.wetArea)/(2*Math.PI)))):.0390625;
+  const sigma=gpuPrecision?Math.fround(physicalSigma):physicalSigma;
+- // Match the uploaded cell-space centre, including the domain's z origin.
+  const x=gpuPrecision?Math.fround((m?.x??0)/g.dx)*g.dx:(m?.x??0);
+  const z=gpuPrecision?Math.fround(((m?.z??0)+4)/g.dz)*g.dz-4:(m?.z??0);
+  if(!m||![m.x,m.z,m.impulseY,sigma].every(Number.isFinite))return {x:0,z:0,sigma,increment:0,normalization:0,energy:0};
+diff --git a/tests/contact-resolution.test.ts b/tests/contact-resolution.test.ts
+index 7c9d4e3..f16f59f 100644
+--- a/tests/contact-resolution.test.ts
++++ b/tests/contact-resolution.test.ts
+@@ -1,6 +1,6 @@
+ import {test} from 'node:test';
+ import assert from 'node:assert/strict';
+-import {BASE_GRID,FINE_GRID,WATER_DT,WATER_SPEED,WATER_DENSITY,WATER_PARTICIPATION_DEPTH,waterGrid,momentumSource,reactionFraction,displacedVolume,displacementScale,cellDisplacement,interpolateFootprint} from '../src/simulation/water-grid';
++import {BASE_GRID,FINE_GRID,WATER_DT,WATER_SPEED,WATER_DENSITY,WATER_PARTICIPATION_DEPTH,waterGrid,momentumSource,reactionFraction,displacedVolume,displacementScale,cellDisplacement,interpolateFootprint,redistributedDisplacement} from '../src/simulation/water-grid';
+ import {Session} from '../src/app/session';
+ import {DEFAULT} from '../src/simulation/physics';
+ 
+@@ -47,6 +47,17 @@ test('cell-integrated kinematic source preserves analytic displaced volume as th
+   assert.ok(Math.abs(volume-displacedVolume(p))<1e-16);
+  }
+ });
++test('oriented displacement returns its cavity volume to a continuous raised rim',()=>{
++ for(const g of [BASE_GRID,FINE_GRID]){
++  const p={x:3.217,z:-.031,y:-.002,radius:.04,depth:.0045,aspect:.75,angle:.73};
++  let volume=0,low=0,high=0;
++  for(let row=Math.floor((p.z+4-.09)/g.dz);row<=Math.ceil((p.z+4+.09)/g.dz);row++)for(let col=Math.floor((p.x-.09)/g.dx);col<=Math.ceil((p.x+.09)/g.dx);col++){
++   const value=redistributedDisplacement(p,col,row,g);volume+=value*g.dx*g.dz;low=Math.min(low,value);high=Math.max(high,value);
++  }
++  assert.ok(Math.abs(volume)<1e-16);assert.ok(low<0);assert.ok(high>0);
++  assert.equal(redistributedDisplacement({...p,y:-.3},Math.floor(p.x/g.dx),Math.floor((p.z+4)/g.dz),g),0);
++ }
++});
+ test('substep reaction fractions sum once and do not begin before their measured interval',()=>{
+  const m={x:2,z:0,impulseY:-.02,from:.27,to:.91};
+  for(let n=1;n<=12;n++){
+
+base-commit: 955d36fac58afd98235de07505e573bb03f62b3a
+-- 
+2.53.0
+

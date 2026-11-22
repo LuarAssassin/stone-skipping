@@ -1,0 +1,193 @@
+{
+  "alignment": {
+    "cellCentres": true,
+    "grid": {
+      "cfl": 0.7999999999999999,
+      "damping": 0.9989979939789199,
+      "dt": 0.0016666666666666666,
+      "dx": 0.0078125,
+      "dz": 0.0078125,
+      "height": 1024,
+      "speed": 2.651650429449553,
+      "substeps": 5,
+      "width": 2048,
+      "wx": 0.3199999999999999,
+      "wz": 0.3199999999999999
+    },
+    "samplerUsesDirectUv": true,
+    "surfaceVertexCount": 2123856
+  },
+  "errors": [],
+  "frontRadiusDifferenceFineToMid": 0.010000000000000009,
+  "glError": 0,
+  "limitations": "Linear heightfield, not airborne fluid. Global fine grid; no adaptive-patch claim. Front is peak annular height-squared density, not leading support. Mean-volume approximation remains.",
+  "programs": [
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": "MirrorShader"
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": "Slate_PBR"
+    },
+    {
+      "linked": true,
+      "name": "Slate_PBR"
+    }
+  ],
+  "replays": [
+    {
+      "commandsIdentical": true,
+      "maxRgbaDifference": 0,
+      "mode": "normal",
+      "ticks": 480,
+      "time": 3.999999999999143
+    },
+    {
+      "commandsIdentical": true,
+      "maxRgbaDifference": 0,
+      "mode": "slow",
+      "ticks": 480,
+      "time": 3.999999999999143
+    },
+    {
+      "commandsIdentical": true,
+      "maxRgbaDifference": 0,
+      "mode": "bullet",
+      "ticks": 480,
+      "time": 3.999999999999143
+    }
+  ],
+  "resolutions": [
+    {
+      "estimatedFrontSpeed": 2.325,
+      "expectedDampedImpulse": -0.01992496867163,
+      "finite": true,
+      "grid": {
+        "cfl": 0.5,
+        "damping": 0.9974968671630001,
+        "dt": 0.004166666666666667,
+        "dx": 0.03125,
+        "dz": 0.03125,
+        "height": 256,
+        "speed": 2.651650429449553,
+        "substeps": 2,
+        "width": 512,
+        "wx": 0.12499999999999997,
+        "wz": 0.12499999999999997
+      },
+      "impulseError": 1.2100812955828655e-9,
+      "injected": -0.02,
+      "meanVolume": -0.00009317740477577779,
+      "measuredImpulse": -0.019924967461548704,
+      "peakAfterPoint2s": 0.0002471061598043889,
+      "ringEnergyPeakRadius": 0.465,
+      "source": {
+        "cells": 5,
+        "energy": 0.0035849415056479752,
+        "increment": -0.0018243012025963934,
+        "normalization": 0.0011419897823716162,
+        "sigma": 0.01261566299945116,
+        "x": 4.013000011444092,
+        "z": 0.017000198364257812
+      },
+      "width": 512
+    },
+    {
+      "estimatedFrontSpeed": 2.4749999999999996,
+      "expectedDampedImpulse": -0.01993329620341118,
+      "finite": true,
+      "grid": {
+        "cfl": 0.6666666666666666,
+        "damping": 0.9983305478136913,
+        "dt": 0.002777777777777778,
+        "dx": 0.015625,
+        "dz": 0.015625,
+        "height": 512,
+        "speed": 2.651650429449553,
+        "substeps": 3,
+        "width": 1024,
+        "wx": 0.22222222222222215,
+        "wz": 0.22222222222222215
+      },
+      "impulseError": 1.3079874267019065e-9,
+      "injected": -0.02,
+      "meanVolume": -0.00009290818024429347,
+      "measuredImpulse": -0.019933297511398607,
+      "peakAfterPoint2s": 0.0002664283965714276,
+      "ringEnergyPeakRadius": 0.495,
+      "source": {
+        "cells": 18,
+        "energy": 0.0025510546212497765,
+        "increment": -0.0014061305809096635,
+        "normalization": 0.000987738199954644,
+        "sigma": 0.01261566299945116,
+        "x": 4.013000011444092,
+        "z": 0.017000198364257812
+      },
+      "width": 1024
+    },
+    {
+      "estimatedFrontSpeed": 2.525,
+      "expectedDampedImpulse": -0.019939959899682873,
+      "finite": true,
+      "grid": {
+        "cfl": 0.7999999999999999,
+        "damping": 0.9989979939789199,
+        "dt": 0.0016666666666666666,
+        "dx": 0.0078125,
+        "dz": 0.0078125,
+        "height": 1024,
+        "speed": 2.651650429449553,
+        "substeps": 5,
+        "width": 2048,
+        "wx": 0.3199999999999999,
+        "wz": 0.3199999999999999
+      },
+      "impulseError": 9.401284264964893e-11,
+      "injected": -0.02,
+      "meanVolume": -0.00009269259395859239,
+      "measuredImpulse": -0.019939959993695716,
+      "peakAfterPoint2s": 0.00025401278981007636,
+      "ringEnergyPeakRadius": 0.505,
+      "source": {
+        "cells": 74,
+        "energy": 0.0025557286698294685,
+        "increment": -0.0008426225006254154,
+        "normalization": 0.0009889758850669338,
+        "sigma": 0.01261566299945116,
+        "x": 4.013000011444092,
+        "z": 0.017000198364257812
+      },
+      "width": 2048
+    }
+  ]
+}

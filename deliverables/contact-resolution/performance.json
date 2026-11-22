@@ -1,0 +1,25 @@
+{
+  "cpu": {
+    "max": 6,
+    "mean": 2.2254901960767195,
+    "p50": 2,
+    "p95": 4
+  },
+  "ended": true,
+  "errors": [],
+  "frames": 102,
+  "glError": 0,
+  "gpuTimerAvailable": false,
+  "memory": {
+    "geometries": 7,
+    "textures": 8
+  },
+  "raf": {
+    "max": 224,
+    "mean": 30.03921568627451,
+    "p50": 22,
+    "p95": 63
+  },
+  "visualTime": 3.122999999999629,
+  "wallMs": 3020
+}

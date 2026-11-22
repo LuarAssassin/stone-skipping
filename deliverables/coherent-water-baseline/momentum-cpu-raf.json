@@ -1,0 +1,18 @@
+{
+  "cpu": {
+    "max": 3,
+    "mean": 1.261111111109656,
+    "p50": 1,
+    "p95": 2
+  },
+  "frames": 180,
+  "glError": 0,
+  "label": "short actual running desktop sample; tail180 frames, includes later after-sink; CPU submission/RAF only, no GPU timer query",
+  "raf": {
+    "max": 70,
+    "mean": 20.511111111111113,
+    "p50": 17,
+    "p95": 57
+  },
+  "visualTime": 59.871750000194865
+}

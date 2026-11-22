@@ -1,0 +1,20 @@
+{
+  "note": "Same current Linux/Electron session, follow view, 1024x768; 4 second RAF sample, not GPU timings. Screenshot playback measured separately.",
+  "before": {
+    "count": 203,
+    "mean": 20.275862068965516,
+    "p95": 57,
+    "max": 70,
+    "time": 4.115999999999285
+  },
+  "after": {
+    "count": 203,
+    "ended": true,
+    "errors": [],
+    "glError": 0,
+    "max": 67,
+    "mean": 20.379310344827587,
+    "p95": 57,
+    "time": 4.13699999999931
+  }
+}

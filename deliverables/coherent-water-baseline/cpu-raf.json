@@ -1,0 +1,18 @@
+{
+  "context": "Default game, retained last 600 RAF samples, includes paused review frames and controlled captures; CPU elapsed includes rendering submission, not GPU execution.",
+  "cpuMs": {
+    "count": 600,
+    "max": 3,
+    "mean": 0.9666666666661816,
+    "p50": 1,
+    "p95": 1.0000000000291038
+  },
+  "gpuTimerQueryUsed": false,
+  "rafMs": {
+    "count": 600,
+    "max": 107,
+    "mean": 21.535,
+    "p50": 17,
+    "p95": 86
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "abSamePhysics": true,
+  "controlsNextThrowOnly": true,
+  "errors": [],
+  "paused": true,
+  "programs": [
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": "MirrorShader"
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": "Slate_PBR"
+    },
+    {
+      "linked": true,
+      "name": "Slate_PBR"
+    }
+  ],
+  "time": 0.3749999999999931
+}

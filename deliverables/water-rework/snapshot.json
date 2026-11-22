@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "seed": 271,
+  "temperature": 0,
+  "target": {
+    "speed": 11,
+    "elevation": 2,
+    "tilt": 6,
+    "spin": 18,
+    "direction": 0
+  },
+  "sampled": {
+    "speed": 11,
+    "elevation": 2,
+    "tilt": 6,
+    "spin": 18,
+    "direction": 0
+  }
+}

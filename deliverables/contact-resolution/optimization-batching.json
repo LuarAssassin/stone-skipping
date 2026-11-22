@@ -1,0 +1,24 @@
+{
+  "batching": [
+    {
+      "batched": false,
+      "finite": true,
+      "maxRgbaDifference": 0,
+      "ticks": 480
+    },
+    {
+      "batched": true,
+      "finite": true,
+      "maxRgbaDifference": 0,
+      "ticks": 480
+    }
+  ],
+  "displacement": {
+    "maximum": 0.0011666748905554414,
+    "minimum": -0.003927056677639484,
+    "tolerance": 1e-7,
+    "volume": -2.748484773107407e-11
+  },
+  "errors": [],
+  "glError": 0
+}

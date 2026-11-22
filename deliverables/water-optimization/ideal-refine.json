@@ -1,0 +1,538 @@
+{
+  "rows": [
+    {
+      "launch": {
+        "speed": 24,
+        "spin": 55,
+        "tilt": 14,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 91,
+      "distance": 51.1691680078839,
+      "time": 4.571968749993581
+    },
+    {
+      "launch": {
+        "speed": 26,
+        "spin": 55,
+        "tilt": 10,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 89,
+      "distance": 53.97891253861686,
+      "time": 4.28442187499425
+    },
+    {
+      "launch": {
+        "speed": 22,
+        "spin": 45,
+        "tilt": 14,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 88,
+      "distance": 42.98679435483543,
+      "time": 4.154882812494553
+    },
+    {
+      "launch": {
+        "speed": 24,
+        "spin": 55,
+        "tilt": 12,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 93,
+      "distance": 50.02897640635376,
+      "time": 4.406968749993966
+    },
+    {
+      "launch": {
+        "speed": 22,
+        "spin": 55,
+        "tilt": 12,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 82,
+      "distance": 43.30000700260411,
+      "time": 4.2370937499943615
+    },
+    {
+      "launch": {
+        "speed": 26,
+        "spin": 55,
+        "tilt": 14,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 98,
+      "distance": 58.47383472515207,
+      "time": 4.769210937493129
+    },
+    {
+      "launch": {
+        "speed": 26,
+        "spin": 55,
+        "tilt": 8,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 79,
+      "distance": 48.87920800080223,
+      "time": 3.9456406249950415
+    },
+    {
+      "launch": {
+        "speed": 22,
+        "spin": 50,
+        "tilt": 14,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 76,
+      "distance": 43.63068973404425,
+      "time": 4.277148437494268
+    },
+    {
+      "launch": {
+        "speed": 24,
+        "spin": 55,
+        "tilt": 8,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 76,
+      "distance": 43.01538092855453,
+      "time": 3.8180703124953372
+    },
+    {
+      "launch": {
+        "speed": 26,
+        "spin": 50,
+        "tilt": 14,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 75,
+      "distance": 57.92137439817602,
+      "time": 4.725796874993507
+    },
+    {
+      "launch": {
+        "speed": 22,
+        "spin": 45,
+        "tilt": 8,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 108,
+      "distance": 35.1578483776631,
+      "time": 3.3543828124964175
+    },
+    {
+      "launch": {
+        "speed": 26,
+        "spin": 45,
+        "tilt": 14,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 109,
+      "distance": 57.06323327105386,
+      "time": 4.558039062493615
+    },
+    {
+      "launch": {
+        "speed": 22,
+        "spin": 55,
+        "tilt": 10,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 69,
+      "distance": 41.265986587435115,
+      "time": 4.027085937494852
+    },
+    {
+      "launch": {
+        "speed": 26,
+        "spin": 50,
+        "tilt": 10,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 69,
+      "distance": 52.7933126628233,
+      "time": 4.181171874994493
+    },
+    {
+      "launch": {
+        "speed": 24,
+        "spin": 50,
+        "tilt": 8,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 67,
+      "distance": 41.96460499060775,
+      "time": 3.6933515624956286
+    },
+    {
+      "launch": {
+        "speed": 22,
+        "spin": 50,
+        "tilt": 12,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 62,
+      "distance": 42.683647135128695,
+      "time": 4.187914062494478
+    },
+    {
+      "launch": {
+        "speed": 24,
+        "spin": 45,
+        "tilt": 12,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 62,
+      "distance": 48.40977138732564,
+      "time": 4.204148437494437
+    },
+    {
+      "launch": {
+        "speed": 22,
+        "spin": 45,
+        "tilt": 10,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 60,
+      "distance": 39.60113809184621,
+      "time": 3.7957421874953914
+    },
+    {
+      "launch": {
+        "speed": 24,
+        "spin": 50,
+        "tilt": 14,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 60,
+      "distance": 50.74831828144435,
+      "time": 4.519351562494055
+    },
+    {
+      "launch": {
+        "speed": 24,
+        "spin": 45,
+        "tilt": 8,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 58,
+      "distance": 40.8623520955395,
+      "time": 3.5479609374959673
+    },
+    {
+      "launch": {
+        "speed": 24,
+        "spin": 55,
+        "tilt": 10,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 58,
+      "distance": 47.53293174243746,
+      "time": 4.231867187494375
+    },
+    {
+      "launch": {
+        "speed": 22,
+        "spin": 50,
+        "tilt": 8,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 57,
+      "distance": 36.550547063007784,
+      "time": 3.5864687499958783
+    },
+    {
+      "launch": {
+        "speed": 24,
+        "spin": 50,
+        "tilt": 10,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 57,
+      "distance": 46.38645446342737,
+      "time": 4.094101562494695
+    },
+    {
+      "launch": {
+        "speed": 22,
+        "spin": 55,
+        "tilt": 14,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 55,
+      "distance": 44.07669836713408,
+      "time": 4.377265624994036
+    },
+    {
+      "launch": {
+        "speed": 26,
+        "spin": 50,
+        "tilt": 8,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 52,
+      "distance": 48.074051493259816,
+      "time": 3.842554687495281
+    },
+    {
+      "launch": {
+        "speed": 22,
+        "spin": 55,
+        "tilt": 8,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 49,
+      "distance": 37.477205004661826,
+      "time": 3.693359374995629
+    },
+    {
+      "launch": {
+        "speed": 26,
+        "spin": 45,
+        "tilt": 10,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 49,
+      "distance": 51.66615208585731,
+      "time": 4.123374999994628
+    },
+    {
+      "launch": {
+        "speed": 26,
+        "spin": 55,
+        "tilt": 12,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 49,
+      "distance": 57.32908363920875,
+      "time": 4.6772421874940555
+    },
+    {
+      "launch": {
+        "speed": 24,
+        "spin": 50,
+        "tilt": 12,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 48,
+      "distance": 49.586931486842246,
+      "time": 4.399843749994358
+    },
+    {
+      "launch": {
+        "speed": 26,
+        "spin": 50,
+        "tilt": 12,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 47,
+      "distance": 56.24736368952571,
+      "time": 4.532820312493841
+    },
+    {
+      "launch": {
+        "speed": 24,
+        "spin": 45,
+        "tilt": 14,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 46,
+      "distance": 50.177286215617805,
+      "time": 4.432562499994144
+    },
+    {
+      "launch": {
+        "speed": 22,
+        "spin": 45,
+        "tilt": 12,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 43,
+      "distance": 42.15184087949242,
+      "time": 4.122148437494628
+    },
+    {
+      "launch": {
+        "speed": 24,
+        "spin": 45,
+        "tilt": 10,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 41,
+      "distance": 45.53882876754357,
+      "time": 4.005968749994899
+    },
+    {
+      "launch": {
+        "speed": 26,
+        "spin": 45,
+        "tilt": 12,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 40,
+      "distance": 55.309566527893736,
+      "time": 4.407843749994557
+    },
+    {
+      "launch": {
+        "speed": 22,
+        "spin": 50,
+        "tilt": 10,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 35,
+      "distance": 40.41165918089053,
+      "time": 3.965078124994996
+    },
+    {
+      "launch": {
+        "speed": 26,
+        "spin": 45,
+        "tilt": 8,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 28,
+      "distance": 46.249858023219296,
+      "time": 3.7006874999956123
+    }
+  ],
+  "verified": [
+    {
+      "launch": {
+        "speed": 24,
+        "spin": 55,
+        "tilt": 14,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 91,
+      "distance": 51.1691680078839,
+      "time": 4.571968749993581,
+      "quarter": {
+        "skips": 108,
+        "distance": 51.02346771694469
+      },
+      "eighth": {
+        "skips": 102,
+        "distance": 51.09217098252964
+      }
+    },
+    {
+      "launch": {
+        "speed": 26,
+        "spin": 55,
+        "tilt": 10,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 89,
+      "distance": 53.97891253861686,
+      "time": 4.28442187499425,
+      "quarter": {
+        "skips": 53,
+        "distance": 54.24465871581868
+      },
+      "eighth": {
+        "skips": 61,
+        "distance": 54.15535343007755
+      }
+    },
+    {
+      "launch": {
+        "speed": 22,
+        "spin": 45,
+        "tilt": 14,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 88,
+      "distance": 42.98679435483543,
+      "time": 4.154882812494553,
+      "quarter": {
+        "skips": 43,
+        "distance": 43.30392724620603
+      },
+      "eighth": {
+        "skips": 73,
+        "distance": 43.14261891896136
+      }
+    },
+    {
+      "launch": {
+        "speed": 24,
+        "spin": 55,
+        "tilt": 12,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 93,
+      "distance": 50.02897640635376,
+      "time": 4.406968749993966,
+      "quarter": {
+        "skips": 75,
+        "distance": 50.07581529423753
+      },
+      "eighth": {
+        "skips": 78,
+        "distance": 50.071342726856905
+      }
+    },
+    {
+      "launch": {
+        "speed": 22,
+        "spin": 55,
+        "tilt": 12,
+        "elevation": 0,
+        "direction": 0
+      },
+      "skips": 82,
+      "distance": 43.30000700260411,
+      "time": 4.2370937499943615,
+      "quarter": {
+        "skips": 75,
+        "distance": 43.31888468759514
+      },
+      "eighth": {
+        "skips": 67,
+        "distance": 43.34006300398544
+      }
+    }
+  ]
+}

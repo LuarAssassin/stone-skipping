@@ -1,0 +1,379 @@
+[
+  {
+    "name": "early-contact",
+    "camera": [
+      1.8198822298246855,
+      0.8222304058179396,
+      1.7650018983250204
+    ],
+    "cameraFov": 48,
+    "cameraQuaternion": [
+      -0.13451940716424557,
+      -0.3908705306116271,
+      -0.057861077971237594,
+      0.9087226491353516
+    ],
+    "glError": 0,
+    "gpu": {
+      "hash": 1283255436,
+      "peak": 0.0048009054735302925
+    },
+    "programs": [
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": "MirrorShader"
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": "Slate_PBR"
+      },
+      {
+        "linked": true,
+        "name": "Slate_PBR"
+      },
+      {
+        "linked": true,
+        "name": ""
+      }
+    ],
+    "shaderErrors": [],
+    "simTime": 0.30000000000000165,
+    "viewport": [
+      1024,
+      768,
+      1
+    ],
+    "visualTime": 0.29999999999999466
+  },
+  {
+    "name": "last-contact",
+    "camera": [
+      5.195299205236884,
+      0.8051513111841142,
+      1.7065947843155027
+    ],
+    "cameraFov": 47.959572318005485,
+    "cameraQuaternion": [
+      -0.13244827063433964,
+      -0.38923304587125196,
+      -0.056664088179020314,
+      0.9098045244548969
+    ],
+    "glError": 0,
+    "gpu": {
+      "hash": 1560233657,
+      "peak": 0.0014525220030918717
+    },
+    "programs": [
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": "MirrorShader"
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": "Slate_PBR"
+      },
+      {
+        "linked": true,
+        "name": "Slate_PBR"
+      },
+      {
+        "linked": true,
+        "name": ""
+      }
+    ],
+    "shaderErrors": [],
+    "simTime": 0.7267499999999653,
+    "viewport": [
+      1024,
+      768,
+      1
+    ],
+    "visualTime": 0.7267499999999477
+  },
+  {
+    "name": "final-sink",
+    "camera": [
+      7.749974150550978,
+      0.502055127068088,
+      1.5009765900343948
+    ],
+    "cameraFov": 47.9999876052868,
+    "cameraQuaternion": [
+      -0.08136560481968418,
+      -0.39548128218661127,
+      -0.03519917140266567,
+      0.9141855457864814
+    ],
+    "glError": 0,
+    "gpu": {
+      "hash": 3158284681,
+      "peak": 0.0025520017370581627
+    },
+    "programs": [
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": "MirrorShader"
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": "Slate_PBR"
+      },
+      {
+        "linked": true,
+        "name": "Slate_PBR"
+      },
+      {
+        "linked": true,
+        "name": ""
+      }
+    ],
+    "shaderErrors": [],
+    "simTime": 2.043062500000245,
+    "viewport": [
+      1024,
+      768,
+      1
+    ],
+    "visualTime": 2.0432500000002274
+  },
+  {
+    "name": "post-sink",
+    "camera": [
+      7.767398026075069,
+      0.4999862150494804,
+      1.499579265224847
+    ],
+    "cameraFov": 47.99999999661273,
+    "cameraQuaternion": [
+      -0.08150268121123011,
+      -0.39357224817070696,
+      -0.035056953941791376,
+      0.915002299672279
+    ],
+    "glError": 0,
+    "gpu": {
+      "hash": 653364780,
+      "peak": 0.0016307826153934002
+    },
+    "programs": [
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": "MirrorShader"
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": "Slate_PBR"
+      },
+      {
+        "linked": true,
+        "name": "Slate_PBR"
+      },
+      {
+        "linked": true,
+        "name": ""
+      }
+    ],
+    "shaderErrors": [],
+    "simTime": 2.043062500000245,
+    "viewport": [
+      1024,
+      768,
+      1
+    ],
+    "visualTime": 2.5432499999999503
+  },
+  {
+    "name": "mouse-continuous",
+    "camera": [
+      1.8198822298246855,
+      0.8222304058179396,
+      1.7650018983250204
+    ],
+    "cameraFov": 48,
+    "cameraQuaternion": [
+      -0.13451940716424557,
+      -0.3908705306116271,
+      -0.057861077971237594,
+      0.9087226491353516
+    ],
+    "glError": 0,
+    "gpu": {
+      "hash": 692887382,
+      "peak": 0.01555371843278408
+    },
+    "mouse": {
+      "depth": 0.075,
+      "radius": 0.22,
+      "x": 2.6,
+      "y": 0,
+      "z": 0
+    },
+    "programs": [
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": "MirrorShader"
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": "Slate_PBR"
+      },
+      {
+        "linked": true,
+        "name": "Slate_PBR"
+      },
+      {
+        "linked": true,
+        "name": ""
+      }
+    ],
+    "shaderErrors": [],
+    "simTime": 0,
+    "viewport": [
+      1024,
+      768,
+      1
+    ],
+    "visualTime": 0.29999999999999466
+  }
+]

@@ -1,0 +1,452 @@
+[
+  {
+    "camera": {
+      "azimuth": 18,
+      "distance": 0.2,
+      "fov": 32,
+      "height": 0.65,
+      "target": 2.9
+    },
+    "errors": [],
+    "physicalSeed": 271,
+    "programs": [
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": "MirrorShader"
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": "Slate_PBR"
+      },
+      {
+        "linked": true,
+        "name": "Slate_PBR"
+      }
+    ],
+    "stage": "contact",
+    "time": 0.2700000000000009,
+    "visual": {
+      "breakup": 1.1,
+      "seed": 0,
+      "sheet": 0.8,
+      "surface": 0.35
+    }
+  },
+  {
+    "camera": {
+      "azimuth": 18,
+      "distance": 0.2,
+      "fov": 32,
+      "height": 0.65,
+      "target": 2.9
+    },
+    "errors": [],
+    "physicalSeed": 271,
+    "programs": [
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": "MirrorShader"
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": "Slate_PBR"
+      },
+      {
+        "linked": true,
+        "name": "Slate_PBR"
+      }
+    ],
+    "stage": "exit",
+    "time": 0.2950000000000019,
+    "visual": {
+      "breakup": 1.1,
+      "seed": 0,
+      "sheet": 0.8,
+      "surface": 0.35
+    }
+  },
+  {
+    "camera": {
+      "azimuth": 18,
+      "distance": 0.2,
+      "fov": 32,
+      "height": 0.65,
+      "target": 2.9
+    },
+    "errors": [],
+    "physicalSeed": 271,
+    "programs": [
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": "MirrorShader"
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": "Slate_PBR"
+      },
+      {
+        "linked": true,
+        "name": "Slate_PBR"
+      }
+    ],
+    "stage": "return",
+    "time": 0.3749999999999931,
+    "visual": {
+      "breakup": 1.1,
+      "seed": 0,
+      "sheet": 0.8,
+      "surface": 0.35
+    }
+  },
+  {
+    "camera": {
+      "azimuth": 0,
+      "distance": -2.5,
+      "fov": 32,
+      "height": 0.18,
+      "target": 2.98
+    },
+    "detail": true,
+    "errors": [],
+    "time": 0.2950000000000019,
+    "visual": {
+      "breakup": 1.1,
+      "seed": 0,
+      "sheet": 0.8,
+      "surface": 0.35
+    }
+  },
+  {
+    "camera": {
+      "azimuth": 18,
+      "distance": 0.2,
+      "fov": 32,
+      "height": 0.65,
+      "target": 2.9
+    },
+    "errors": [],
+    "physicalSeed": 271,
+    "programs": [
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": "MirrorShader"
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": "Slate_PBR"
+      },
+      {
+        "linked": true,
+        "name": "Slate_PBR"
+      }
+    ],
+    "stage": "contact",
+    "time": 0.2700000000000009,
+    "visual": {
+      "breakup": 1.1,
+      "seed": 7,
+      "sheet": 0.8,
+      "surface": 0.35
+    }
+  },
+  {
+    "camera": {
+      "azimuth": 18,
+      "distance": 0.2,
+      "fov": 32,
+      "height": 0.65,
+      "target": 2.9
+    },
+    "errors": [],
+    "physicalSeed": 271,
+    "programs": [
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": "MirrorShader"
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": "Slate_PBR"
+      },
+      {
+        "linked": true,
+        "name": "Slate_PBR"
+      }
+    ],
+    "stage": "exit",
+    "time": 0.2950000000000019,
+    "visual": {
+      "breakup": 1.1,
+      "seed": 7,
+      "sheet": 0.8,
+      "surface": 0.35
+    }
+  },
+  {
+    "camera": {
+      "azimuth": 18,
+      "distance": 0.2,
+      "fov": 32,
+      "height": 0.65,
+      "target": 2.9
+    },
+    "errors": [],
+    "physicalSeed": 271,
+    "programs": [
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": "MirrorShader"
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": ""
+      },
+      {
+        "linked": true,
+        "name": "Slate_PBR"
+      },
+      {
+        "linked": true,
+        "name": "Slate_PBR"
+      }
+    ],
+    "stage": "return",
+    "time": 0.3749999999999931,
+    "visual": {
+      "breakup": 1.1,
+      "seed": 7,
+      "sheet": 0.8,
+      "surface": 0.35
+    }
+  },
+  {
+    "camera": {
+      "azimuth": 0,
+      "distance": -2.5,
+      "fov": 32,
+      "height": 0.18,
+      "target": 2.98
+    },
+    "detail": true,
+    "errors": [],
+    "time": 0.2950000000000019,
+    "visual": {
+      "breakup": 1.1,
+      "seed": 7,
+      "sheet": 0.8,
+      "surface": 0.35
+    }
+  }
+]

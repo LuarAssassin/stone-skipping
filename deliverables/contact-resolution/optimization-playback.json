@@ -1,0 +1,95 @@
+{
+  "note": "Unpaused 1x playback; screenshot time is between before and after, not an exact seek.",
+  "frames": [
+    {
+      "before": {
+        "paused": false,
+        "phase": "飞行",
+        "skips": 1,
+        "time": 0.28999999999999576
+      },
+      "after": {
+        "paused": false,
+        "phase": "接触",
+        "skips": 5,
+        "time": 0.7769999999999422
+      },
+      "file": "deliverables/contact-resolution/optimization-play-0.png"
+    },
+    {
+      "before": {
+        "paused": false,
+        "phase": "接触",
+        "skips": 5,
+        "time": 1.0569999999999367
+      },
+      "after": {
+        "paused": false,
+        "phase": "沉水",
+        "skips": 5,
+        "time": 1.5410000000000983
+      },
+      "file": "deliverables/contact-resolution/optimization-play-1.png"
+    },
+    {
+      "before": {
+        "paused": false,
+        "phase": "沉水",
+        "skips": 5,
+        "time": 1.8640000000002062
+      },
+      "after": {
+        "paused": false,
+        "phase": "已沉水",
+        "skips": 5,
+        "time": 2.360000000000052
+      },
+      "file": "deliverables/contact-resolution/optimization-play-2.png"
+    },
+    {
+      "before": {
+        "paused": false,
+        "phase": "已沉水",
+        "skips": 5,
+        "time": 2.638999999999897
+      },
+      "after": {
+        "paused": false,
+        "phase": "已沉水",
+        "skips": 5,
+        "time": 3.158999999999609
+      },
+      "file": "deliverables/contact-resolution/optimization-play-3.png"
+    },
+    {
+      "before": {
+        "paused": false,
+        "phase": "已沉水",
+        "skips": 5,
+        "time": 3.468999999999437
+      },
+      "after": {
+        "paused": false,
+        "phase": "已沉水",
+        "skips": 5,
+        "time": 3.9829999999991523
+      },
+      "file": "deliverables/contact-resolution/optimization-play-4.png"
+    },
+    {
+      "before": {
+        "paused": false,
+        "phase": "已沉水",
+        "skips": 5,
+        "time": 4.271999999999475
+      },
+      "after": {
+        "paused": false,
+        "phase": "已沉水",
+        "skips": 5,
+        "time": 4.761000000000073
+      },
+      "file": "deliverables/contact-resolution/optimization-play-5.png"
+    }
+  ]
+}

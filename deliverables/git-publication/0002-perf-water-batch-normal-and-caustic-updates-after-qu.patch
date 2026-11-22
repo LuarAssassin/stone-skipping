@@ -1,0 +1,67 @@
+From d7314df4e539c45d3941d1652f03b7528c1f5a0b Mon Sep 17 00:00:00 2001
+From: sugarsopenclaw <258971782+sugarsopenclaw@users.noreply.github.com>
+Date: Mon, 16 Nov 2026 00:46:18 -0800
+Subject: [PATCH 2/5] perf(water): batch normal and caustic updates after
+ queued steps
+
+---
+ src/rendering/coherent.ts | 5 +++--
+ src/rendering/water.ts    | 2 +-
+ tests/coherent.test.ts    | 4 ++--
+ 3 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/src/rendering/coherent.ts b/src/rendering/coherent.ts
+index a76dc2c..24406dc 100644
+--- a/src/rendering/coherent.ts
++++ b/src/rendering/coherent.ts
+@@ -73,7 +73,8 @@ export class CoherentWater {
+   const found=this.scaleCache.get(key);if(found!==undefined)return found;
+   const value=displacementScale(p,this.grid);if(this.scaleCache.size>=64)this.scaleCache.delete(this.scaleCache.keys().next().value!);this.scaleCache.set(key,value);return value;
+  }
+- step(renderer:THREE.WebGLRenderer,tick:WaterTick){
++ updateNormals(renderer:THREE.WebGLRenderer){this.pass(renderer,2);}
++ step(renderer:THREE.WebGLRenderer,tick:WaterTick,updateNormals=true){
+   const old=validFootprint(tick.old),next=validFootprint(tick.next),n=this.grid.substeps;
+   for(let i=0;i<n;i++){
+    const a=interpolateFootprint(old,next,i/n),b=interpolateFootprint(old,next,(i+1)/n);
+@@ -87,7 +88,7 @@ export class CoherentWater {
+    this.material.uniforms.reaction.value.set(reaction.x/this.grid.dx,(reaction.z+4)/this.grid.dz,reaction.sigma,reaction.increment);
+    this.pass(renderer,3);
+   }
+-  this.pass(renderer,2);
++  if(updateNormals)this.updateNormals(renderer);
+  }
+  read(renderer:THREE.WebGLRenderer){const data=new Float32Array(this.grid.width*this.grid.height*4);renderer.readRenderTargetPixels(this.targets[this.index],0,0,this.grid.width,this.grid.height,data);return data;}
+ }
+diff --git a/src/rendering/water.ts b/src/rendering/water.ts
+index a547ab7..ecf9072 100644
+--- a/src/rendering/water.ts
++++ b/src/rendering/water.ts
+@@ -57,6 +57,6 @@ export function createWater(grid:WaterGrid=FINE_GRID){
+   renderer.setRenderTarget(transmission);renderer.clear();renderer.render(scene,camera);renderer.setRenderTarget(target);mesh.visible=visible;
+  };
+  let generation=-1;
+- return {mesh,solver,update(renderer:THREE.WebGLRenderer,ticks:WaterTick[],version:number){if(version!==generation){solver.clear(renderer);generation=version;}for(const tick of ticks)solver.step(renderer,tick);solver.updateCaustics(renderer);ticks.length=0;material.uniforms.heightState.value=solver.texture;}};
++ return {mesh,solver,update(renderer:THREE.WebGLRenderer,ticks:WaterTick[],version:number){const changed=version!==generation||ticks.length>0;if(version!==generation){solver.clear(renderer);generation=version;}for(const tick of ticks)solver.step(renderer,tick,false);if(changed){solver.updateNormals(renderer);solver.updateCaustics(renderer);}ticks.length=0;material.uniforms.heightState.value=solver.texture;}};
+ }
+ 
+diff --git a/tests/coherent.test.ts b/tests/coherent.test.ts
+index 3e9b93b..df32120 100644
+--- a/tests/coherent.test.ts
++++ b/tests/coherent.test.ts
+@@ -29,10 +29,10 @@ test('GPU source uniforms receive orientation and reject zero NaN shape commands
+ });
+ test('generation clears both targets once, drains queue once and keeps target resources stable',()=>{
+  const water=createWater(),targets=[...water.solver.targets];let clears=0,steps=0;
+- water.solver.clear=()=>{clears++;};water.solver.step=()=>{steps++;};water.solver.updateCaustics=()=>{};
++ water.solver.clear=()=>{clears++;};water.solver.step=()=>{steps++;};let normals=0,caustics=0;water.solver.updateNormals=()=>{normals++;};water.solver.updateCaustics=()=>{caustics++;};
+  const queue=[{old:dryFootprint(),next:dryFootprint()}];
+  water.update(null as unknown as THREE.WebGLRenderer,queue,1);water.update(null as unknown as THREE.WebGLRenderer,queue,1);
+- assert.equal(queue.length,0);assert.equal(steps,1);assert.equal(clears,1);
++ assert.equal(queue.length,0);assert.equal(steps,1);assert.equal(clears,1);assert.equal(normals,1);assert.equal(caustics,1);
+  water.update(null as unknown as THREE.WebGLRenderer,queue,2);assert.equal(clears,2);assert.deepEqual(water.solver.targets,targets);water.solver.dispose();
+ });
+ function run(groups:number[],time=2){const session=new Session(()=>271);session.start(DEFAULT,0);let index=0;while(session.visualTime<time-1e-8)session.advance(Math.min(groups[index++%groups.length],time-session.visualTime));return session;}
+-- 
+2.53.0
+

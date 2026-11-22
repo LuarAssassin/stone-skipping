@@ -1,0 +1,24 @@
+{
+  "dropTrianglesPerInstance": 160,
+  "errors": [],
+  "frames": 77,
+  "glError": 0,
+  "linked": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+  ],
+  "mainThreadMeanMs": 5.103896103896387,
+  "mainThreadP95Ms": 10,
+  "passes": "same planar reflection + transmission + main; no added render target/pass"
+}
+

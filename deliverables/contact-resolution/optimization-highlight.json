@@ -1,0 +1,46 @@
+{
+  "before-follow": {
+    "roi": [
+      130,
+      180,
+      330,
+      560
+    ],
+    "pixels": 76000,
+    "allChannelsAbove230": 20150,
+    "meanLuma": 210.95841392631579
+  },
+  "after-follow": {
+    "roi": [
+      130,
+      180,
+      330,
+      560
+    ],
+    "pixels": 76000,
+    "allChannelsAbove230": 0,
+    "meanLuma": 188.64534348157895
+  },
+  "before-sink": {
+    "roi": [
+      130,
+      180,
+      330,
+      560
+    ],
+    "pixels": 76000,
+    "allChannelsAbove230": 18641,
+    "meanLuma": 213.7750885236842
+  },
+  "after-sink": {
+    "roi": [
+      130,
+      180,
+      330,
+      560
+    ],
+    "pixels": 76000,
+    "allChannelsAbove230": 0,
+    "meanLuma": 194.3872653736842
+  }
+}

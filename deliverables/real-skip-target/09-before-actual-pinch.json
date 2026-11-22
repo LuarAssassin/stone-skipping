@@ -1,0 +1,74 @@
+{
+  "bulbRadius": 0.004087959032204337,
+  "camera": {
+    "fov": 38,
+    "position": [
+      2.912561521925619,
+      0.115,
+      0.48789385211218206
+    ]
+  },
+  "errors": [],
+  "linked": [
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": "MirrorShader"
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": "Slate_PBR"
+    },
+    {
+      "linked": true,
+      "name": "Slate_PBR"
+    }
+  ],
+  "neckRadius": 0.000107131049533873,
+  "particles": 4,
+  "selectedLigament": 0,
+  "spec": {
+    "initialLength": 0.005282672050620573,
+    "pinch": 0.3615431030076636,
+    "start": 0.26649999999999996,
+    "stretch": 0.46327406175116703,
+    "u": 0.16,
+    "volume": 2.8793270039538165e-07
+  },
+  "time": 0.36124999999999463
+}

@@ -1,0 +1,98 @@
+{
+  "camera": [
+    7.767398026075069,
+    0.4999862150494804,
+    1.499579265224847
+  ],
+  "cameraFov": 47.99999999661273,
+  "cameraQuaternion": [
+    -0.08150268121123011,
+    -0.39357224817070696,
+    -0.035056953941791376,
+    0.915002299672279
+  ],
+  "glError": 0,
+  "gpu": {
+    "hash": 653364780,
+    "peak": 0.0016307826153934002
+  },
+  "programs": [
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": "MirrorShader"
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": "Slate_PBR"
+    },
+    {
+      "linked": true,
+      "name": "Slate_PBR"
+    },
+    {
+      "linked": true,
+      "name": ""
+    }
+  ],
+  "shaderErrors": [],
+  "simTime": 2.043062500000245,
+  "snapshot": {
+    "sampled": {
+      "direction": -0.6188272524159402,
+      "elevation": 1.9552998458966613,
+      "speed": 11.004204752879836,
+      "spin": 17.62325845554471,
+      "tilt": 6.4760777780320495
+    },
+    "seed": 2735818023,
+    "target": {
+      "direction": 0,
+      "elevation": 2,
+      "speed": 11,
+      "spin": 18,
+      "tilt": 6
+    },
+    "temperature": 1,
+    "version": 1,
+    "visual": {
+      "breakup": 1.1,
+      "seed": 2750435971,
+      "sheet": 0.8,
+      "surface": 0.35
+    }
+  },
+  "viewport": [
+    1024,
+    768,
+    1
+  ],
+  "visualTime": 2.5432499999999503
+}

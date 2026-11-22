@@ -1,0 +1,60 @@
+{
+  "glError": 0,
+  "mouseMode": false,
+  "paused": true,
+  "peak": 0.0012784601422026753,
+  "programs": [
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": "MirrorShader"
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": "Slate_PBR"
+    },
+    {
+      "linked": true,
+      "name": "Slate_PBR"
+    },
+    {
+      "linked": true,
+      "name": ""
+    }
+  ],
+  "queuedTicks": 0,
+  "seed": 2735818023,
+  "shaderErrors": [],
+  "simTime": 0.8499999999999517,
+  "skips": 5,
+  "url": "http://localhost:5173/",
+  "view": "follow",
+  "visualTime": 0.8499999999999341
+}

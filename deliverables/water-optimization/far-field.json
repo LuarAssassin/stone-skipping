@@ -1,0 +1,97 @@
+{
+  "grid": {
+    "width": 4096,
+    "height": 1024,
+    "sizeX": 64,
+    "sizeZ": 32,
+    "dx": 0.015625,
+    "dz": 0.03125,
+    "substeps": 2,
+    "dt": 0.004166666666666667,
+    "speed": 2.651650429449553,
+    "cfl": 0.7905694150420948,
+    "wx": 0.4999999999999999,
+    "wz": 0.12499999999999997,
+    "damping": 0.9974968671630001
+  },
+  "hash": 1832685478,
+  "peak": 0.001733044977299869,
+  "farPeak": 0.001733044977299869,
+  "finite": true,
+  "glError": 0,
+  "programs": [
+    {
+      "name": "",
+      "linked": true
+    },
+    {
+      "name": "",
+      "linked": true
+    },
+    {
+      "name": "",
+      "linked": true
+    },
+    {
+      "name": "",
+      "linked": true
+    },
+    {
+      "name": "",
+      "linked": true
+    },
+    {
+      "name": "",
+      "linked": true
+    },
+    {
+      "name": "",
+      "linked": true
+    },
+    {
+      "name": "",
+      "linked": true
+    },
+    {
+      "name": "MirrorShader",
+      "linked": true
+    },
+    {
+      "name": "MirrorShader",
+      "linked": true
+    },
+    {
+      "name": "",
+      "linked": true
+    },
+    {
+      "name": "",
+      "linked": true
+    },
+    {
+      "name": "",
+      "linked": true
+    },
+    {
+      "name": "",
+      "linked": true
+    },
+    {
+      "name": "",
+      "linked": true
+    },
+    {
+      "name": "",
+      "linked": true
+    }
+  ],
+  "errors": [],
+  "skips": 14,
+  "position": [
+    34.32884150095591,
+    0.01777643295789509,
+    -0.3566567913625779
+  ],
+  "ribbons": 8,
+  "drops": 440
+}

@@ -1,0 +1,170 @@
+{
+  "alignment": {
+    "cellCentres": true,
+    "grid": {
+      "cfl": 0.7999999999999999,
+      "damping": 0.9989979939789199,
+      "dt": 0.0016666666666666666,
+      "dx": 0.0078125,
+      "dz": 0.0078125,
+      "height": 1024,
+      "speed": 2.651650429449553,
+      "substeps": 5,
+      "width": 2048,
+      "wx": 0.3199999999999999,
+      "wz": 0.3199999999999999
+    },
+    "samplerUsesDirectUv": true,
+    "surfaceVertexCount": 2123856
+  },
+  "errors": [],
+  "frontRadiusDifferenceFineToMid": 0,
+  "glError": 0,
+  "limitations": "Linear heightfield, not airborne fluid. Global fine grid; no adaptive-patch claim. Front is peak annular height-squared density, not leading support. Mean-volume approximation remains.",
+  "programs": [
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": "MirrorShader"
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": "Slate_PBR"
+    },
+    {
+      "linked": true,
+      "name": "Slate_PBR"
+    },
+    {
+      "linked": true,
+      "name": ""
+    }
+  ],
+  "replays": [
+    {
+      "commandsIdentical": true,
+      "maxRgbaDifference": 0,
+      "mode": "normal",
+      "ticks": 36,
+      "time": 0.29999999999999466
+    },
+    {
+      "commandsIdentical": true,
+      "maxRgbaDifference": 0,
+      "mode": "slow",
+      "ticks": 36,
+      "time": 0.29999999999999466
+    },
+    {
+      "commandsIdentical": true,
+      "maxRgbaDifference": 0,
+      "mode": "bullet",
+      "ticks": 36,
+      "time": 0.29999999999999466
+    }
+  ],
+  "resolutions": [
+    {
+      "estimatedFrontSpeed": 2.375,
+      "expectedDampedImpulse": -0.01992496867163,
+      "finite": true,
+      "grid": {
+        "cfl": 0.5,
+        "damping": 0.9974968671630001,
+        "dt": 0.004166666666666667,
+        "dx": 0.03125,
+        "dz": 0.03125,
+        "height": 256,
+        "speed": 2.651650429449553,
+        "substeps": 2,
+        "width": 512,
+        "wx": 0.12499999999999997,
+        "wz": 0.12499999999999997
+      },
+      "impulseError": 4.356570178568053e-8,
+      "injected": -0.02,
+      "meanVolume": -0.00009317759617628513,
+      "measuredImpulse": -0.019925012237331785,
+      "peakAfterPoint2s": 0.00015829318726900965,
+      "ringEnergyPeakRadius": 0.47500000000000003,
+      "width": 512
+    },
+    {
+      "estimatedFrontSpeed": 2.425,
+      "expectedDampedImpulse": -0.01993329620341118,
+      "finite": true,
+      "grid": {
+        "cfl": 0.6666666666666666,
+        "damping": 0.9983305478136913,
+        "dt": 0.002777777777777778,
+        "dx": 0.015625,
+        "dz": 0.015625,
+        "height": 512,
+        "speed": 2.651650429449553,
+        "substeps": 3,
+        "width": 1024,
+        "wx": 0.22222222222222215,
+        "wz": 0.22222222222222215
+      },
+      "impulseError": 4.672230972946334e-8,
+      "injected": -0.02,
+      "meanVolume": -0.00009290839836275424,
+      "measuredImpulse": -0.01993334292572091,
+      "peakAfterPoint2s": 0.0001489335991209373,
+      "ringEnergyPeakRadius": 0.485,
+      "width": 1024
+    },
+    {
+      "estimatedFrontSpeed": 2.425,
+      "expectedDampedImpulse": -0.019939959899682873,
+      "finite": true,
+      "grid": {
+        "cfl": 0.7999999999999999,
+        "damping": 0.9989979939789199,
+        "dt": 0.0016666666666666666,
+        "dx": 0.0078125,
+        "dz": 0.0078125,
+        "height": 1024,
+        "speed": 2.651650429449553,
+        "substeps": 5,
+        "width": 2048,
+        "wx": 0.3199999999999999,
+        "wz": 0.3199999999999999
+      },
+      "impulseError": 4.557477360431217e-8,
+      "injected": -0.02,
+      "meanVolume": -0.00009269276989909898,
+      "measuredImpulse": -0.019940005474456478,
+      "peakAfterPoint2s": 0.0001462724758312106,
+      "ringEnergyPeakRadius": 0.485,
+      "width": 2048
+    }
+  ]
+}

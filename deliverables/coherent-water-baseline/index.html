@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Coherent water — retained evidence</title>
+<style>body{background:#10282d;color:#d7ece7;font:16px/1.5 system-ui;margin:24px;max-width:1600px}a{color:#8ce4df}h1{margin-bottom:6px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px}figure{margin:0;background:#1d383d;padding:12px;border-radius:8px}img{width:100%;height:auto}figcaption{font-size:14px}code{color:#b6ded3}nav a{margin-right:20px}.warning{border-left:4px solid #eab76d;padding-left:16px}</style>
+<h1>Coherent water baseline — actual default-game captures</h1>
+<p>Same GPU solver for mouse and real stone; no replacement demo. Full launch snapshots, contact history, exact clocks, GPU hashes and sampled height states accompany the main screenshots.</p>
+<nav><a href="README.md">Measured results, provenance and visual gaps</a><a href="gpu-verification.json">GPU checks</a><a href="cpu-raf-running.json">CPU/RAF sample</a><a href="npm-test.log">Full test log</a><a href="../../docs/COHERENT_WATER_BASELINE.md">Equations / stability</a><a href="../../THIRD_PARTY_NOTICES.md">Upstream / MIT</a><a href="/">Live game</a></nav>
+<p class="warning">68 pass / 0 fail / 10 explicitly retired-renderer skips. Real vertical contact reaction now reaches the GPU; numerical coupling passes, but last-contact/sink visual acceptance still FAILS. Previous images are retained as name.previous.png/json; exact new commands/quaternion are stored. See README for the old-camera-orientation caveat. Identical 480-tick GPU state at visual 4 s for normal/slow/bullet. This is a heightfield: no overturning, airborne water or breakup. Stone ripples remain faint in overview; checker calibration dominates, caustics are approximate. Images were read; visual parity is NOT claimed.</p>
+<h2>Matched-time actual mouse input and Throw-button snapshot</h2><div class="grid" id="primary"></div>
+<h2>Same launch: last contact → final sink → after-sink</h2><div class="grid" id="sink"></div>
+<h2>Separate real hold/drag/release throw gesture</h2><figure><a href="gesture-stone.png"><img src="gesture-stone.png" alt="Actual gesture stone input at visual .3 seconds"></a><figcaption>Separate gesture launch, not matched to the button series. <a href="gesture-stone.json">Full gesture snapshot</a></figcaption></figure>
+<script type="module">
+const format=value=>Number(value).toFixed(6);
+function card(name,state){const figure=document.createElement('figure');figure.innerHTML=`<a href="${name}.png"><img loading="lazy" src="${name}.png" alt="${name}: actual game capture"></a><figcaption><strong>${name}</strong><br>visual ${format(state.time??state.visualTime)} s · physics ${format(state.simTime)} s · ended ${state.ended} · skips ${state.skips}<br>peak ${format((state.peak??state.gpu?.peak)*1000)} mm · RMS ${format((state.rms??state.gpu?.rms)*1000)} mm<br><a href="${name}.json">Exact state / snapshot</a></figcaption>`;return figure;}
+const index=await fetch('capture-index.json').then(response=>response.json());
+for(const entry of [...index.captures,{name:'mouse-matched-0100'}]){const state=await fetch(entry.name+'.json').then(response=>response.json());document.querySelector('#primary').append(card(entry.name,state));}
+for(const name of ['last-contact','final-sink','post-sink']){const state=await fetch(name+'.json').then(response=>response.json());document.querySelector('#sink').append(card(name,state));}
+</script></html>

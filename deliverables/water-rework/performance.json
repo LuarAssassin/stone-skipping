@@ -1,0 +1,98 @@
+{
+  "environment": {
+    "devicePixelRatio": 1,
+    "floatTargets": true,
+    "grid": [
+      512,
+      256
+    ],
+    "maxTexture": 32768,
+    "timerQuery": false,
+    "userAgent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/60.5 Safari/605.1.15",
+    "webgl2": true
+  },
+  "frames": [
+    {
+      "errors": [],
+      "frames": 153,
+      "height": 800,
+      "mainThreadMs": {
+        "max": 16,
+        "mean": 4.947712418300659,
+        "p50": 5,
+        "p95": 8
+      },
+      "mode": "normal",
+      "overflow": false,
+      "rafMs": {
+        "max": 68,
+        "mean": 19.686274509803923,
+        "p50": 17,
+        "p95": 56
+      },
+      "visualTime": 3.2189374999996,
+      "width": 1280
+    },
+    {
+      "errors": [],
+      "frames": 171,
+      "height": 800,
+      "mainThreadMs": {
+        "max": 4,
+        "mean": 1.9064327485379797,
+        "p50": 2,
+        "p95": 3
+      },
+      "mode": "bullet",
+      "overflow": false,
+      "rafMs": {
+        "max": 34,
+        "mean": 17.514619883040936,
+        "p50": 17,
+        "p95": 30
+      },
+      "visualTime": 0.4197499999999935,
+      "width": 1280
+    },
+    {
+      "errors": [],
+      "frames": 178,
+      "height": 844,
+      "mainThreadMs": {
+        "max": 7,
+        "mean": 3.9606741573033197,
+        "p50": 4,
+        "p95": 6
+      },
+      "mode": "normal",
+      "overflow": false,
+      "rafMs": {
+        "max": 22,
+        "mean": 16.831460674157302,
+        "p50": 17,
+        "p95": 21
+      },
+      "visualTime": 3.2109374999996043,
+      "width": 390
+    }
+  ],
+  "textureReadback": {
+    "absoluteError": 0,
+    "column": 92,
+    "cpuHeight": -0.0043592434376478195,
+    "cpuVelocity": -0.00905920471996069,
+    "errors": [],
+    "glError": 0,
+    "method": "GPU texture sampling/readback of the actual CPU solver state, NOT a GPU solver benchmark",
+    "row": 127,
+    "sampledHeight": -0.0043592434376478195,
+    "sampledVelocity": -0.00905920471996069
+  },
+  "cpuSolverStep": {
+    "CFL": 0.31961610124579803,
+    "depth": 256,
+    "meanMs": 0.6083333333333333,
+    "steps": 240,
+    "width": 512
+  }
+}

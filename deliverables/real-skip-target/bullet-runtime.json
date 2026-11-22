@@ -1,0 +1,83 @@
+{
+  "camera": {
+    "fov": 43.999970960477754,
+    "position": [
+      2.985879229985037,
+      0.31548049764028796,
+      -0.6228284385043223
+    ],
+    "quaternion": [
+      0.060806631399891765,
+      0.8919193682986145,
+      0.12613656999861728,
+      -0.4299673938109518
+    ]
+  },
+  "contacts": 1,
+  "cpuMs": {
+    "count": 131,
+    "max": 3.000000000029104,
+    "mean": 2.1450381679382646,
+    "p95": 3
+  },
+  "errors": [],
+  "gpuMs": null,
+  "mode": "bullet",
+  "programs": [
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": "MirrorShader"
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": ""
+    },
+    {
+      "linked": true,
+      "name": "Slate_PBR"
+    },
+    {
+      "linked": true,
+      "name": "Slate_PBR"
+    }
+  ],
+  "rafMs": {
+    "count": 131,
+    "max": 38,
+    "mean": 17.00763358778626,
+    "p95": 18
+  },
+  "time": 0.37124999999999353
+}

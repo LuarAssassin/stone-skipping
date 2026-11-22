@@ -1,0 +1,125 @@
+{
+  "input": "Actual CDP pointer drag/release/re-press in explicit mouse toggle; actual Throw button; replayed captured full throw snapshot at exact visual times. Tick was held during controlled input, not a substitute solver.",
+  "captures": [
+    {
+      "name": "mouse-0100",
+      "time": 0.10000000000000007,
+      "simTime": 0,
+      "ended": false,
+      "skips": 0,
+      "peak": 0.04498014226555824,
+      "rms": 0.0012153989042797053,
+      "hash": 1962486012
+    },
+    {
+      "name": "mouse-drag-0200",
+      "time": 0.20000000000000015,
+      "simTime": 0,
+      "ended": false,
+      "skips": 0,
+      "peak": 0.07545599341392517,
+      "rms": 0.002447568342687578,
+      "hash": 3371787829
+    },
+    {
+      "name": "mouse-overlap-0300",
+      "time": 0.29999999999999466,
+      "simTime": 0,
+      "ended": false,
+      "skips": 0,
+      "peak": 0.09259505569934845,
+      "rms": 0.0033036052661248004,
+      "hash": 3702444036
+    },
+    {
+      "name": "mouse-release-0600",
+      "time": 0.5999999999999617,
+      "simTime": 0,
+      "ended": false,
+      "skips": 0,
+      "peak": 0.048639457672834396,
+      "rms": 0.003530769059606402,
+      "hash": 4071329270
+    },
+    {
+      "name": "stone-0266",
+      "time": 0.2659999999999984,
+      "simTime": 0.2660000000000008,
+      "ended": false,
+      "skips": 0,
+      "peak": 0,
+      "rms": 0,
+      "hash": 664575429
+    },
+    {
+      "name": "stone-0300",
+      "time": 0.29999999999999466,
+      "simTime": 0.30000000000000165,
+      "ended": false,
+      "skips": 1,
+      "peak": 0.001489026821218431,
+      "rms": 0.0000188457023001675,
+      "hash": 2938811158
+    },
+    {
+      "name": "stone-0570",
+      "time": 0.569999999999965,
+      "simTime": 0.5699999999999824,
+      "ended": false,
+      "skips": 3,
+      "peak": 0.0013102260418236256,
+      "rms": 0.00002602234599818673,
+      "hash": 3793604829
+    },
+    {
+      "name": "stone-0635",
+      "time": 0.6349999999999578,
+      "simTime": 0.6349999999999754,
+      "ended": false,
+      "skips": 4,
+      "peak": 0.0013633063063025475,
+      "rms": 0.000027223718146014498,
+      "hash": 1104143486
+    },
+    {
+      "name": "stone-0800",
+      "time": 0.7999999999999396,
+      "simTime": 0.7999999999999572,
+      "ended": false,
+      "skips": 5,
+      "peak": 0.0010884783696383238,
+      "rms": 0.00002845062228000281,
+      "hash": 503860324
+    },
+    {
+      "name": "stone-1990",
+      "time": 1.9900000000002482,
+      "simTime": 1.9900000000002658,
+      "ended": false,
+      "skips": 5,
+      "peak": 0.0028743252623826265,
+      "rms": 0.00015953118865991503,
+      "hash": 3868417446
+    },
+    {
+      "name": "stone-2500",
+      "time": 2.4999999999999742,
+      "simTime": 2.043062500000245,
+      "ended": true,
+      "skips": 5,
+      "peak": 0.0016830306267365813,
+      "rms": 0.0001368807948268449,
+      "hash": 3140606832
+    },
+    {
+      "name": "stone-4000",
+      "time": 3.999999999999143,
+      "simTime": 2.043062500000245,
+      "ended": true,
+      "skips": 5,
+      "peak": 0.0008047268493101001,
+      "rms": 0.00008744570108647382,
+      "hash": 1539115817
+    }
+  ]
+}

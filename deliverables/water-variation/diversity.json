@@ -1,0 +1,1004 @@
+{
+  "physicalSeed": 271,
+  "physicalTemperature": 0,
+  "time": 0.4,
+  "physicsDigest": "b5a075800a78a683e5f0794686dc74e099ea1beeadf443ac8eeb9e643b492b45",
+  "report": [
+    {
+      "tier": "zero",
+      "temperatures": {
+        "surface": 0,
+        "sheet": 0,
+        "breakup": 0
+      },
+      "unique": 1,
+      "repeats": 15,
+      "rows": [
+        {
+          "seed": 0,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06249772066357241,
+          "rightWidth": 0.06249772066357242,
+          "holes": 208,
+          "particleCount": 126,
+          "particleEnergy": 0.000006510102820786587,
+          "shapeSignature": "ee5bb853f7048a64b118950231ed5cff34065c0eb6ae5ffe3b5b68017c3187bc",
+          "holeSignature": "87fbdabc0f6101f7744fdca68e646b1446b8d60aba4755d764817762730d4348",
+          "dropSignature": "d89983ca485e0b32ad36602988126f4d2aca67028597b94932666e6aec498c3b",
+          "signature": "8353b8068bcfac151f241b56ae6842ef84a7403de16c77da83dc30bc48bc2ca2"
+        },
+        {
+          "seed": 1,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06249772066357241,
+          "rightWidth": 0.06249772066357242,
+          "holes": 208,
+          "particleCount": 126,
+          "particleEnergy": 0.000006510102820786587,
+          "shapeSignature": "ee5bb853f7048a64b118950231ed5cff34065c0eb6ae5ffe3b5b68017c3187bc",
+          "holeSignature": "87fbdabc0f6101f7744fdca68e646b1446b8d60aba4755d764817762730d4348",
+          "dropSignature": "d89983ca485e0b32ad36602988126f4d2aca67028597b94932666e6aec498c3b",
+          "signature": "8353b8068bcfac151f241b56ae6842ef84a7403de16c77da83dc30bc48bc2ca2"
+        },
+        {
+          "seed": 2,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06249772066357241,
+          "rightWidth": 0.06249772066357242,
+          "holes": 208,
+          "particleCount": 126,
+          "particleEnergy": 0.000006510102820786587,
+          "shapeSignature": "ee5bb853f7048a64b118950231ed5cff34065c0eb6ae5ffe3b5b68017c3187bc",
+          "holeSignature": "87fbdabc0f6101f7744fdca68e646b1446b8d60aba4755d764817762730d4348",
+          "dropSignature": "d89983ca485e0b32ad36602988126f4d2aca67028597b94932666e6aec498c3b",
+          "signature": "8353b8068bcfac151f241b56ae6842ef84a7403de16c77da83dc30bc48bc2ca2"
+        },
+        {
+          "seed": 3,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06249772066357241,
+          "rightWidth": 0.06249772066357242,
+          "holes": 208,
+          "particleCount": 126,
+          "particleEnergy": 0.000006510102820786587,
+          "shapeSignature": "ee5bb853f7048a64b118950231ed5cff34065c0eb6ae5ffe3b5b68017c3187bc",
+          "holeSignature": "87fbdabc0f6101f7744fdca68e646b1446b8d60aba4755d764817762730d4348",
+          "dropSignature": "d89983ca485e0b32ad36602988126f4d2aca67028597b94932666e6aec498c3b",
+          "signature": "8353b8068bcfac151f241b56ae6842ef84a7403de16c77da83dc30bc48bc2ca2"
+        },
+        {
+          "seed": 4,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06249772066357241,
+          "rightWidth": 0.06249772066357242,
+          "holes": 208,
+          "particleCount": 126,
+          "particleEnergy": 0.000006510102820786587,
+          "shapeSignature": "ee5bb853f7048a64b118950231ed5cff34065c0eb6ae5ffe3b5b68017c3187bc",
+          "holeSignature": "87fbdabc0f6101f7744fdca68e646b1446b8d60aba4755d764817762730d4348",
+          "dropSignature": "d89983ca485e0b32ad36602988126f4d2aca67028597b94932666e6aec498c3b",
+          "signature": "8353b8068bcfac151f241b56ae6842ef84a7403de16c77da83dc30bc48bc2ca2"
+        },
+        {
+          "seed": 5,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06249772066357241,
+          "rightWidth": 0.06249772066357242,
+          "holes": 208,
+          "particleCount": 126,
+          "particleEnergy": 0.000006510102820786587,
+          "shapeSignature": "ee5bb853f7048a64b118950231ed5cff34065c0eb6ae5ffe3b5b68017c3187bc",
+          "holeSignature": "87fbdabc0f6101f7744fdca68e646b1446b8d60aba4755d764817762730d4348",
+          "dropSignature": "d89983ca485e0b32ad36602988126f4d2aca67028597b94932666e6aec498c3b",
+          "signature": "8353b8068bcfac151f241b56ae6842ef84a7403de16c77da83dc30bc48bc2ca2"
+        },
+        {
+          "seed": 6,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06249772066357241,
+          "rightWidth": 0.06249772066357242,
+          "holes": 208,
+          "particleCount": 126,
+          "particleEnergy": 0.000006510102820786587,
+          "shapeSignature": "ee5bb853f7048a64b118950231ed5cff34065c0eb6ae5ffe3b5b68017c3187bc",
+          "holeSignature": "87fbdabc0f6101f7744fdca68e646b1446b8d60aba4755d764817762730d4348",
+          "dropSignature": "d89983ca485e0b32ad36602988126f4d2aca67028597b94932666e6aec498c3b",
+          "signature": "8353b8068bcfac151f241b56ae6842ef84a7403de16c77da83dc30bc48bc2ca2"
+        },
+        {
+          "seed": 7,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06249772066357241,
+          "rightWidth": 0.06249772066357242,
+          "holes": 208,
+          "particleCount": 126,
+          "particleEnergy": 0.000006510102820786587,
+          "shapeSignature": "ee5bb853f7048a64b118950231ed5cff34065c0eb6ae5ffe3b5b68017c3187bc",
+          "holeSignature": "87fbdabc0f6101f7744fdca68e646b1446b8d60aba4755d764817762730d4348",
+          "dropSignature": "d89983ca485e0b32ad36602988126f4d2aca67028597b94932666e6aec498c3b",
+          "signature": "8353b8068bcfac151f241b56ae6842ef84a7403de16c77da83dc30bc48bc2ca2"
+        },
+        {
+          "seed": 8,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06249772066357241,
+          "rightWidth": 0.06249772066357242,
+          "holes": 208,
+          "particleCount": 126,
+          "particleEnergy": 0.000006510102820786587,
+          "shapeSignature": "ee5bb853f7048a64b118950231ed5cff34065c0eb6ae5ffe3b5b68017c3187bc",
+          "holeSignature": "87fbdabc0f6101f7744fdca68e646b1446b8d60aba4755d764817762730d4348",
+          "dropSignature": "d89983ca485e0b32ad36602988126f4d2aca67028597b94932666e6aec498c3b",
+          "signature": "8353b8068bcfac151f241b56ae6842ef84a7403de16c77da83dc30bc48bc2ca2"
+        },
+        {
+          "seed": 9,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06249772066357241,
+          "rightWidth": 0.06249772066357242,
+          "holes": 208,
+          "particleCount": 126,
+          "particleEnergy": 0.000006510102820786587,
+          "shapeSignature": "ee5bb853f7048a64b118950231ed5cff34065c0eb6ae5ffe3b5b68017c3187bc",
+          "holeSignature": "87fbdabc0f6101f7744fdca68e646b1446b8d60aba4755d764817762730d4348",
+          "dropSignature": "d89983ca485e0b32ad36602988126f4d2aca67028597b94932666e6aec498c3b",
+          "signature": "8353b8068bcfac151f241b56ae6842ef84a7403de16c77da83dc30bc48bc2ca2"
+        },
+        {
+          "seed": 10,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06249772066357241,
+          "rightWidth": 0.06249772066357242,
+          "holes": 208,
+          "particleCount": 126,
+          "particleEnergy": 0.000006510102820786587,
+          "shapeSignature": "ee5bb853f7048a64b118950231ed5cff34065c0eb6ae5ffe3b5b68017c3187bc",
+          "holeSignature": "87fbdabc0f6101f7744fdca68e646b1446b8d60aba4755d764817762730d4348",
+          "dropSignature": "d89983ca485e0b32ad36602988126f4d2aca67028597b94932666e6aec498c3b",
+          "signature": "8353b8068bcfac151f241b56ae6842ef84a7403de16c77da83dc30bc48bc2ca2"
+        },
+        {
+          "seed": 11,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06249772066357241,
+          "rightWidth": 0.06249772066357242,
+          "holes": 208,
+          "particleCount": 126,
+          "particleEnergy": 0.000006510102820786587,
+          "shapeSignature": "ee5bb853f7048a64b118950231ed5cff34065c0eb6ae5ffe3b5b68017c3187bc",
+          "holeSignature": "87fbdabc0f6101f7744fdca68e646b1446b8d60aba4755d764817762730d4348",
+          "dropSignature": "d89983ca485e0b32ad36602988126f4d2aca67028597b94932666e6aec498c3b",
+          "signature": "8353b8068bcfac151f241b56ae6842ef84a7403de16c77da83dc30bc48bc2ca2"
+        },
+        {
+          "seed": 12,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06249772066357241,
+          "rightWidth": 0.06249772066357242,
+          "holes": 208,
+          "particleCount": 126,
+          "particleEnergy": 0.000006510102820786587,
+          "shapeSignature": "ee5bb853f7048a64b118950231ed5cff34065c0eb6ae5ffe3b5b68017c3187bc",
+          "holeSignature": "87fbdabc0f6101f7744fdca68e646b1446b8d60aba4755d764817762730d4348",
+          "dropSignature": "d89983ca485e0b32ad36602988126f4d2aca67028597b94932666e6aec498c3b",
+          "signature": "8353b8068bcfac151f241b56ae6842ef84a7403de16c77da83dc30bc48bc2ca2"
+        },
+        {
+          "seed": 13,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06249772066357241,
+          "rightWidth": 0.06249772066357242,
+          "holes": 208,
+          "particleCount": 126,
+          "particleEnergy": 0.000006510102820786587,
+          "shapeSignature": "ee5bb853f7048a64b118950231ed5cff34065c0eb6ae5ffe3b5b68017c3187bc",
+          "holeSignature": "87fbdabc0f6101f7744fdca68e646b1446b8d60aba4755d764817762730d4348",
+          "dropSignature": "d89983ca485e0b32ad36602988126f4d2aca67028597b94932666e6aec498c3b",
+          "signature": "8353b8068bcfac151f241b56ae6842ef84a7403de16c77da83dc30bc48bc2ca2"
+        },
+        {
+          "seed": 14,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06249772066357241,
+          "rightWidth": 0.06249772066357242,
+          "holes": 208,
+          "particleCount": 126,
+          "particleEnergy": 0.000006510102820786587,
+          "shapeSignature": "ee5bb853f7048a64b118950231ed5cff34065c0eb6ae5ffe3b5b68017c3187bc",
+          "holeSignature": "87fbdabc0f6101f7744fdca68e646b1446b8d60aba4755d764817762730d4348",
+          "dropSignature": "d89983ca485e0b32ad36602988126f4d2aca67028597b94932666e6aec498c3b",
+          "signature": "8353b8068bcfac151f241b56ae6842ef84a7403de16c77da83dc30bc48bc2ca2"
+        },
+        {
+          "seed": 15,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06249772066357241,
+          "rightWidth": 0.06249772066357242,
+          "holes": 208,
+          "particleCount": 126,
+          "particleEnergy": 0.000006510102820786587,
+          "shapeSignature": "ee5bb853f7048a64b118950231ed5cff34065c0eb6ae5ffe3b5b68017c3187bc",
+          "holeSignature": "87fbdabc0f6101f7744fdca68e646b1446b8d60aba4755d764817762730d4348",
+          "dropSignature": "d89983ca485e0b32ad36602988126f4d2aca67028597b94932666e6aec498c3b",
+          "signature": "8353b8068bcfac151f241b56ae6842ef84a7403de16c77da83dc30bc48bc2ca2"
+        }
+      ]
+    },
+    {
+      "tier": "default",
+      "temperatures": {
+        "surface": 0.35,
+        "sheet": 0.8,
+        "breakup": 1.1
+      },
+      "unique": 16,
+      "repeats": 0,
+      "rows": [
+        {
+          "seed": 0,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06792893549379386,
+          "rightWidth": 0.05043677966769809,
+          "holes": 288,
+          "particleCount": 126,
+          "particleEnergy": 0.00000671321681053507,
+          "shapeSignature": "3be6f8974c829d200ef804567707903524248f7dec74a1f351e44ddc0ed2b1b3",
+          "holeSignature": "200dbe9c3c94aa652d33d8583f97c4d116125624246179a51f08a98d93304603",
+          "dropSignature": "0384f04348ca9956d67564fa35121e664bc7128cb6f09e46013b7d18692804f5",
+          "signature": "0e27598ddce75433705c5c263a61c5f78d015c5e03924807587be41ea873b3ca"
+        },
+        {
+          "seed": 1,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.07061269347457938,
+          "rightWidth": 0.05163575762303588,
+          "holes": 261,
+          "particleCount": 126,
+          "particleEnergy": 0.0000069739247438613486,
+          "shapeSignature": "f95582c3392f8f04eb4866b860d4f2f38714abfe74f9fb164d7d15fd467c243d",
+          "holeSignature": "da97e6351c472c3df93bf3efa3037a4bb90d7e8a365fc484f0c8db91e3cdb294",
+          "dropSignature": "2a81b93bb74e5c24a6d478e7060b286a8a7f8b89de4f39cbbd1a81c125ea7da6",
+          "signature": "b15d93c74938eaa0bea659ba83636ff21b8852acbf1d5ebff1c4aa7f52c3b92d"
+        },
+        {
+          "seed": 2,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.05180271281078754,
+          "rightWidth": 0.06553157455348738,
+          "holes": 249,
+          "particleCount": 126,
+          "particleEnergy": 0.000007307046773167617,
+          "shapeSignature": "39e6dd84ae56cf11202bdef42749d130c772054077e748c7c8dbc49b7f3e3d9d",
+          "holeSignature": "baff595e1e14f772841d5bcd6a31373db0604ca996b0afca7d1f1e38059eade1",
+          "dropSignature": "c101e917e6ab4106d7f7fb6553e1e94e255bb329111b40df81d2d591df315ad4",
+          "signature": "506bbacec45b2415dda358fc60cc568c1ce46ed5fcc6bcb123301bca60ef47ae"
+        },
+        {
+          "seed": 3,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.04949349692830978,
+          "rightWidth": 0.06746713571876468,
+          "holes": 269,
+          "particleCount": 126,
+          "particleEnergy": 0.000006403044626305674,
+          "shapeSignature": "4f7572d5ca5f818206b0932b7da1e23a7d7a59c2b68d0eb833db932e91cda459",
+          "holeSignature": "a8593d59af0a346f0debb0e8352b00bab852ba32fde4a2dc339ead3033ddef33",
+          "dropSignature": "30af913ed7a3ad3128963d0db9b0883f6733f206bf9085c7e9efe313b3085753",
+          "signature": "45e4b8b8ba5aa52bc08122234231ab331ae7bf88779b3b92fbfe5c36eaeaeb98"
+        },
+        {
+          "seed": 4,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.059941267712544426,
+          "rightWidth": 0.05957549078273617,
+          "holes": 215,
+          "particleCount": 126,
+          "particleEnergy": 0.000006804464238144626,
+          "shapeSignature": "8d484655f58598c0b425e8708bf6e7fcc1f592a69708528db9dbac0c7496dff5",
+          "holeSignature": "d94cded12fdde15b0500286dfb41e7927dd867df7c56f39eee198866618bca78",
+          "dropSignature": "c02dfb5a1039c68d87cfad6df77fb57687163cb10761ffebec66dd17426a129d",
+          "signature": "fb7dad06ba99000f33b4ad617ab1c48eabd143c402c46cd25e09c832478dd16e"
+        },
+        {
+          "seed": 5,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.05831163370884199,
+          "rightWidth": 0.05866964221477279,
+          "holes": 273,
+          "particleCount": 126,
+          "particleEnergy": 0.000006419176544232162,
+          "shapeSignature": "f74d8b0622f55231bcc867eeee039ffed86fc3d3906d097e8fb5be1fa8d3d815",
+          "holeSignature": "1c6370a39f108c94407f41a63afc80ac26ec9e0fd7ac05e22aae83a27ef97b9b",
+          "dropSignature": "a71710bd020a8552232af3a826277f558e208887e609ff4754eed90e3d6ea21a",
+          "signature": "72ed57d98a9ec3c864be5c393185b9eb78b0b86b58e3f3196861526a676d5e6e"
+        },
+        {
+          "seed": 6,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.04425041115314714,
+          "rightWidth": 0.06185486576596716,
+          "holes": 230,
+          "particleCount": 126,
+          "particleEnergy": 0.000006923506561436879,
+          "shapeSignature": "0f7f30623663b0e5106f90ba8321f75153f5a789fec8cb52b63f52c185d9daf0",
+          "holeSignature": "a630b4581aced557314be9fa9659f952a470477e114878b171fab7df357479fb",
+          "dropSignature": "866b3e120e1d309b573bcbb8fe7b010d0bb4f88016cf25895a49819968747f6f",
+          "signature": "030ce939656722342413994944a55d3b22254a39715104d08d42c020e7ad7096"
+        },
+        {
+          "seed": 7,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.0682544639545256,
+          "rightWidth": 0.05299235105668053,
+          "holes": 295,
+          "particleCount": 126,
+          "particleEnergy": 0.000007278349684840764,
+          "shapeSignature": "0f97c5c89b778c44d2566822bc4669d42ff15bac5288be9c3c1a3cbe96a35b65",
+          "holeSignature": "e5b98efacf7f4715a0ec640d207791b987fd11edaaa6e8ff996b8cd58b2e5881",
+          "dropSignature": "f5f356ea16aac3f815cd64d3de1e193473575d8f3c2567df9f30afb1398ed9f8",
+          "signature": "b7e8cb4243297bdac6a51b4313442ab524ea2a9baba0b32401065391ac193194"
+        },
+        {
+          "seed": 8,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.049038297374251194,
+          "rightWidth": 0.05602199583125342,
+          "holes": 267,
+          "particleCount": 126,
+          "particleEnergy": 0.000007146046171086618,
+          "shapeSignature": "9c9f13d755ee1f955fa0da24cc49422b16a554e95b0beb550832c9de6694c2d5",
+          "holeSignature": "44a6c6399bcae5c90707963cb2fcac4035a0b7cfbc9298b2b3dfa685087d93e2",
+          "dropSignature": "8666f3cb2878faf9cb549a1ae9278aba24d593f14141ddb91ebfc40529704fef",
+          "signature": "ef6cc1d1bce2f05c1f4b66b21ab8959bde7dfe41113bcb5381fee42ad7f36df9"
+        },
+        {
+          "seed": 9,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06299797383562823,
+          "rightWidth": 0.05702002624632631,
+          "holes": 210,
+          "particleCount": 126,
+          "particleEnergy": 0.000007012913370659402,
+          "shapeSignature": "a502d280684ae25de65afd26ebfd3925b6b238003f3bdebd5813b5b5afee59b2",
+          "holeSignature": "167c70ae3f562a8dbb514af3338ed00b060f8962f913832f83b110ade637464f",
+          "dropSignature": "94d4f57070f9e8ad016acb117ea38b1e1e155935245d0928f78b944765b2c6d8",
+          "signature": "456bc80e029489767f8a11e70c393d7d033c71e1c57cbc1fc6151ebbcf3c5723"
+        },
+        {
+          "seed": 10,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.05965029994131979,
+          "rightWidth": 0.049721040975425644,
+          "holes": 230,
+          "particleCount": 126,
+          "particleEnergy": 0.000007162541644345568,
+          "shapeSignature": "4b3cb0112ed94da8941a63cb81ac1307f9a40a6a1417b9e03c2234abe4b5bb44",
+          "holeSignature": "0ece090acc227ec777b256aef7b36deb6be62d5aceb930399c0d93f384781dd8",
+          "dropSignature": "0a175f21bf70b0cf624cc5bca7816e00ac87ee1ace323f671d7f500924dddfba",
+          "signature": "929aef99d79f8dc95c99260ff859cf3aed0f181350a09edf050534ed97396ec2"
+        },
+        {
+          "seed": 11,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.0638521614488662,
+          "rightWidth": 0.05458502744990195,
+          "holes": 217,
+          "particleCount": 126,
+          "particleEnergy": 0.000007211253576629444,
+          "shapeSignature": "c87a4813b8a1861d28bbdb3d8fc0abfaf827ce378d1f1934e6d0e23143a3b5d5",
+          "holeSignature": "a9e44dae4974d04f070998ccf2382acbdfa34c3e1d5a110df414e3a0ec97a638",
+          "dropSignature": "9b8cf40495e6defb691c47b65686154fceef45779f5c4b9bedd4ed9ffa433382",
+          "signature": "5ce0a289dfffdb842521615a78374f17a8e6426aae5ed0de7effc63fbe475061"
+        },
+        {
+          "seed": 12,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06289323678914985,
+          "rightWidth": 0.043639777207627004,
+          "holes": 257,
+          "particleCount": 126,
+          "particleEnergy": 0.000006780185413345841,
+          "shapeSignature": "d890c457966f277cb86272b41768371eacda9ef14e53f5e5f92f37f8c38ad28c",
+          "holeSignature": "5ad0de8cdc27060c3c0593cf6a4721c38897c5d8e78f73ee1defd5882bf65b6d",
+          "dropSignature": "085edc2e6b4c1412bfb3b946dfdbbae964f8feb773301a270cc6d41df5b404aa",
+          "signature": "4350d57ab7e7848a4a98b58d3997fa1a3b7a50bdcbf4e67cf9223c1a2961b8ec"
+        },
+        {
+          "seed": 13,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.053588991688731935,
+          "rightWidth": 0.06827496966279058,
+          "holes": 217,
+          "particleCount": 126,
+          "particleEnergy": 0.000007294952472989191,
+          "shapeSignature": "573289ff278dfc2f2e6ac89d370f66adfa9bcf47ca5ad12615dde6330ed024dd",
+          "holeSignature": "5ba959223003ff578eed2b074871238160b0cd7bb495b33210161e91c27136e2",
+          "dropSignature": "0b91ad7dba9b62893e8bd7162be7e5b2b2c3f4e0efe90441381598716afb114f",
+          "signature": "5796c4b879ecbaee7a699db76a238117e0ea426e285c55ce49a5384e879f6235"
+        },
+        {
+          "seed": 14,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.05960949654351615,
+          "rightWidth": 0.045954238447306776,
+          "holes": 279,
+          "particleCount": 126,
+          "particleEnergy": 0.00000759516865975893,
+          "shapeSignature": "a84f0313a26f12bd0d1b068447a3285b17203078b1a5d2f538d056b6afaed221",
+          "holeSignature": "82d8dd0f58064e681c7f7923e3a5a21a6fdb499b0605fedf05417263d7f65cba",
+          "dropSignature": "abb6f552b3697bda22630b4a71ea2107e81d8f25415b37fdfea21725da4ff135",
+          "signature": "1ab6e0f339735dd87106d36f70eaefb8f1138bbedd0b1e9b734ac09500c7c971"
+        },
+        {
+          "seed": 15,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.05425916056916024,
+          "rightWidth": 0.06217241484970896,
+          "holes": 303,
+          "particleCount": 126,
+          "particleEnergy": 0.000007006305738751569,
+          "shapeSignature": "2c18bdb31dd39401c0534ecb87dfaa84d3dfcc6d43b625d9c04d960554a8e1b8",
+          "holeSignature": "d2bd3737524ce49b6dbd9d517e110165b189b4cb3fcf99fe244dfda436438c50",
+          "dropSignature": "c4db651516c7fd9dd9993b6d0acb2a4e357ae0664cab3999ae85c7a089f9b308",
+          "signature": "380e87ebffe1cd53b90eba2157cbf15242b56d957613c93847b3b37237faafa0"
+        }
+      ]
+    },
+    {
+      "tier": "high",
+      "temperatures": {
+        "surface": 2,
+        "sheet": 2,
+        "breakup": 2
+      },
+      "unique": 16,
+      "repeats": 0,
+      "rows": [
+        {
+          "seed": 0,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06905937060853218,
+          "rightWidth": 0.04752043165302484,
+          "holes": 288,
+          "particleCount": 126,
+          "particleEnergy": 0.000007597311176693894,
+          "shapeSignature": "ee8b342dabbbfe2762bc12b3d7a77b7cff8f148b4eebf77416c9d5ee937b7be9",
+          "holeSignature": "200dbe9c3c94aa652d33d8583f97c4d116125624246179a51f08a98d93304603",
+          "dropSignature": "1c818f9b86173de5359b53606bee28e8bd0f386b51158364a9e7b1f4215c930c",
+          "signature": "f5de2887da68c3aaa06288e72c2ee32dc621deeb1a5310af7d10b0ae3a159f45"
+        },
+        {
+          "seed": 1,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.07263098700287353,
+          "rightWidth": 0.04903981652654397,
+          "holes": 261,
+          "particleCount": 126,
+          "particleEnergy": 0.000008326660318693785,
+          "shapeSignature": "2f7013367ad73cb63eefd5db0dca57a1b67f7afd67e2bd58697cbfadea2aca92",
+          "holeSignature": "da97e6351c472c3df93bf3efa3037a4bb90d7e8a365fc484f0c8db91e3cdb294",
+          "dropSignature": "26e83106bcfdf88abe3565f0d7d78d9d779894a1d4790820583ac153c5ae3974",
+          "signature": "34bf956ba1a8e81af5c005f54ac2c4cc0349de020be7d88995a5397d32e414af"
+        },
+        {
+          "seed": 2,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.049256204334390694,
+          "rightWidth": 0.06628695356833295,
+          "holes": 249,
+          "particleCount": 126,
+          "particleEnergy": 0.000008739217225540682,
+          "shapeSignature": "650ab4928e6fce7e70d3e4f7c9166710143be38dedb2dc9831aa4ed77cbcff69",
+          "holeSignature": "baff595e1e14f772841d5bcd6a31373db0604ca996b0afca7d1f1e38059eade1",
+          "dropSignature": "62028773711fe132239cc61026b6570142eb476b9ff4c2b24cd66c5ee5a55d6c",
+          "signature": "ded39ba539221b02e83e7814d170dc6055c8aeb4a7426c5df93686c0386fe637"
+        },
+        {
+          "seed": 3,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.046475512478219155,
+          "rightWidth": 0.06867914890875995,
+          "holes": 269,
+          "particleCount": 126,
+          "particleEnergy": 0.0000069726789107801784,
+          "shapeSignature": "8d33fd55521e9e5e91019d38d14af8f53655f989f03105772c691b9243841213",
+          "holeSignature": "a8593d59af0a346f0debb0e8352b00bab852ba32fde4a2dc339ead3033ddef33",
+          "dropSignature": "f71858a69a31ad68886fc352577402109067fc76e32258cd7f52ceafda826dd8",
+          "signature": "723deed8fb90277c62f3c93970ba0b6f2e2c4229bec9cea5a6a84eaaa768a760"
+        },
+        {
+          "seed": 4,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.05924692902072478,
+          "rightWidth": 0.058852009976000104,
+          "holes": 215,
+          "particleCount": 126,
+          "particleEnergy": 0.00000791829035236578,
+          "shapeSignature": "c1917ef605c4b278d3dbb981f6faf4225697fa7d80229e6482217a9b993b1167",
+          "holeSignature": "d94cded12fdde15b0500286dfb41e7927dd867df7c56f39eee198866618bca78",
+          "dropSignature": "55b9d75e511cb6b0720aae5db288d391e64e06bd059b454c0d63b09574ecc0cb",
+          "signature": "7b0b59abf8cd32447ee36eebc5325b52c201ded648ff2563d94033ff87aad955"
+        },
+        {
+          "seed": 5,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.0572368759906987,
+          "rightWidth": 0.05772780304835574,
+          "holes": 273,
+          "particleCount": 126,
+          "particleEnergy": 0.0000070066241586521295,
+          "shapeSignature": "b676ab36da59656cfbe5ced769472225cbb3e63aad4f0379bbf4573eb471c1c6",
+          "holeSignature": "1c6370a39f108c94407f41a63afc80ac26ec9e0fd7ac05e22aae83a27ef97b9b",
+          "dropSignature": "bdaa8bf834bdc04ae826237e52d68bd6fb79c165c27ee97a1d3d81aabb617b88",
+          "signature": "a79f05c3030a894f04b06c64a0bad861dd64ba71525c376bdd752e70755018fb"
+        },
+        {
+          "seed": 6,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.0401794369996067,
+          "rightWidth": 0.06123075315122055,
+          "holes": 230,
+          "particleCount": 126,
+          "particleEnergy": 0.000008394458547634245,
+          "shapeSignature": "b8e9c7116bb882da6bbe46fd83a6f045d071efd5bd7121e9f954da961862f741",
+          "holeSignature": "a630b4581aced557314be9fa9659f952a470477e114878b171fab7df357479fb",
+          "dropSignature": "76d0b9265de573551df8388a551182cda3cbfa8776bd86d1ea9b6a634c1152f5",
+          "signature": "1a8085b7021b04b74dd3b520dec3c2fe03e8abd6a8368a1885c9713396effc0c"
+        },
+        {
+          "seed": 7,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06957416881961606,
+          "rightWidth": 0.05065018618708205,
+          "holes": 295,
+          "particleCount": 126,
+          "particleEnergy": 0.000008851116805888475,
+          "shapeSignature": "7088b3478fb9838af480f5f6d11983709c0535c4711b1ddee700b87c76b1b58b",
+          "holeSignature": "e5b98efacf7f4715a0ec640d207791b987fd11edaaa6e8ff996b8cd58b2e5881",
+          "dropSignature": "7e03832e6c9a82294a08ea0ba2d3cc50a5160c08ad4f0aa978c94c6779e09012",
+          "signature": "affcbb703a1e23c4c026ebb6d54f47179753a4a23000567d686b5265e5887380"
+        },
+        {
+          "seed": 8,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.04585766376741244,
+          "rightWidth": 0.0542384198031912,
+          "holes": 267,
+          "particleCount": 126,
+          "particleEnergy": 0.000008647934568901585,
+          "shapeSignature": "eb23c83e6bed5b95ce9f83d6d5373291431ee496c3f77089f19009875581efbc",
+          "holeSignature": "44a6c6399bcae5c90707963cb2fcac4035a0b7cfbc9298b2b3dfa685087d93e2",
+          "dropSignature": "bc1522008591239aa5b837a3f0ca519539c5629b3fc2001644885dc4f1b2ea26",
+          "signature": "38d3776a6f5c995ffc253a0a56e03ebfa8eb5d83c24acd82838b1ec03e8753c4"
+        },
+        {
+          "seed": 9,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06308006216692132,
+          "rightWidth": 0.05568870336544582,
+          "holes": 210,
+          "particleCount": 126,
+          "particleEnergy": 0.000008151861207698127,
+          "shapeSignature": "cfefcbac1cb699dc0dbf3347e0cedb8e8c0fcfbfe859992840b50b461909c9de",
+          "holeSignature": "167c70ae3f562a8dbb514af3338ed00b060f8962f913832f83b110ade637464f",
+          "dropSignature": "a7ece9381cce3df305db071a9e6826ce720b44cd6a6e8c57ea0ce1b9fd854f2c",
+          "signature": "aaa9d27c3ef4ddc2ae6f02b8f2686b9a452b28d1ed7487f9913e06c555b4a361"
+        },
+        {
+          "seed": 10,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.05871489561654371,
+          "rightWidth": 0.04674886026263459,
+          "holes": 230,
+          "particleCount": 126,
+          "particleEnergy": 0.000008439302208235443,
+          "shapeSignature": "e567a76b88c2844b6696478ef82f4ea017a0e8d3e3129f0804efd3a71a7da4dd",
+          "holeSignature": "0ece090acc227ec777b256aef7b36deb6be62d5aceb930399c0d93f384781dd8",
+          "dropSignature": "ab064234448a8e843accb4e2057b5ab2a324fe0818a1d678640380c741820697",
+          "signature": "fa281190e325e1276d2348a8b8819f790163cc7ee49daeeeb2f77f6533ade8be"
+        },
+        {
+          "seed": 11,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06404945273014294,
+          "rightWidth": 0.05266345598528796,
+          "holes": 217,
+          "particleCount": 126,
+          "particleEnergy": 0.000008609556797096805,
+          "shapeSignature": "058330cf03f8981f230e9666820bea10d76956c9c76ca18b4d367332ecef5f29",
+          "holeSignature": "a9e44dae4974d04f070998ccf2382acbdfa34c3e1d5a110df414e3a0ec97a638",
+          "dropSignature": "50f8c3501d789361ba3ed610111119e2bb26f5e0a06dea9cbb09a37b45575179",
+          "signature": "cd4dad1d9da9b7dd1ef0b329b1d64e3487bbbd1048807473a2c47b335389fbe5"
+        },
+        {
+          "seed": 12,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.06230934068364273,
+          "rightWidth": 0.03940441260576988,
+          "holes": 257,
+          "particleCount": 126,
+          "particleEnergy": 0.000007874796080034902,
+          "shapeSignature": "a67ae2dbc57249437beb4d7d774b5528c1ef9da28a8d2cba3beadd4397d72c33",
+          "holeSignature": "5ad0de8cdc27060c3c0593cf6a4721c38897c5d8e78f73ee1defd5882bf65b6d",
+          "dropSignature": "61aa4472928ca5fba90ef34a5726819e17c6b4d57d85fe557c016afa969acb63",
+          "signature": "1615cbafec9ac4cfe616b24034b518d5a0014dfd78280ad882c280f7f8ae00e6"
+        },
+        {
+          "seed": 13,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.051458689258215735,
+          "rightWidth": 0.06971382654331765,
+          "holes": 217,
+          "particleCount": 126,
+          "particleEnergy": 0.000008878214388378278,
+          "shapeSignature": "8ea15a4e0e9fb851269df5a249ee45649e05e037a2dfadbef34f71222085a80d",
+          "holeSignature": "5ba959223003ff578eed2b074871238160b0cd7bb495b33210161e91c27136e2",
+          "dropSignature": "ff55415dfa0d822a3aac95b713e6019956524dbdc35ff7f17cedc7bcec6f6ec5",
+          "signature": "73649b5247ce5b7d647e8dcd2456bc9efc41218015862fe9eb4767694a194aaa"
+        },
+        {
+          "seed": 14,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.05846327991959819,
+          "rightWidth": 0.0422139290615605,
+          "holes": 279,
+          "particleCount": 126,
+          "particleEnergy": 0.000009549001071637428,
+          "shapeSignature": "23035084bcec9428477dc506fb0bb9f95d24f8615b95d841cb85a7524b9444cc",
+          "holeSignature": "82d8dd0f58064e681c7f7923e3a5a21a6fdb499b0605fedf05417263d7f65cba",
+          "dropSignature": "62a56c33e9abafeaaf55fbc95a037a9c98206664fd8ca22b9ca37839a6ed1ae3",
+          "signature": "2dc17f8f119d531049445991218095b3cc2df804a45e84caf7cdbd29f516cb9a"
+        },
+        {
+          "seed": 15,
+          "nodeWidthRange": [
+            0.01058321590669191,
+            0.069274191087548
+          ],
+          "nodeLiftRange": [
+            0.09822552228899434,
+            1.0757274847330374
+          ],
+          "leftWidth": 0.05226787544898502,
+          "rightWidth": 0.06190257301153522,
+          "holes": 303,
+          "particleCount": 126,
+          "particleEnergy": 0.00000845916503043715,
+          "shapeSignature": "e076620e42e5a9dcd4803392ad8ed65ec73347d196021fbfb5ed37131eebe999",
+          "holeSignature": "d2bd3737524ce49b6dbd9d517e110165b189b4cb3fcf99fe244dfda436438c50",
+          "dropSignature": "f96ebfeb49aee0e4a97f01dd777b4a0bb53f7574bcc00501a464b645b25edaf4",
+          "signature": "9ab0ac71bfa61295f31869ad0bf04109fff599910b7f09d3e3a725c7e307f599"
+        }
+      ]
+    }
+  ]
+}

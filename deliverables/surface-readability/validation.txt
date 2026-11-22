@@ -1,0 +1,119 @@
+
+> stone-skipping@0.1.0 test
+> tsx --test tests/*.test.ts
+
+✔ 默认全景在出手点后方抬高，固定构图不随石子移动 (4.932689ms)
+✔ 五个全景参数生效且重置不改变用户选择 (0.702907ms)
+✔ 近景跟随平移与石子一致，子弹机位随独立时间环绕且始终在水面上 (1.945618ms)
+✔ 镜头过渡连续，暂停冻结子弹轨道，退出恢复用户跟随 (9.206347ms)
+✔ 独立presentation clock不受慢放倍率影响且暂停严格冻结 (80.232888ms)
+✔ 新投掷恢复正常1x与默认T1，重放不抽seed且快照隔离 (6.303802ms)
+✔ 同snapshot在1x/0.25x/0.05x下的终态、接触及跳数一致 (1113.272785ms)
+✔ full sink and after-sink command replay survives normal slow bullet and irregular RAF (1474.76785ms)
+✔ real projected stone footprint has finite physical horizontal and vertical bounds (72.31285ms)
+✔ GPU source uniforms receive orientation and reject zero NaN shape commands (71.098941ms)
+✔ generation clears both targets once, drains queue once and keeps target resources stable (115.836403ms)
+✔ shared source footprint returns old displaced volume and vanishes when sunk (12.139194ms)
+✔ complete snapshot shared source commands replay identically across frame grouping and pause (766.631674ms)
+✔ water remains scheduled through real final sinking and scoring end (211.759377ms)
+✔ mouse movement and release use the same displacement command type, not independent splashes (8.418017ms)
+contact/calibration {"controls":{"count":24,"disagreements":1,"totalSkipDelta":6,"maxDistanceDelta":0.0011566954731705437,"meanDistanceDelta":0.00006322154751297233,"matchedContactCases":23,"maxMatchedContactTimeDelta":0.00029348754860647475,"physicsMs":11093.619395999998},"seeds":{"count":64,"disagreements":0,"totalSkipDelta":0,"maxDistanceDelta":0.0000018675063149231619,"meanDistanceDelta":2.9434641571346454e-7,"matchedContactCases":64,"maxMatchedContactTimeDelta":0.00000456237783907909,"physicsMs":25606.12994999998}}
+✔ 接触边界：亚子步入水时刻及切点形心不退回质心 (13.345791ms)
+✔ 临界浅掠水：小于旧外步的真实接触仍被保留而非间隙合并 (7.872253ms)
+✔ 固定24+64种子DT/半步最终回归且不覆盖已保存报告 (36709.817113ms)
+✔ 已出生水滴不随累计冲量改写轨迹 (59.721206ms)
+✔ 同seed同输入产生相同水滴 (0.7871ms)
+✔ 数量与生命周期有界，重投清空 (1371.752583ms)
+✔ 波纹包络随时间衰减且消失 (0.321513ms)
+✔ 固定物理步采样不依赖render分组，物理结果不变 (1484.771906ms)
+✔ normalization uses usable canvas and clamps edges (3.067306ms)
+✔ DOMRect-like inherited geometry is copied explicitly (0.644146ms)
+✔ hold duration changes power rather than forcing maximum (0.842625ms)
+✔ mapping is normalized, bounded and independent of move frequency (0.920848ms)
+✔ cancel, pointer ownership and release once (0.532578ms)
+✔ preview, target, snapshot and in-flight launch do not alias (1.57119ms)
+✔ 固定效果时钟在1x、0.25x、0.05x完全一致 (337.239013ms)
+✔ 事件池上限与过期接触不再重复注水 (1360.009147ms)
+✔ 高度场CFL有余量且真实传播、衰减、无NaN (1555.488418ms)
+✔ 边界吸收带耗散且外边缘保持零 (689.936761ms)
+✔ 高度场分组固定步确定性与reset (283.615067ms)
+✔ 波源沿当前接触形心且历史冻结，离水仅一次 (3.151374ms)
+✔ 弹道落水解析时刻地点只一次且生命周期取消不误发 (200.061093ms)
+✔ 水舌一次接触仅一条，轨迹采用不可变替换，资源上限 (6.578649ms)
+✔ 重放、暂停与不同RAF分组的真实水状态一致，结束后消散 (408.654596ms)
+✔ T0严格恒等且不持有目标引用 (6.796089ms)
+✔ 同种子可复现，不同种子多样且T0..2有界 (39.534968ms)
+✔ 温度增大输入均方扰动按T²增大 (14.568543ms)
+✔ JSON快照重放隔离后续目标与温度，篡改被拒绝 (3.425212ms)
+✔ 随机投掷重放物理水花完全一致且不依赖render分组 (1865.992281ms)
+✔ 固定连续64seed真实物理：T0无离散，T1距离和跳数多样 (20630.088788ms)
+﹣ root uses the rendered heightfield triangle at every sampled lateral coordinate (1.66639ms) # Retired CPU/airborne renderer; replaced by coherent GPU source, sink, replay and resource checks. Physics tests remain active.
+﹣ film and thick rim have disjoint bounded volume budgets in SI units (0.301013ms) # Retired CPU/airborne renderer; replaced by coherent GPU source, sink, replay and resource checks. Physics tests remain active.
+﹣ ligaments thin while their lost cross-section feeds terminal bulbs, not random holes (0.14898ms) # Retired CPU/airborne renderer; replaced by coherent GPU source, sink, replay and resource checks. Physics tests remain active.
+﹣ pinch position, velocity, radius and ballistic handoff are continuous (0.116506ms) # Retired CPU/airborne renderer; replaced by coherent GPU source, sink, replay and resource checks. Physics tests remain active.
+﹣ after exit rim keeps its birth velocity and lags the real stone (0.196623ms) # Retired CPU/airborne renderer; replaced by coherent GPU source, sink, replay and resource checks. Physics tests remain active.
+﹣ actual renderer has bounded instances, no shader hole discard, and reusable resources (0.170395ms) # Retired CPU/airborne renderer; replaced by coherent GPU source, sink, replay and resource checks. Physics tests remain active.
+﹣ complete snapshot liquid replay survives temperatures, pause, playback rates and RAF grouping (0.184123ms) # Retired CPU/airborne renderer; replaced by coherent GPU source, sink, replay and resource checks. Physics tests remain active.
+﹣ causal inflow grows during contact, freezes old cohorts and stops at exit (0.142879ms) # Retired CPU/airborne renderer; replaced by coherent GPU source, sink, replay and resource checks. Physics tests remain active.
+✔ DEV single contact diagnosis leaves physical trajectory unchanged (389.810886ms)
+matrix/convergence {"cases":24,"disagreements":1,"maxDistanceDelta":0.0011512550656256337,"maxTrajectoryDelta":0.055208040878322664}
+default/convergence {"skips":4,"distance":8.845126249857863,"fineDistance":8.845126189820968,"time":1.989187500000272,"fineTime":1.9891562499995774}
+✔ 连续椭圆裁剪：全干、全湿、半盘面积及真实形心 (3.076527ms)
+✔ 临界触水连续无1.5mm平滑带，近水平不产生NaN (0.787259ms)
+✔ 固定24组步长对照：保留难例，分歧与轨迹误差低于before (11363.581952ms)
+✔ 全部参数每次接触唯一、冲量单调且无额外计分 (3398.421533ms)
+✔ 完全浸没零自旋与反向yaw有限且不制造水下弹跳 (472.977899ms)
+✔ 无水无阻力的解析抛体基线与四元数 (22.837493ms)
+✔ 确定性重放：完整状态与接触记录相同 (659.263477ms)
+✔ 30/60/144 Hz 与不规则 render 调度一致 (659.184828ms)
+✔ 默认自然续跳至少两次并沉水，差参数首次失败 (264.637597ms)
+✔ 独立接触只计一次，结束后不能重复得分 (173.138117ms)
+✔ 静水无持续能量增长，接触耗散且状态有限 (3377.565499ms)
+✔ 步长减半对照：默认跳数相同，距离差<1%，接触时间差<20ms (488.63726ms)
+✔ 浅擦向前低矮，陡入宽展高冠，形心投影贴水 (2.467974ms)
+✔ 液片和延迟边滴出生冻结，累计接触不能回写 (8.796048ms)
+✔ seed确定且液片池寿命清空有界 (345.502613ms)
+✔ 同固定接触步不同RAF分组液片与边滴一致 (308.054338ms)
+✔ reaction increments are consumed once, including final unbounced sinking contact (920.544504ms)
+✔ normalized resolved reaction preserves N s at subcell offsets and finite bounded energy (23.556032ms)
+✔ zero optional impulse and kinematic mouse produce no extra momentum (12.011818ms)
+✔ breakup field is frozen, spatially correlated and has no old sine period (5.271158ms)
+✔ new throws have separate visual identity; per-tick physics is identical under visual replacement (387.565434ms)
+✔ visual metadata v1 legacy compatibility, validated preservation and bounds (2.60259ms)
+✔ source moment integrates only actual duration, with no birth height or impulse boost (14.976313ms)
+﹣ Legacy CPU source moment: actual first contact 0–50ms: no precontact h; first h and normal next physics tick at 1x and .05x (0.327122ms) # Retired CPU/airborne renderer; coherent GPU baseline does not implement sheet/breakup temperature. Physical variation tests remain active.
+﹣ Legacy airborne sheets: 16 real seed outputs / T0 default high: unique profiles, bounded energy, isolated channels and repeatable complete replay (0.252777ms) # Retired CPU/airborne renderer; coherent GPU baseline does not implement sheet/breakup temperature. Physical variation tests remain active.
+ℹ tests 78
+ℹ suites 0
+ℹ pass 68
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 10
+ℹ todo 0
+ℹ duration_ms 37131.636464
+
+> stone-skipping@0.1.0 typecheck
+> tsc --noEmit
+
+
+> stone-skipping@0.1.0 prebuild
+> node tools/prepare-assets.mjs
+
+
+> stone-skipping@0.1.0 build
+> tsc --noEmit && vite build
+
+[36mvite v7.3.8 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32m✓[39m 29 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                 [39m[1m[2m  0.37 kB[22m[1m[22m[2m │ gzip:   0.30 kB[22m
+[2mdist/[22m[2massets/[22m[35mindex-CkzdNA9X.css  [39m[1m[2m  3.92 kB[22m[1m[22m[2m │ gzip:   1.38 kB[22m
+[2mdist/[22m[2massets/[22m[36mindex-CtsbF7-w.js   [39m[1m[33m633.13 kB[39m[22m[2m │ gzip: 169.04 kB[22m
+[33m
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[32m✓ built in 1.10s[39m
