@@ -44,3 +44,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+## Lake environment
+
+The local lake-horizon.webp uses the sky and distant bank from Greg Zaal’s CC0 *Bell Park Pier*. The upper hemisphere was tone-mapped and mirrored below the horizon for environment lighting. The water surface is rendered live. [Source and license](https://polyhaven.com/a/bell_park_pier)

@@ -1,0 +1,1651 @@
+[
+  {
+    "temperature": 0,
+    "seeds": "0..63 inclusive",
+    "target": {
+      "speed": 11,
+      "elevation": 2,
+      "tilt": 6,
+      "spin": 18,
+      "direction": 0
+    },
+    "histogram": {
+      "4": 64
+    },
+    "distance": {
+      "min": 8.846545386922847,
+      "mean": 8.846545386922847,
+      "max": 8.846545386922847,
+      "sd": 0
+    },
+    "deviations": {
+      "speed": {
+        "min": 0,
+        "mean": 0,
+        "max": 0,
+        "sd": 0
+      },
+      "elevation": {
+        "min": 0,
+        "mean": 0,
+        "max": 0,
+        "sd": 0
+      },
+      "tilt": {
+        "min": 0,
+        "mean": 0,
+        "max": 0,
+        "sd": 0
+      },
+      "spin": {
+        "min": 0,
+        "mean": 0,
+        "max": 0,
+        "sd": 0
+      },
+      "direction": {
+        "min": 0,
+        "mean": 0,
+        "max": 0,
+        "sd": 0
+      }
+    },
+    "rows": [
+      {
+        "seed": 0,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 1,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 2,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 3,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 4,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 5,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 6,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 7,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 8,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 9,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 10,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 11,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 12,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 13,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 14,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 15,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 16,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 17,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 18,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 19,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 20,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 21,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 22,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 23,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 24,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 25,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 26,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 27,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 28,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 29,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 30,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 31,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 32,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 33,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 34,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 35,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 36,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 37,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 38,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 39,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 40,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 41,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 42,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 43,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 44,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 45,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 46,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 47,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 48,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 49,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 50,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 51,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 52,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 53,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 54,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 55,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 56,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 57,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 58,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 59,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 60,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 61,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 62,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      },
+      {
+        "seed": 63,
+        "sampled": {
+          "speed": 11,
+          "elevation": 2,
+          "tilt": 6,
+          "spin": 18,
+          "direction": 0
+        },
+        "skips": 4,
+        "distance": 8.846545386922847
+      }
+    ]
+  },
+  {
+    "temperature": 1,
+    "seeds": "0..63 inclusive",
+    "target": {
+      "speed": 11,
+      "elevation": 2,
+      "tilt": 6,
+      "spin": 18,
+      "direction": 0
+    },
+    "histogram": {
+      "4": 7,
+      "5": 12,
+      "6": 12,
+      "7": 17,
+      "8": 15,
+      "9": 1
+    },
+    "distance": {
+      "min": 7.501847795195194,
+      "mean": 8.71976947848766,
+      "max": 9.595809103162146,
+      "sd": 0.48887374965123837
+    },
+    "deviations": {
+      "speed": {
+        "min": -0.2692987866334935,
+        "mean": -0.03065585705631138,
+        "max": 0.1945180690148831,
+        "sd": 0.11551304011864014
+      },
+      "elevation": {
+        "min": -1.1800249223597348,
+        "mean": 0.06684479599061888,
+        "max": 1.1269098205957562,
+        "sd": 0.4509173043103202
+      },
+      "tilt": {
+        "min": -1.2417871649377048,
+        "mean": -0.0506031045842974,
+        "max": 1.0446203427854925,
+        "sd": 0.5261516682367902
+      },
+      "spin": {
+        "min": -0.6366831134632243,
+        "mean": -0.053318764374707506,
+        "max": 0.5483186099678292,
+        "sd": 0.24330532679400976
+      },
+      "direction": {
+        "min": -1.408288554288447,
+        "mean": -0.150170809814881,
+        "max": 0.7343377280049026,
+        "sd": 0.4463161517606371
+      }
+    },
+    "rows": [
+      {
+        "seed": 0,
+        "sampled": {
+          "speed": 10.7407746186705,
+          "elevation": 2.220243976917118,
+          "tilt": 5.425328192533925,
+          "spin": 18.255326506197452,
+          "direction": -0.34142094640992576
+        },
+        "skips": 7,
+        "distance": 8.143576676633822
+      },
+      {
+        "seed": 1,
+        "sampled": {
+          "speed": 10.912029220110272,
+          "elevation": 2.2593789538368583,
+          "tilt": 6.43888239027001,
+          "spin": 17.659297077544032,
+          "direction": 0.7305323686450721
+        },
+        "skips": 5,
+        "distance": 9.102791025276682
+      },
+      {
+        "seed": 2,
+        "sampled": {
+          "speed": 10.960099994187864,
+          "elevation": 2.13803513511084,
+          "tilt": 5.601444064639509,
+          "spin": 18.163460891582073,
+          "direction": 0.5440764464437963
+        },
+        "skips": 8,
+        "distance": 8.51148499439592
+      },
+      {
+        "seed": 3,
+        "sampled": {
+          "speed": 10.926870825139341,
+          "elevation": 1.411786409560591,
+          "tilt": 5.3311163580510765,
+          "spin": 18.232438794113698,
+          "direction": -0.1808861827012151
+        },
+        "skips": 8,
+        "distance": 8.071922530559346
+      },
+      {
+        "seed": 4,
+        "sampled": {
+          "speed": 10.994443160867473,
+          "elevation": 2.173290887614712,
+          "tilt": 6.328110229456797,
+          "spin": 18.305826598070563,
+          "direction": -0.675664883106947
+        },
+        "skips": 8,
+        "distance": 9.087097000238852
+      },
+      {
+        "seed": 5,
+        "sampled": {
+          "speed": 11.046785506585147,
+          "elevation": 2.5838279584422708,
+          "tilt": 6.249905199278146,
+          "spin": 17.827095783390106,
+          "direction": -0.19951903633773332
+        },
+        "skips": 7,
+        "distance": 9.074231781903485
+      },
+      {
+        "seed": 6,
+        "sampled": {
+          "speed": 10.920757138682529,
+          "elevation": 2.396019883453846,
+          "tilt": 6.026788675691932,
+          "spin": 17.53290633380413,
+          "direction": -0.6849538395181298
+        },
+        "skips": 7,
+        "distance": 8.745286147381924
+      },
+      {
+        "seed": 7,
+        "sampled": {
+          "speed": 10.884646465166782,
+          "elevation": 1.7594834223855287,
+          "tilt": 5.643586014863104,
+          "spin": 17.990222252346577,
+          "direction": 0.12599566229619097
+        },
+        "skips": 7,
+        "distance": 8.35837009678069
+      },
+      {
+        "seed": 8,
+        "sampled": {
+          "speed": 10.89275234999523,
+          "elevation": 2.064191776327789,
+          "tilt": 5.147680408321321,
+          "spin": 17.736173786222935,
+          "direction": 0.2303623901680112
+        },
+        "skips": 6,
+        "distance": 7.973945058272032
+      },
+      {
+        "seed": 9,
+        "sampled": {
+          "speed": 10.92087116074438,
+          "elevation": 1.8130343407392502,
+          "tilt": 6.4175916847307235,
+          "spin": 18.00396911457181,
+          "direction": 0.7343377280049026
+        },
+        "skips": 5,
+        "distance": 9.057972737256078
+      },
+      {
+        "seed": 10,
+        "sampled": {
+          "speed": 11.156771261941952,
+          "elevation": 0.8199750776402652,
+          "tilt": 6.548140773549676,
+          "spin": 17.86807142905891,
+          "direction": 0.20786650897935033
+        },
+        "skips": 7,
+        "distance": 9.249021894649688
+      },
+      {
+        "seed": 11,
+        "sampled": {
+          "speed": 11.038410685391474,
+          "elevation": 1.7182682568673044,
+          "tilt": 6.273888032650575,
+          "spin": 18.130421725027265,
+          "direction": 0.4789566295221448
+        },
+        "skips": 5,
+        "distance": 9.093005072341914
+      },
+      {
+        "seed": 12,
+        "sampled": {
+          "speed": 10.857288068822431,
+          "elevation": 2.390943336766213,
+          "tilt": 6.194980453699827,
+          "spin": 18.04389336179942,
+          "direction": -0.39218016224913294
+        },
+        "skips": 4,
+        "distance": 8.762808981137571
+      },
+      {
+        "seed": 13,
+        "sampled": {
+          "speed": 10.870904535121905,
+          "elevation": 1.5036568597424775,
+          "tilt": 6.7855101097375154,
+          "spin": 17.768823233619333,
+          "direction": -1.408288554288447
+        },
+        "skips": 5,
+        "distance": 9.094022450079787
+      },
+      {
+        "seed": 14,
+        "sampled": {
+          "speed": 10.970346737104313,
+          "elevation": 2.1181032271124423,
+          "tilt": 5.799587001092732,
+          "spin": 17.72771590936929,
+          "direction": -0.5263179580215365
+        },
+        "skips": 5,
+        "distance": 8.665926517125227
+      },
+      {
+        "seed": 15,
+        "sampled": {
+          "speed": 10.883155034804561,
+          "elevation": 1.810567874694243,
+          "tilt": 5.554063321556896,
+          "spin": 17.74889644537121,
+          "direction": -0.1700209823902697
+        },
+        "skips": 8,
+        "distance": 8.223215214432395
+      },
+      {
+        "seed": 16,
+        "sampled": {
+          "speed": 11.007200757009754,
+          "elevation": 2.1389210131019354,
+          "tilt": 5.894158912822604,
+          "spin": 17.889706643633545,
+          "direction": -0.7523555718362331
+        },
+        "skips": 7,
+        "distance": 8.731430123049549
+      },
+      {
+        "seed": 17,
+        "sampled": {
+          "speed": 10.974639055098717,
+          "elevation": 1.5853319361340255,
+          "tilt": 6.284924251260236,
+          "spin": 17.791260865665972,
+          "direction": -0.485919758444652
+        },
+        "skips": 6,
+        "distance": 8.751095165996375
+      },
+      {
+        "seed": 18,
+        "sampled": {
+          "speed": 11.00714474719561,
+          "elevation": 1.564915781840682,
+          "tilt": 5.947070256341249,
+          "spin": 17.90405878856778,
+          "direction": 0.03492361120879661
+        },
+        "skips": 8,
+        "distance": 8.594228344650778
+      },
+      {
+        "seed": 19,
+        "sampled": {
+          "speed": 10.830073539991087,
+          "elevation": 2.2145341055002064,
+          "tilt": 5.923387574730441,
+          "spin": 18.02460741955787,
+          "direction": 0.5660405040252954
+        },
+        "skips": 8,
+        "distance": 8.555435130775976
+      },
+      {
+        "seed": 20,
+        "sampled": {
+          "speed": 11.060373358785485,
+          "elevation": 2.5011437775101513,
+          "tilt": 5.872905894415453,
+          "spin": 17.7852869201079,
+          "direction": -0.593662281287834
+        },
+        "skips": 8,
+        "distance": 8.771394655197302
+      },
+      {
+        "seed": 21,
+        "sampled": {
+          "speed": 10.913401773519194,
+          "elevation": 2.158727932255715,
+          "tilt": 5.805390577763319,
+          "spin": 17.784134649150072,
+          "direction": 0.25108424737118196
+        },
+        "skips": 6,
+        "distance": 8.57680026792669
+      },
+      {
+        "seed": 22,
+        "sampled": {
+          "speed": 10.893170326926434,
+          "elevation": 2.3633681386709213,
+          "tilt": 4.758212835062295,
+          "spin": 17.6807389979437,
+          "direction": -0.0329796858131885
+        },
+        "skips": 4,
+        "distance": 7.664730416018283
+      },
+      {
+        "seed": 23,
+        "sampled": {
+          "speed": 10.81857429322709,
+          "elevation": 2.7915369456168264,
+          "tilt": 5.426354181254283,
+          "spin": 18.197355661131443,
+          "direction": -0.6562867371831089
+        },
+        "skips": 6,
+        "distance": 8.262935076409509
+      },
+      {
+        "seed": 24,
+        "sampled": {
+          "speed": 11.023043300279728,
+          "elevation": 2.1076624842826277,
+          "tilt": 6.256728658219799,
+          "spin": 17.855870219171045,
+          "direction": -0.770180278690532
+        },
+        "skips": 5,
+        "distance": 9.108979477689084
+      },
+      {
+        "seed": 25,
+        "sampled": {
+          "speed": 11.128879124305676,
+          "elevation": 1.715715931262821,
+          "tilt": 5.046743064653128,
+          "spin": 17.973083558678628,
+          "direction": -0.37729761586524546
+        },
+        "skips": 6,
+        "distance": 8.038729295213532
+      },
+      {
+        "seed": 26,
+        "sampled": {
+          "speed": 11.068050477995227,
+          "elevation": 3.065461394377053,
+          "tilt": 5.6732751643285155,
+          "spin": 18.503614744059742,
+          "direction": -0.13676436152309185
+        },
+        "skips": 7,
+        "distance": 8.800227356003234
+      },
+      {
+        "seed": 27,
+        "sampled": {
+          "speed": 10.730701213366507,
+          "elevation": 1.3352915237192065,
+          "tilt": 5.925446498673409,
+          "spin": 17.764423697702586,
+          "direction": -0.2592828029301018
+        },
+        "skips": 6,
+        "distance": 8.157827061040265
+      },
+      {
+        "seed": 28,
+        "sampled": {
+          "speed": 11.095563680836156,
+          "elevation": 1.9767978237941861,
+          "tilt": 6.693747019162402,
+          "spin": 17.892841987386344,
+          "direction": -0.19371706433594227
+        },
+        "skips": 8,
+        "distance": 9.595809103162146
+      },
+      {
+        "seed": 29,
+        "sampled": {
+          "speed": 10.788059049792743,
+          "elevation": 1.427549228304997,
+          "tilt": 5.1899282657541335,
+          "spin": 18.391923138611016,
+          "direction": -0.5176163807045668
+        },
+        "skips": 7,
+        "distance": 7.788005687806251
+      },
+      {
+        "seed": 30,
+        "sampled": {
+          "speed": 11.170033590563108,
+          "elevation": 2.735425691353157,
+          "tilt": 6.127229174831882,
+          "spin": 18.42795077059418,
+          "direction": -0.725357296410948
+        },
+        "skips": 5,
+        "distance": 9.37733264768593
+      },
+      {
+        "seed": 31,
+        "sampled": {
+          "speed": 11.194518069014883,
+          "elevation": 2.3192641937639564,
+          "tilt": 6.214235261781141,
+          "spin": 18.10259574316442,
+          "direction": -0.6887157573364675
+        },
+        "skips": 5,
+        "distance": 9.209440494753757
+      },
+      {
+        "seed": 32,
+        "sampled": {
+          "speed": 10.983714121297623,
+          "elevation": 1.8511750022880733,
+          "tilt": 5.757756374543533,
+          "spin": 17.969843042828142,
+          "direction": 0.3845833360683174
+        },
+        "skips": 5,
+        "distance": 8.555061427577003
+      },
+      {
+        "seed": 33,
+        "sampled": {
+          "speed": 11.105322623454656,
+          "elevation": 2.1482173486147076,
+          "tilt": 6.593612427357584,
+          "spin": 18.192879606485366,
+          "direction": -0.21815072349272668
+        },
+        "skips": 8,
+        "distance": 9.528018624492278
+      },
+      {
+        "seed": 34,
+        "sampled": {
+          "speed": 11.011816209981529,
+          "elevation": 1.907076022354886,
+          "tilt": 6.089984050253406,
+          "spin": 17.363316886536776,
+          "direction": -0.22097080107778305
+        },
+        "skips": 5,
+        "distance": 8.716974913112402
+      },
+      {
+        "seed": 35,
+        "sampled": {
+          "speed": 10.931953451753749,
+          "elevation": 2.4900853456929326,
+          "tilt": 6.194813285721466,
+          "spin": 17.82661000572145,
+          "direction": 0.05942514329217374
+        },
+        "skips": 5,
+        "distance": 8.822291887617387
+      },
+      {
+        "seed": 36,
+        "sampled": {
+          "speed": 11.167769396180908,
+          "elevation": 2.813750612316653,
+          "tilt": 5.576486017089337,
+          "spin": 17.816143465004863,
+          "direction": 0.33041203557513643
+        },
+        "skips": 9,
+        "distance": 8.811750560831033
+      },
+      {
+        "seed": 37,
+        "sampled": {
+          "speed": 11.01019316945225,
+          "elevation": 2.2739972681738436,
+          "tilt": 6.39093310944736,
+          "spin": 18.188941327482464,
+          "direction": 0.025631926022469886
+        },
+        "skips": 7,
+        "distance": 9.152873624760971
+      },
+      {
+        "seed": 38,
+        "sampled": {
+          "speed": 11.034637960361628,
+          "elevation": 2.0666390869300812,
+          "tilt": 5.469243358820677,
+          "spin": 18.055837427303196,
+          "direction": 0.4561226705554873
+        },
+        "skips": 7,
+        "distance": 8.542975543623806
+      },
+      {
+        "seed": 39,
+        "sampled": {
+          "speed": 10.966353355883621,
+          "elevation": 1.734612000407651,
+          "tilt": 6.971263030543923,
+          "spin": 18.077007570303977,
+          "direction": -0.00910859671421349
+        },
+        "skips": 7,
+        "distance": 9.528059861651366
+      },
+      {
+        "seed": 40,
+        "sampled": {
+          "speed": 10.99545970390318,
+          "elevation": 1.4023872932884842,
+          "tilt": 5.794574681436643,
+          "spin": 17.550297978110613,
+          "direction": 0.3014035937376319
+        },
+        "skips": 8,
+        "distance": 8.373957059287617
+      },
+      {
+        "seed": 41,
+        "sampled": {
+          "speed": 11.126863496421526,
+          "elevation": 1.9149828732479364,
+          "tilt": 6.371923360973597,
+          "spin": 18.098174613565206,
+          "direction": 0.3850523168221117
+        },
+        "skips": 7,
+        "distance": 9.318833285182077
+      },
+      {
+        "seed": 42,
+        "sampled": {
+          "speed": 11.10314409346475,
+          "elevation": 2.263447296572849,
+          "tilt": 6.10429962282069,
+          "spin": 17.87999659985304,
+          "direction": -0.1288595176301896
+        },
+        "skips": 8,
+        "distance": 9.020749906664527
+      },
+      {
+        "seed": 43,
+        "sampled": {
+          "speed": 11.078444850069161,
+          "elevation": 1.4852312684524804,
+          "tilt": 5.802527224877849,
+          "spin": 17.97505765300244,
+          "direction": -0.6331190294586122
+        },
+        "skips": 8,
+        "distance": 8.60980501715864
+      },
+      {
+        "seed": 44,
+        "sampled": {
+          "speed": 10.891949776858091,
+          "elevation": 2.0058538110461086,
+          "tilt": 5.547217520186678,
+          "spin": 18.54831860996783,
+          "direction": 0.4328083929140121
+        },
+        "skips": 8,
+        "distance": 8.320246655261453
+      },
+      {
+        "seed": 45,
+        "sampled": {
+          "speed": 11.06100202216922,
+          "elevation": 1.8232554215937853,
+          "tilt": 6.831589753739536,
+          "spin": 17.75244579434395,
+          "direction": -0.1839030287228524
+        },
+        "skips": 8,
+        "distance": 9.495146154679118
+      },
+      {
+        "seed": 46,
+        "sampled": {
+          "speed": 10.978824540023536,
+          "elevation": 1.8878147825598717,
+          "tilt": 5.930261156521738,
+          "spin": 18.161385963298383,
+          "direction": -0.20722889667376881
+        },
+        "skips": 4,
+        "distance": 8.744859131148875
+      },
+      {
+        "seed": 47,
+        "sampled": {
+          "speed": 10.922438646949207,
+          "elevation": 1.798324678093195,
+          "tilt": 5.26371253002435,
+          "spin": 17.816484535373746,
+          "direction": 0.20119079994037736
+        },
+        "skips": 6,
+        "distance": 7.9815859685491946
+      },
+      {
+        "seed": 48,
+        "sampled": {
+          "speed": 11.03352782034936,
+          "elevation": 1.859133210964501,
+          "tilt": 5.600142099428922,
+          "spin": 18.020401794835927,
+          "direction": -0.16212602332234383
+        },
+        "skips": 6,
+        "distance": 8.536806092152792
+      },
+      {
+        "seed": 49,
+        "sampled": {
+          "speed": 11.065947804728058,
+          "elevation": 1.8138565574772656,
+          "tilt": 6.01522542652674,
+          "spin": 17.841359590888025,
+          "direction": -0.6683990540914237
+        },
+        "skips": 6,
+        "distance": 8.845970535956294
+      },
+      {
+        "seed": 50,
+        "sampled": {
+          "speed": 10.868674026419564,
+          "elevation": 1.8184597718063742,
+          "tilt": 5.079044030513614,
+          "spin": 17.846194328516724,
+          "direction": -0.366251828148961
+        },
+        "skips": 6,
+        "distance": 7.796725847819901
+      },
+      {
+        "seed": 51,
+        "sampled": {
+          "speed": 10.77743744071185,
+          "elevation": 2.2061827834695578,
+          "tilt": 6.758496418362483,
+          "spin": 17.67525889635086,
+          "direction": -0.868167098844424
+        },
+        "skips": 4,
+        "distance": 9.154839007054061
+      },
+      {
+        "seed": 52,
+        "sampled": {
+          "speed": 10.782326777807127,
+          "elevation": 1.687077929964289,
+          "tilt": 6.733722927514464,
+          "spin": 17.826555916182695,
+          "direction": 0.3920463412068783
+        },
+        "skips": 5,
+        "distance": 8.969965617322611
+      },
+      {
+        "seed": 53,
+        "sampled": {
+          "speed": 10.857981711258956,
+          "elevation": 1.884551385883242,
+          "tilt": 7.0446203427854925,
+          "spin": 18.502161692529917,
+          "direction": 0.08114073541946698
+        },
+        "skips": 7,
+        "distance": 9.380358150690906
+      },
+      {
+        "seed": 54,
+        "sampled": {
+          "speed": 10.934948410803141,
+          "elevation": 2.786852056859061,
+          "tilt": 6.023993563139811,
+          "spin": 17.876947502531113,
+          "direction": -0.002075709635391887
+        },
+        "skips": 6,
+        "distance": 8.798220872026292
+      },
+      {
+        "seed": 55,
+        "sampled": {
+          "speed": 11.135314308498831,
+          "elevation": 1.8459699258673936,
+          "tilt": 5.559486326528713,
+          "spin": 17.775301684588193,
+          "direction": -0.4676431145053357
+        },
+        "skips": 6,
+        "distance": 8.53975451138201
+      },
+      {
+        "seed": 56,
+        "sampled": {
+          "speed": 10.960355760673993,
+          "elevation": 2.6282455718610436,
+          "tilt": 5.314143521944061,
+          "spin": 17.7071343152225,
+          "direction": -0.1705555424559862
+        },
+        "skips": 7,
+        "distance": 8.364113793732
+      },
+      {
+        "seed": 57,
+        "sampled": {
+          "speed": 10.891941328785226,
+          "elevation": 1.7518935422413051,
+          "tilt": 6.127091774018481,
+          "spin": 17.932269370146095,
+          "direction": 0.2022113709244877
+        },
+        "skips": 8,
+        "distance": 8.69428951000295
+      },
+      {
+        "seed": 58,
+        "sampled": {
+          "speed": 11.092429885337285,
+          "elevation": 2.6626721448265016,
+          "tilt": 6.585871331393719,
+          "spin": 17.59766907993704,
+          "direction": -0.13755434099584812
+        },
+        "skips": 7,
+        "distance": 9.40397076199602
+      },
+      {
+        "seed": 59,
+        "sampled": {
+          "speed": 10.942643703047652,
+          "elevation": 2.0640388706233352,
+          "tilt": 5.442085636546835,
+          "spin": 17.956967861764134,
+          "direction": -0.5694375652819872
+        },
+        "skips": 4,
+        "distance": 8.358940650808158
+      },
+      {
+        "seed": 60,
+        "sampled": {
+          "speed": 10.80815634678273,
+          "elevation": 3.097195074893534,
+          "tilt": 5.977855399949476,
+          "spin": 17.949599490612744,
+          "direction": 0.5045042287092655
+        },
+        "skips": 4,
+        "distance": 8.765453774800203
+      },
+      {
+        "seed": 61,
+        "sampled": {
+          "speed": 11.163555615617273,
+          "elevation": 1.8863230790011585,
+          "tilt": 6.435800552833825,
+          "spin": 18.177670041918752,
+          "direction": -0.5241229322273284
+        },
+        "skips": 7,
+        "distance": 9.45841286635854
+      },
+      {
+        "seed": 62,
+        "sampled": {
+          "speed": 10.902607304187647,
+          "elevation": 3.126909820595756,
+          "tilt": 5.792275145417079,
+          "spin": 17.701579205319288,
+          "direction": -0.7569110875483603
+        },
+        "skips": 7,
+        "distance": 8.773308732470458
+      },
+      {
+        "seed": 63,
+        "sampled": {
+          "speed": 10.76995636391919,
+          "elevation": 2.109399826731533,
+          "tilt": 4.775008804164827,
+          "spin": 17.963794182278217,
+          "direction": -0.20766778779216116
+        },
+        "skips": 4,
+        "distance": 7.501847795195194
+      }
+    ]
+  }
+]
