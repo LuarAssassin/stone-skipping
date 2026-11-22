@@ -2,12 +2,22 @@ import * as THREE from 'three';
 import { Water } from 'three/addons/objects/Water.js';
 import { CoherentWater, FINE_GRID, type WaterGrid, type WaterTick } from './coherent';
 import { SUN_DIRECTION } from './sunset-env';
+import { MAX_RIPPLE_PACKETS, RIPPLE_LIFETIME, type RipplePacket } from '../simulation/ripples';
 
 export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=null){
  const {width,height:depth}=grid;
  const solver=new CoherentWater(grid);
  const state=solver.texture;
  const normals=new THREE.DataTexture(new Uint8Array([128,128,255,255]),1,1);normals.needsUpdate=true;
+
+ // 48 × 2 RGBA32F table packing active physical Contact dispersive ripple packets
+ const rippleBuffer=new Float32Array(MAX_RIPPLE_PACKETS*2*4);
+ const rippleTexture=new THREE.DataTexture(rippleBuffer,MAX_RIPPLE_PACKETS,2,THREE.RGBAFormat,THREE.FloatType);
+ rippleTexture.minFilter=THREE.NearestFilter;
+ rippleTexture.magFilter=THREE.NearestFilter;
+ rippleTexture.generateMipmaps=false;
+ rippleTexture.needsUpdate=true;
+
  // State resolution and visible mesh resolution are independent. Keep the
  // original fine mesh for the calibration domain; cap the long-course mesh.
  const columns=Math.min(width,2048),rows=Math.min(depth,512);
@@ -39,16 +49,71 @@ export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=nu
   surfaceInspection:{value:0},
   domainSize:{value:new THREE.Vector2(grid.sizeX,grid.sizeZ)},
   uTime:{value:0},
+  rippleData:{value:rippleTexture},
+  rippleCount:{value:0},
+  rippleTime:{value:0},
  });
- const stateGLSL=`uniform sampler2D heightState;uniform vec2 domainSize;
+
+ const rippleGLSL=`uniform sampler2D heightState;uniform vec2 domainSize;
+ uniform sampler2D rippleData;uniform int rippleCount;uniform float rippleTime;uniform float surfaceInspection;
+ float localHeight(vec2 point){vec2 coord=vec2(point.x/domainSize.x,point.y/domainSize.y+.5);if(any(lessThan(coord,vec2(0.0)))||any(greaterThan(coord,vec2(1.0))))return 0.0;return texture2D(heightState,coord).r;}
+ // Cauchy-Poisson deep-water dispersive multi-ring wave packets driven by real Contact impulses.
+ // Returns vec3(height, dh/dx, dh/dz) analytically with zero grid aliasing.
+ vec3 dispersiveRipples(vec2 point){
+  if(rippleCount<=0||surfaceInspection>0.5)return vec3(0.0);
+  float totalH=0.0;vec2 totalG=vec2(0.0);
+  float invCount=1.0/${MAX_RIPPLE_PACKETS.toFixed(1)};
+  for(int i=0;i<${MAX_RIPPLE_PACKETS};i++){
+   if(i>=rippleCount)break;
+   float u=(float(i)+0.5)*invCount;
+   vec4 p0=texture2D(rippleData,vec2(u,0.25));
+   float tau=rippleTime-p0.z;
+   if(tau<=0.001||tau>=${RIPPLE_LIFETIME.toFixed(1)})continue;
+   vec4 p1=texture2D(rippleData,vec2(u,0.75));
+   vec2 rel=point-p0.xy;
+   float leadRadius=p1.w*1.48*tau+0.12;
+   if(abs(rel.x)>leadRadius+0.35||abs(rel.y)>leadRadius+0.35)continue;
+   float dist=length(rel);
+   if(dist>leadRadius+0.35)continue;
+   vec2 dir=p1.xy;
+   float forwardBias=p1.z;
+   float sweep=0.095*(forwardBias/0.44);
+   float along=dot(rel,dir);
+   vec2 q=rel-clamp(along,-sweep,sweep)*dir;
+   float qDist=length(q);
+   float r=sqrt(qDist*qDist+0.001024);
+   vec2 radialDir=q/r;
+   float tEff=tau+0.11;
+   float rEff=r+0.038;
+   float phase=(9.81*tEff*tEff)/(4.0*rEff);
+   float k=phase/rEff;
+   float viscous=exp(-0.000095*k*k*tEff);
+   float front=smoothstep(leadRadius,max(0.0,leadRadius-(0.14+0.36*leadRadius)),r);
+   float birthFade=smoothstep(0.0,0.045,tau);
+   float decay=exp(-0.24*tau)*smoothstep(${RIPPLE_LIFETIME.toFixed(1)},${(RIPPLE_LIFETIME-1.2).toFixed(1)},tau);
+   float spread=inversesqrt(1.0+2.4*r);
+   float cosTheta=dist>0.005?along/dist:0.0;
+   float dirWeight=1.0+forwardBias*cosTheta;
+   float env=p0.w*dirWeight*viscous*front*birthFade*decay*spread;
+   if(env<1e-6)continue;
+   totalH+=env*sin(phase);
+   float dHdr=-env*k*cos(phase)*(qDist/r);
+   totalG+=dHdr*radialDir;
+  }
+  return vec3(totalH,totalG);
+ }
+ `;
+
+ const vertexHeightGLSL=`uniform sampler2D heightState;uniform vec2 domainSize;
  float localHeight(vec2 point){vec2 coord=vec2(point.x/domainSize.x,point.y/domainSize.y+.5);if(any(lessThan(coord,vec2(0.0)))||any(greaterThan(coord,vec2(1.0))))return 0.0;return texture2D(heightState,coord).r;}
  `;
+
  material.vertexShader=material.vertexShader
-  .replace('void main() {',stateGLSL+'varying vec4 transmissionCoord;\nvoid main() {\nvec3 displaced=position; displaced.z=localHeight(vec2(position.x,-position.y));')
+  .replace('void main() {',vertexHeightGLSL+'varying vec4 transmissionCoord;\nvoid main() {\nvec2 wPt=vec2(position.x,-position.y); vec3 displaced=position; displaced.z=localHeight(wPt);')
   .replaceAll('vec4( position, 1.0 )','vec4( displaced, 1.0 )')
   .replace('gl_Position = projectionMatrix * mvPosition;','gl_Position = projectionMatrix * mvPosition; transmissionCoord=gl_Position;');
  material.fragmentShader=material.fragmentShader
-  .replace('void main() {',stateGLSL+`
+  .replace('void main() {',rippleGLSL+`
  float surfaceGrain(vec2 p){
   vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
   vec4 k=vec4(0.,1.,127.,128.)+i.x+127.*i.y;
@@ -56,19 +121,21 @@ export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=nu
   return mix(mix(h.x,h.y,f.x),mix(h.z,h.w,f.x),f.y);
  }
  vec2 breezeSlope(vec2 p, float t){
-  // Very subtle twilight wind micro-ripples (visual only, muted during surfaceInspection)
+  // Whisper-quiet glassy lake breeze so expanding stone ripples stand out clearly
   float w1 = sin(p.x*2.4 + p.y*1.7 + t*1.15) * 0.5 + cos(p.x*1.5 - p.y*2.9 + t*0.85) * 0.5;
   float w2 = sin(p.x*6.3 - p.y*4.8 - t*1.85) * 0.5 + cos(p.x*4.9 + p.y*6.1 + t*1.45) * 0.5;
   float g1 = cos(p.x*2.4 + p.y*1.7 + t*1.15) * 1.2 - sin(p.x*1.5 - p.y*2.9 + t*0.85) * 0.75;
   float g2 = cos(p.x*2.4 + p.y*1.7 + t*1.15) * 0.85 + sin(p.x*1.5 - p.y*2.9 + t*0.85) * 1.45;
-  return vec2(g1 + w2*0.6, g2 - w1*0.55) * 0.0042;
+  return vec2(g1 + w2*0.6, g2 - w1*0.55) * 0.0015;
  }
- `+'uniform mat4 textureMatrix; uniform sampler2D churnMap; uniform sampler2D transmission; uniform sampler2D transmissionDepth; uniform vec2 cameraRange; uniform float surfaceInspection; uniform float uTime; varying vec4 transmissionCoord;\nvoid main() {')
+ `+'uniform mat4 textureMatrix; uniform sampler2D churnMap; uniform sampler2D transmission; uniform sampler2D transmissionDepth; uniform vec2 cameraRange; uniform float uTime; varying vec4 transmissionCoord;\nvoid main() {')
   .replace('vec3 surfaceNormal = normalize( noise.xzy * vec3( 1.5, 1.0, 1.5 ) );',`vec2 spacing=vec2(${grid.dx},${grid.dz});
  vec2 point=worldPosition.xz;
  vec2 gradient=vec2(localHeight(point+vec2(spacing.x,0.0))-localHeight(point-vec2(spacing.x,0.0)),localHeight(point+vec2(0.0,spacing.y))-localHeight(point-vec2(0.0,spacing.y)))/(2.0*spacing);
+ vec3 ripple=dispersiveRipples(point);
  vec2 calmWind=breezeSlope(point,uTime)*(1.0-surfaceInspection);
- vec3 surfaceNormal=normalize(vec3(-(gradient.x+calmWind.x),1.0,-(gradient.y+calmWind.y)));`)
+ vec2 totalSlope=gradient+ripple.yz+calmWind;
+ vec3 surfaceNormal=normalize(vec3(-totalSlope.x,1.0,-totalSlope.y));`)
   .replace('mirrorCoord.xy / mirrorCoord.w + distortion','reflectionUV')
   .replace('vec3 reflectionSample =',`vec4 ray=textureMatrix*vec4(reflect(-eyeDirection,surfaceNormal),0.0);
  vec2 reflectionUV=ray.w>0.001?clamp(ray.xy/ray.w,vec2(.001),vec2(.999)):mirrorCoord.xy/mirrorCoord.w;
@@ -79,12 +146,12 @@ export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=nu
  float lightCosine=max(dot(surfaceNormal,sunDirection),0.0);
  float halfCosine=max(dot(surfaceNormal,halfDirection),0.0);
  float sunFresnel=.0204+.9796*pow(1.0-max(dot(eyeDirection,halfDirection),0.0),5.0);
- // Dual-lobe sunset specular: sharp golden glitter + warm broad sheen on wave slopes
- float tightCore=420.0/(2.0*3.14159265)*pow(halfCosine,420.0);
- float warmSheen=44.0/(2.0*3.14159265)*pow(halfCosine,44.0);
+ // Dual-lobe sunset specular: sharp golden glitter + warm broad sheen along expanding ripple crests
+ float tightCore=380.0/(2.0*3.14159265)*pow(halfCosine,380.0);
+ float warmSheen=36.0/(2.0*3.14159265)*pow(halfCosine,36.0);
  float masking=min(1.0,min(2.0*halfCosine*viewCosine/max(dot(eyeDirection,halfDirection),.001),2.0*halfCosine*lightCosine/max(dot(eyeDirection,halfDirection),.001)));
  float geom=sunFresnel*masking/(4.0*viewCosine)*step(.001,lightCosine);
- specularLight=(vec3(1.28,0.82,0.44)*tightCore*0.24 + sunColor*warmSheen*0.11)*geom;`)
+ specularLight=(vec3(1.30,0.84,0.45)*tightCore*0.24 + sunColor*warmSheen*0.14)*geom;`)
   .replace('vec3 outgoingLight = albedo;',`vec2 screenUV=transmissionCoord.xy/transmissionCoord.w*.5+.5;
  vec2 bend=(mat3(viewMatrix)*(surfaceNormal-vec3(0.,1.,0.))).xy;
  vec2 refractedUV=clamp(screenUV-bend*.06,vec2(.001),vec2(.999));
@@ -102,6 +169,12 @@ export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=nu
  if(all(greaterThanEqual(wetUV,vec2(0.)))&&all(lessThanEqual(wetUV,vec2(1.))))opticalDepth=texture2D(churnMap,wetUV).r;
  // Crisp Fresnel reflection blending cool twilight sky & warm sunset glow
  vec3 outgoingLight=mix(bed,reflectionSample,reflectance)+specularLight;
+ // Subtle golden rim catch on steep ripple crests facing the sunset
+ float rippleSlopeMag=length(ripple.yz);
+ if(rippleSlopeMag>0.008){
+  float rimCatch=pow(max(0.0,dot(surfaceNormal,sunDirection)),1.2)*smoothstep(0.008,0.16,rippleSlopeMag);
+  outgoingLight+=vec3(0.42,0.25,0.13)*rimCatch*(0.25+0.75*reflectance);
+ }
  if(opticalDepth>.002){
   float coarse=surfaceGrain(point*27.+.8*gradient);
   float detail=surfaceGrain(point*91.+coarse*2.);
@@ -116,17 +189,34 @@ export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=nu
  float horizonFog=smoothstep(34.0,152.0,viewDist)*(1.0-surfaceInspection);
  vec3 fogCol=mix(vec3(0.49,0.32,0.32),vec3(0.84,0.49,0.32),pow(max(0.0,dot(-eyeDirection,sunDirection)),2.2));
  outgoingLight=mix(outgoingLight,fogCol,horizonFog*0.86);`);
+ let transmissionHidden:THREE.Object3D[]=[];
  const reflection=mesh.onBeforeRender;
  mesh.onBeforeRender=function(renderer,scene,camera,geometry,material,group){
   reflection.call(this,renderer,scene,camera,geometry,material,group);
   const target=renderer.getRenderTarget();const visible=mesh.visible;mesh.visible=false;
+  const saved=transmissionHidden.map(o=>o.visible);
+  for(const o of transmissionHidden)o.visible=false;
   renderer.setRenderTarget(transmission);renderer.clear();renderer.render(scene,camera);
+  for(let i=0;i<transmissionHidden.length;i++)transmissionHidden[i].visible=saved[i];
   renderer.setRenderTarget(target);mesh.visible=visible;
  };
  let generation=-1;
  return {
   mesh,solver,
   setTime(time:number){material.uniforms.uTime.value=time;},
+  setTransmissionHidden(objects:THREE.Object3D[]){transmissionHidden=objects;},
+  updateRipples(packets:readonly RipplePacket[],time:number){
+   const n=Math.min(MAX_RIPPLE_PACKETS,packets.length);
+   const row1Offset=MAX_RIPPLE_PACKETS*4;
+   for(let i=0;i<n;i++){
+    const p=packets[i],o=i*4;
+    rippleBuffer[o]=p.x;rippleBuffer[o+1]=p.z;rippleBuffer[o+2]=p.birth;rippleBuffer[o+3]=p.amplitude;
+    rippleBuffer[row1Offset+o]=p.dirX;rippleBuffer[row1Offset+o+1]=p.dirZ;rippleBuffer[row1Offset+o+2]=p.forwardBias;rippleBuffer[row1Offset+o+3]=p.waveSpeed;
+   }
+   rippleTexture.needsUpdate=true;
+   material.uniforms.rippleCount.value=n;
+   material.uniforms.rippleTime.value=time;
+  },
   update(renderer:THREE.WebGLRenderer,ticks:WaterTick[],version:number){
    const changed=version!==generation||ticks.length>0;
    if(version!==generation){solver.clear(renderer);generation=version;}

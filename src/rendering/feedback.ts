@@ -1,17 +1,25 @@
 import * as THREE from 'three';
 import type { Session } from '../app/session';
 import type { createWorld } from './world';
+import { extractRipplePackets } from '../simulation/ripples';
 
 export function createFeedback(world: ReturnType<typeof createWorld>) {
     const { waterField, stone, halo, trail, trailGeometry } = world;
     let trailCount=0;
     let lastTrail = 0;
     return {
-        reset() { lastTrail = 0; trailCount=0; trailGeometry.setDrawRange(0,0); },
+        reset() {
+            lastTrail = 0;
+            trailCount=0;
+            trailGeometry.setDrawRange(0,0);
+            waterField.updateRipples([], 0);
+        },
         update(session: Session, helpers: boolean) {
             const { sim } = session;
             world.churn.update(world.renderer,session.waterTicks,session.waterGeneration,session.visualTime);
             waterField.update(world.renderer, session.waterTicks, session.waterGeneration);
+            const ripples = session.mouseMode ? [] : extractRipplePackets(sim.contacts, sim.stone, session.visualTime);
+            waterField.updateRipples(ripples, session.visualTime);
 
             stone.position.copy(sim.p);
             stone.quaternion.copy(sim.q);
