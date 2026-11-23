@@ -1,0 +1,2436 @@
+{
+  "version": 1,
+  "generatedAt": "2026-11-23T07:22:00Z",
+  "blender": "5.3.0",
+  "seed": 20261122,
+  "variantsPerArchetype": 4,
+  "count": 36,
+  "passedCount": 36,
+  "allPassed": true,
+  "units": "metres",
+  "blenderAxes": [
+    "length",
+    "width",
+    "thickness"
+  ],
+  "gltfAxes": [
+    "length",
+    "thickness",
+    "width"
+  ],
+  "totalFileBytes": 6103456,
+  "stones": [
+    {
+      "id": "plunge_boulder_01",
+      "passed": true,
+      "dimensionsM": [
+        0.07632564380764961,
+        0.06616019457578659,
+        0.04780508577823639
+      ],
+      "volumeM3": 0.00012821346907413868,
+      "centroidM": [
+        3.2089882007557974e-09,
+        2.7301291231487538e-09,
+        2.801638613503591e-10
+      ],
+      "centroidErrorMm": 4.222523190091637e-06,
+      "triangles": 1008,
+      "vertices": 506,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.07632564380764961,
+        0.04780508577823639,
+        0.06616019457578659
+      ],
+      "gltfVolumeM3": 0.00012821346907413868,
+      "gltfCentroidErrorMm": 4.222523189559011e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.038162821903824806,
+      "b": 0.033080097287893295,
+      "h": 0.023902542889118195,
+      "density": 2680,
+      "massKg": 0.3436120971186917,
+      "flatness": 0.6727295067079873,
+      "aspect": 0.8668147594341784,
+      "fileBytes": 252164,
+      "sha256": "c82a5901e9fb17ab52e2765a1502d15d814d6fab8ded385966e43f254f402b32",
+      "highPolyTriangles": 38448,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.581,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.6078431606292725,
+          0.6901960968971252
+        ],
+        "srgbLuminanceMinMax": [
+          0.20550119294822217,
+          0.4582102283716202
+        ]
+      }
+    },
+    {
+      "id": "plunge_boulder_02",
+      "passed": true,
+      "dimensionsM": [
+        0.07930297404527664,
+        0.062308987602591515,
+        0.04975806921720505
+      ],
+      "volumeM3": 0.00012951475839494803,
+      "centroidM": [
+        -2.4429552883118674e-09,
+        2.1429614361088767e-09,
+        -4.210395093578136e-12
+      ],
+      "centroidErrorMm": 3.249666442077953e-06,
+      "triangles": 1008,
+      "vertices": 506,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.07930297404527664,
+        0.04975806921720505,
+        0.062308987602591515
+      ],
+      "gltfVolumeM3": 0.00012951475839494803,
+      "gltfCentroidErrorMm": 3.2496664414439805e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.03965148702263832,
+      "b": 0.031154493801295757,
+      "h": 0.024879034608602524,
+      "density": 2680,
+      "massKg": 0.34709955249846075,
+      "flatness": 0.7078535836751969,
+      "aspect": 0.7857080816038159,
+      "fileBytes": 251720,
+      "sha256": "1d157efebd90ee9a64c7579814d5094412f4eecd1a428c5deaa182d63b5cb886",
+      "highPolyTriangles": 38448,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.5628,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.6078431606292725,
+          0.6901960968971252
+        ],
+        "srgbLuminanceMinMax": [
+          0.22223687822520735,
+          0.4595945420145989
+        ]
+      }
+    },
+    {
+      "id": "plunge_boulder_03",
+      "passed": true,
+      "dimensionsM": [
+        0.07403051480650902,
+        0.06818317994475365,
+        0.04593745060265064
+      ],
+      "volumeM3": 0.00012801746813507364,
+      "centroidM": [
+        3.8327625677034064e-10,
+        -7.479049459157305e-10,
+        -2.785893936813809e-10
+      ],
+      "centroidErrorMm": 8.853668998787198e-07,
+      "triangles": 1008,
+      "vertices": 506,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.07403051480650902,
+        0.04593745060265064,
+        0.06818317994475365
+      ],
+      "gltfVolumeM3": 0.00012801746813507367,
+      "gltfCentroidErrorMm": 8.853669020060798e-07,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.03701525740325451,
+      "b": 0.03409158997237682,
+      "h": 0.02296872530132532,
+      "density": 2680,
+      "massKg": 0.34308681460199736,
+      "flatness": 0.6465809107687397,
+      "aspect": 0.9210145319529609,
+      "fileBytes": 256088,
+      "sha256": "a19021301c61eeac7021f5f577acc9d086019cfa38bca0bfebfd18814c858309",
+      "highPolyTriangles": 38448,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.6175,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.6078431606292725,
+          0.6901960968971252
+        ],
+        "srgbLuminanceMinMax": [
+          0.2243317811369896,
+          0.4537537580490112
+        ]
+      }
+    },
+    {
+      "id": "plunge_boulder_04",
+      "passed": true,
+      "dimensionsM": [
+        0.08078626543283463,
+        0.06863707676529884,
+        0.051932524889707565
+      ],
+      "volumeM3": 0.00015195995206902617,
+      "centroidM": [
+        -3.142613763863399e-09,
+        4.816338848395193e-09,
+        7.214821130626128e-11
+      ],
+      "centroidErrorMm": 5.751377794561847e-06,
+      "triangles": 1008,
+      "vertices": 506,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.08078626543283463,
+        0.051932524889707565,
+        0.06863707676529884
+      ],
+      "gltfVolumeM3": 0.00015195995206902617,
+      "gltfCentroidErrorMm": 5.7513777940710045e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.04039313271641731,
+      "b": 0.03431853838264942,
+      "h": 0.025966262444853783,
+      "density": 2680,
+      "massKg": 0.4072526715449901,
+      "flatness": 0.697414997646736,
+      "aspect": 0.8496131910239548,
+      "fileBytes": 271424,
+      "sha256": "65d92340ee6d6c0eaf8cdb4fb5c58c13a9c407f5e6b40eed1d6333f6e165fe55",
+      "highPolyTriangles": 38448,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.6265,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.6117647290229797,
+          0.6901960968971252
+        ],
+        "srgbLuminanceMinMax": [
+          0.21753805497586728,
+          0.46044395372867586
+        ]
+      }
+    },
+    {
+      "id": "chunky_cobble_01",
+      "passed": true,
+      "dimensionsM": [
+        0.05782334320247173,
+        0.05194230005145073,
+        0.03183889389038086
+      ],
+      "volumeM3": 5.208305373631649e-05,
+      "centroidM": [
+        -6.183643634963227e-10,
+        -4.3918807595651025e-11,
+        2.424974945474396e-10
+      ],
+      "centroidErrorMm": 6.656638660499919e-07,
+      "triangles": 896,
+      "vertices": 450,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.05782334320247173,
+        0.03183889389038086,
+        0.05194230005145073
+      ],
+      "gltfVolumeM3": 5.208305373631649e-05,
+      "gltfCentroidErrorMm": 6.656638659391522e-07,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.028911671601235867,
+      "b": 0.025971150025725365,
+      "h": 0.01591944694519043,
+      "density": 2650,
+      "massKg": 0.1380200924012387,
+      "flatness": 0.580959401681002,
+      "aspect": 0.8982929241841275,
+      "fileBytes": 160524,
+      "sha256": "4523bfda48f9cfc3b5db45280e56b247da0f18bc125dd083ca9c447bf106f498",
+      "highPolyTriangles": 34176,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.5804,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.5098039507865906,
+          0.5960784554481506
+        ],
+        "srgbLuminanceMinMax": [
+          0.28848158123493195,
+          0.46131375759840015
+        ]
+      }
+    },
+    {
+      "id": "chunky_cobble_02",
+      "passed": true,
+      "dimensionsM": [
+        0.06006302125751972,
+        0.04983620345592499,
+        0.03281010128557682
+      ],
+      "volumeM3": 5.021012564534845e-05,
+      "centroidM": [
+        -1.3973333789607757e-09,
+        -2.7298702177737256e-09,
+        -1.296975143268533e-10
+      ],
+      "centroidErrorMm": 3.069454906505139e-06,
+      "triangles": 896,
+      "vertices": 450,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.06006302125751972,
+        0.03281010128557682,
+        0.04983620345592499
+      ],
+      "gltfVolumeM3": 5.021012564534845e-05,
+      "gltfCentroidErrorMm": 3.0694549067151466e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.03003151062875986,
+      "b": 0.024918101727962494,
+      "h": 0.01640505064278841,
+      "density": 2650,
+      "massKg": 0.1330568329601734,
+      "flatness": 0.5996964927859162,
+      "aspect": 0.8297318784923033,
+      "fileBytes": 155932,
+      "sha256": "a287e549bb2ad7e75469e2537049e30088918b6c558ee98587eebda6839f5f31",
+      "highPolyTriangles": 34176,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.5379,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.5098039507865906,
+          0.5960784554481506
+        ],
+        "srgbLuminanceMinMax": [
+          0.2813843267560005,
+          0.4517466993451118
+        ]
+      }
+    },
+    {
+      "id": "chunky_cobble_03",
+      "passed": true,
+      "dimensionsM": [
+        0.05651697888970375,
+        0.05336078628897667,
+        0.03078434895724058
+      ],
+      "volumeM3": 4.837652060966386e-05,
+      "centroidM": [
+        1.1421560279141044e-09,
+        6.229840712467023e-10,
+        2.398166925686086e-10
+      ],
+      "centroidErrorMm": 1.3229291708788445e-06,
+      "triangles": 896,
+      "vertices": 450,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.05651697888970375,
+        0.03078434895724058,
+        0.05336078628897667
+      ],
+      "gltfVolumeM3": 4.837652060966386e-05,
+      "gltfCentroidErrorMm": 1.3229291700916994e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.028258489444851875,
+      "b": 0.026680393144488335,
+      "h": 0.01539217447862029,
+      "density": 2650,
+      "massKg": 0.12819777961560921,
+      "flatness": 0.5605694086964723,
+      "aspect": 0.944154966122896,
+      "fileBytes": 150820,
+      "sha256": "6c757ddaed32ebee9445300b14b25c71eecf43c182e489354a3f6ebda35d3b34",
+      "highPolyTriangles": 34176,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.5272,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.5090470880866051,
+          0.5960784554481506
+        ],
+        "srgbLuminanceMinMax": [
+          0.2944572671532631,
+          0.4577427774190903
+        ]
+      }
+    },
+    {
+      "id": "chunky_cobble_04",
+      "passed": true,
+      "dimensionsM": [
+        0.059060126543045044,
+        0.05178321711719036,
+        0.03401562757790089
+      ],
+      "volumeM3": 5.672870703697326e-05,
+      "centroidM": [
+        1.96684688577319e-09,
+        -2.27438830125128e-09,
+        2.450686197188561e-10
+      ],
+      "centroidErrorMm": 3.0168505838564963e-06,
+      "triangles": 896,
+      "vertices": 450,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.059060126543045044,
+        0.03401562757790089,
+        0.05178321711719036
+      ],
+      "gltfVolumeM3": 5.672870703697327e-05,
+      "gltfCentroidErrorMm": 3.0168505838218437e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.029530063271522522,
+      "b": 0.02589160855859518,
+      "h": 0.017007813788950443,
+      "density": 2650,
+      "massKg": 0.15033107364797915,
+      "flatness": 0.6150873386146914,
+      "aspect": 0.8767881165890997,
+      "fileBytes": 164868,
+      "sha256": "4c855c3e4b203915166db1ff901802ea250f5e61b0d99825ca61189532d027d4",
+      "highPolyTriangles": 34176,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.5832,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.5098039507865906,
+          0.5921568870544434
+        ],
+        "srgbLuminanceMinMax": [
+          0.26938824903965,
+          0.446728660428524
+        ]
+      }
+    },
+    {
+      "id": "jagged_gravel_01",
+      "passed": true,
+      "dimensionsM": [
+        0.07376087084412575,
+        0.048119399696588516,
+        0.020948179997503757
+      ],
+      "volumeM3": 3.5599000976977325e-05,
+      "centroidM": [
+        -1.5712837218959892e-09,
+        -2.4940028479286574e-09,
+        -5.23981276150026e-11
+      ],
+      "centroidErrorMm": 2.9481737235022504e-06,
+      "triangles": 1080,
+      "vertices": 542,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.07376087084412575,
+        0.020948179997503757,
+        0.048119399696588516
+      ],
+      "gltfVolumeM3": 3.559900097697732e-05,
+      "gltfCentroidErrorMm": 2.9481737233651013e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.036880435422062874,
+      "b": 0.024059699848294258,
+      "h": 0.010474089998751879,
+      "density": 2600,
+      "massKg": 0.09255740254014104,
+      "flatness": 0.35161968360186,
+      "aspect": 0.6523702763525697,
+      "fileBytes": 206352,
+      "sha256": "ae69e6024cd20658539dbf22026af94ed00340a57627b15017752f5393ddc282",
+      "highPolyTriangles": 41040,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4778,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.8274510502815247,
+          0.8980392813682556
+        ],
+        "srgbLuminanceMinMax": [
+          0.25767530856132503,
+          0.4658016004681587
+        ]
+      }
+    },
+    {
+      "id": "jagged_gravel_02",
+      "passed": true,
+      "dimensionsM": [
+        0.07701646164059639,
+        0.04531202092766762,
+        0.021759620867669582
+      ],
+      "volumeM3": 3.699918906262546e-05,
+      "centroidM": [
+        -1.2199677138157052e-09,
+        1.5687253598869176e-09,
+        -1.1519995386445506e-10
+      ],
+      "centroidErrorMm": 1.9906007904337403e-06,
+      "triangles": 1080,
+      "vertices": 542,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.07701646164059639,
+        0.021759620867669582,
+        0.04531202092766762
+      ],
+      "gltfVolumeM3": 3.699918906262546e-05,
+      "gltfCentroidErrorMm": 1.9906007897768675e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.038508230820298195,
+      "b": 0.02265601046383381,
+      "h": 0.010879810433834791,
+      "density": 2600,
+      "massKg": 0.0961978915628262,
+      "flatness": 0.36834334437790023,
+      "aspect": 0.5883420240612957,
+      "fileBytes": 213564,
+      "sha256": "fa089ae3ea5e4df30b955cffb8c14d34d4f44a1bf5ca15136ec312276378884e",
+      "highPolyTriangles": 41040,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4552,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.8235294818878174,
+          0.8980392813682556
+        ],
+        "srgbLuminanceMinMax": [
+          0.25309962255954743,
+          0.4598823851346969
+        ]
+      }
+    },
+    {
+      "id": "jagged_gravel_03",
+      "passed": true,
+      "dimensionsM": [
+        0.07161548361182213,
+        0.049406930804252625,
+        0.019942001439630985
+      ],
+      "volumeM3": 3.372014519154666e-05,
+      "centroidM": [
+        -1.8880591191168623e-09,
+        -7.968701206070052e-10,
+        -6.694326180595808e-11
+      ],
+      "centroidErrorMm": 2.0504269376639066e-06,
+      "triangles": 1080,
+      "vertices": 542,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.07161548361182213,
+        0.019942001439630985,
+        0.049406930804252625
+      ],
+      "gltfVolumeM3": 3.372014519154666e-05,
+      "gltfCentroidErrorMm": 2.050426937095038e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.035807741805911064,
+      "b": 0.024703465402126312,
+      "h": 0.009971000719815493,
+      "density": 2600,
+      "massKg": 0.08767237749802131,
+      "flatness": 0.3352519717203923,
+      "aspect": 0.6898917428534496,
+      "fileBytes": 201832,
+      "sha256": "2d4675e0f552c1ed22a0cd0878cd05695403610a727a692194c72be55b694620",
+      "highPolyTriangles": 41040,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4495,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.8235294818878174,
+          0.8980392813682556
+        ],
+        "srgbLuminanceMinMax": [
+          0.26551844534873964,
+          0.46833885521888735
+        ]
+      }
+    },
+    {
+      "id": "jagged_gravel_04",
+      "passed": true,
+      "dimensionsM": [
+        0.07905544340610504,
+        0.04961984232068062,
+        0.022675574757158756
+      ],
+      "volumeM3": 3.822752545054364e-05,
+      "centroidM": [
+        8.772852460910473e-10,
+        -2.8990194361012527e-09,
+        -7.961498519237048e-11
+      ],
+      "centroidErrorMm": 3.0298979586397026e-06,
+      "triangles": 1080,
+      "vertices": 542,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.07905544340610504,
+        0.022675574757158756,
+        0.04961984232068062
+      ],
+      "gltfVolumeM3": 3.822752545054364e-05,
+      "gltfCentroidErrorMm": 3.029897958512614e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.03952772170305252,
+      "b": 0.02480992116034031,
+      "h": 0.011337787378579378,
+      "density": 2600,
+      "massKg": 0.09939156617141347,
+      "flatness": 0.3620468094095319,
+      "aspect": 0.6276587693751235,
+      "fileBytes": 202684,
+      "sha256": "8b7f9aca56cb2e92867794bda44632be43411face547baaab2eb87a48424d398",
+      "highPolyTriangles": 41040,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4401,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.8235294818878174,
+          0.8980392813682556
+        ],
+        "srgbLuminanceMinMax": [
+          0.26748942562341693,
+          0.46833885521888735
+        ]
+      }
+    },
+    {
+      "id": "small_wafer_01",
+      "passed": true,
+      "dimensionsM": [
+        0.056026676669716835,
+        0.04479553923010826,
+        0.005508997710421681
+      ],
+      "volumeM3": 7.52578209910441e-06,
+      "centroidM": [
+        6.94302859117091e-10,
+        -2.236371661176482e-09,
+        1.1302947376747844e-11
+      ],
+      "centroidErrorMm": 2.3416964841137776e-06,
+      "triangles": 832,
+      "vertices": 418,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.056026676669716835,
+        0.005508997710421681,
+        0.04479553923010826
+      ],
+      "gltfVolumeM3": 7.52578209910441e-06,
+      "gltfCentroidErrorMm": 2.341696484113368e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.028013338334858418,
+      "b": 0.02239776961505413,
+      "h": 0.0027544988552108407,
+      "density": 2400,
+      "massKg": 0.018061877037850584,
+      "flatness": 0.10996583501842527,
+      "aspect": 0.7995394674965765,
+      "fileBytes": 130476,
+      "sha256": "84e9af03b38de6a8cccbbf717d476a0c01f5cd86fc19deb54c5fce8bae55280a",
+      "highPolyTriangles": 31872,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4522,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.7450980544090271,
+          0.8156863451004028
+        ],
+        "srgbLuminanceMinMax": [
+          0.2622658965229988,
+          0.42367297552824024
+        ]
+      }
+    },
+    {
+      "id": "small_wafer_02",
+      "passed": true,
+      "dimensionsM": [
+        0.05743715539574623,
+        0.043057939037680626,
+        0.005669408710673451
+      ],
+      "volumeM3": 8.243548977033226e-06,
+      "centroidM": [
+        -9.942001816806481e-10,
+        2.508565736632042e-10,
+        -7.002075783944689e-11
+      ],
+      "centroidErrorMm": 1.027747988726948e-06,
+      "triangles": 832,
+      "vertices": 418,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.05743715539574623,
+        0.005669408710673451,
+        0.043057939037680626
+      ],
+      "gltfVolumeM3": 8.243548977033226e-06,
+      "gltfCentroidErrorMm": 1.0277479880942105e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.028718577697873116,
+      "b": 0.021528969518840313,
+      "h": 0.0028347043553367257,
+      "density": 2400,
+      "massKg": 0.019784517544879743,
+      "flatness": 0.11400258152710678,
+      "aspect": 0.749653055430901,
+      "fileBytes": 135972,
+      "sha256": "046fd02c35d660aeec1cd9fa4496b08e86dd7b1f50dee83f7919574f604fbbfd",
+      "highPolyTriangles": 31872,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4854,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.7411764860153198,
+          0.8156863451004028
+        ],
+        "srgbLuminanceMinMax": [
+          0.2653176610469818,
+          0.41696709142327304
+        ]
+      }
+    },
+    {
+      "id": "small_wafer_03",
+      "passed": true,
+      "dimensionsM": [
+        0.0549852903932333,
+        0.04630982130765915,
+        0.005327446619048715
+      ],
+      "volumeM3": 7.418940807789697e-06,
+      "centroidM": [
+        1.5556708237137777e-09,
+        -1.2014207410061752e-09,
+        6.587591252101145e-11
+      ],
+      "centroidErrorMm": 1.9666883699571233e-06,
+      "triangles": 832,
+      "vertices": 418,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.0549852903932333,
+        0.005327446619048715,
+        0.04630982130765915
+      ],
+      "gltfVolumeM3": 7.418940807789697e-06,
+      "gltfCentroidErrorMm": 1.9666883696809245e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.02749264519661665,
+      "b": 0.023154910653829575,
+      "h": 0.0026637233095243573,
+      "density": 2400,
+      "massKg": 0.017805457938695275,
+      "flatness": 0.10557456305188795,
+      "aspect": 0.8422220011292004,
+      "fileBytes": 126756,
+      "sha256": "ee206d527f1820146465aa0a03ecaed9485cfdb430675ca0ee98f8eeea0247f2",
+      "highPolyTriangles": 31872,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4218,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.7450980544090271,
+          0.8156863451004028
+        ],
+        "srgbLuminanceMinMax": [
+          0.30578824687004086,
+          0.45288866006135936
+        ]
+      }
+    },
+    {
+      "id": "small_wafer_04",
+      "passed": true,
+      "dimensionsM": [
+        0.059272920712828636,
+        0.0464293472468853,
+        0.0051363634411245584
+      ],
+      "volumeM3": 8.334631963437303e-06,
+      "centroidM": [
+        1.0312323009721701e-09,
+        6.878037568627958e-10,
+        3.829316511624711e-11
+      ],
+      "centroidErrorMm": 1.2401533909228942e-06,
+      "triangles": 832,
+      "vertices": 418,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.059272920712828636,
+        0.0051363634411245584,
+        0.0464293472468853
+      ],
+      "gltfVolumeM3": 8.334631963437303e-06,
+      "gltfCentroidErrorMm": 1.2401533911481533e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.029636460356414318,
+      "b": 0.02321467362344265,
+      "h": 0.0025681817205622792,
+      "density": 2400,
+      "massKg": 0.020003116712249528,
+      "flatness": 0.09791095649565652,
+      "aspect": 0.7833146517586139,
+      "fileBytes": 130224,
+      "sha256": "f8e53ca160fcd3b5bfb7afa7045c88ff1b1e339d6a7351ffc424bbd7ce608d7e",
+      "highPolyTriangles": 31872,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4364,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.7450980544090271,
+          0.8156863451004028
+        ],
+        "srgbLuminanceMinMax": [
+          0.24858197576999666,
+          0.41472866233587263
+        ]
+      }
+    },
+    {
+      "id": "standard_01",
+      "passed": true,
+      "dimensionsM": [
+        0.08000144734978676,
+        0.05979803949594498,
+        0.00900267856195569
+      ],
+      "volumeM3": 2.274847545320566e-05,
+      "centroidM": [
+        -1.926026879496181e-09,
+        4.769484226983861e-09,
+        -9.227770300977051e-12
+      ],
+      "centroidErrorMm": 5.143699493918202e-06,
+      "triangles": 1008,
+      "vertices": 506,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.08000144734978676,
+        0.00900267856195569,
+        0.05979803949594498
+      ],
+      "gltfVolumeM3": 2.274847545320566e-05,
+      "gltfCentroidErrorMm": 5.143699496154684e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.04000072367489338,
+      "b": 0.02989901974797249,
+      "h": 0.004501339280977845,
+      "density": 2650,
+      "massKg": 0.060283459950994996,
+      "flatness": 0.13016054223424522,
+      "aspect": 0.7474619707127632,
+      "fileBytes": 140224,
+      "sha256": "309409fff3ac2cdcab14918eec745173c8907a1ff247f9e91c8c0be05bfde0ef",
+      "highPolyTriangles": 38448,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4415,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.6509804129600525,
+          0.7215686440467834
+        ],
+        "srgbLuminanceMinMax": [
+          0.2773866799354553,
+          0.44236003323793405
+        ]
+      }
+    },
+    {
+      "id": "standard_02",
+      "passed": true,
+      "dimensionsM": [
+        0.08214805647730827,
+        0.058003513142466545,
+        0.009245533496141434
+      ],
+      "volumeM3": 2.4193370882309643e-05,
+      "centroidM": [
+        -3.827991451626414e-10,
+        5.4683741406648316e-09,
+        1.8176650570281416e-10
+      ],
+      "centroidErrorMm": 5.484768909482377e-06,
+      "triangles": 1008,
+      "vertices": 506,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.08214805647730827,
+        0.009245533496141434,
+        0.058003513142466545
+      ],
+      "gltfVolumeM3": 2.4193370882309636e-05,
+      "gltfCentroidErrorMm": 5.484768909481926e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.04107402823865414,
+      "b": 0.029001756571233273,
+      "h": 0.004622766748070717,
+      "density": 2650,
+      "massKg": 0.06411243283812056,
+      "flatness": 0.13393873120128774,
+      "aspect": 0.7060850326810694,
+      "fileBytes": 141020,
+      "sha256": "4200788945897cadef4b2ab07da22638aa0876ea0d0a4ab999be27b718cc427b",
+      "highPolyTriangles": 38448,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4498,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.6470588445663452,
+          0.7215686440467834
+        ],
+        "srgbLuminanceMinMax": [
+          0.27753020933866496,
+          0.4483961113095283
+        ]
+      }
+    },
+    {
+      "id": "standard_03",
+      "passed": true,
+      "dimensionsM": [
+        0.07802724093198776,
+        0.061608731746673584,
+        0.008729042951017618
+      ],
+      "volumeM3": 2.251197819622886e-05,
+      "centroidM": [
+        2.2597806127083596e-09,
+        3.766002041025929e-09,
+        -1.2120535135374663e-11
+      ],
+      "centroidErrorMm": 4.391984369047322e-06,
+      "triangles": 1008,
+      "vertices": 506,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.07802724093198776,
+        0.008729042951017618,
+        0.061608731746673584
+      ],
+      "gltfVolumeM3": 2.2511978196228857e-05,
+      "gltfCentroidErrorMm": 4.391984371116308e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.03901362046599388,
+      "b": 0.030804365873336792,
+      "h": 0.004364521475508809,
+      "density": 2650,
+      "massKg": 0.05965674222000648,
+      "flatness": 0.12589902618458113,
+      "aspect": 0.7895797802254045,
+      "fileBytes": 143692,
+      "sha256": "2f3569e84ab93535560e84c0c5c68f38795c6eab38af0a69501505b2dccca5eb",
+      "highPolyTriangles": 38448,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4626,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.6470588445663452,
+          0.7254902124404907
+        ],
+        "srgbLuminanceMinMax": [
+          0.2818745228052139,
+          0.4471514055013656
+        ]
+      }
+    },
+    {
+      "id": "standard_04",
+      "passed": true,
+      "dimensionsM": [
+        0.07988942041993141,
+        0.060379236936569214,
+        0.009531673043966293
+      ],
+      "volumeM3": 2.3934097953315382e-05,
+      "centroidM": [
+        3.1972848026743434e-09,
+        -1.7594490441837733e-09,
+        -6.491789806916973e-11
+      ],
+      "centroidErrorMm": 3.650000737257628e-06,
+      "triangles": 1008,
+      "vertices": 506,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.07988942041993141,
+        0.009531673043966293,
+        0.060379236936569214
+      ],
+      "gltfVolumeM3": 2.393409795331538e-05,
+      "gltfCentroidErrorMm": 3.65000073816505e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.039944710209965706,
+      "b": 0.030189618468284607,
+      "h": 0.004765836521983147,
+      "density": 2650,
+      "massKg": 0.06342535957628577,
+      "flatness": 0.13723999432206851,
+      "aspect": 0.755785141752078,
+      "fileBytes": 148504,
+      "sha256": "145039e8821ab4253245b0ff9be672b5037caec6156edf88e4956c559728d099",
+      "highPolyTriangles": 38448,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4834,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.6470588445663452,
+          0.7254902124404907
+        ],
+        "srgbLuminanceMinMax": [
+          0.2960776592135429,
+          0.45405728744268414
+        ]
+      }
+    },
+    {
+      "id": "thin_shale_01",
+      "passed": true,
+      "dimensionsM": [
+        0.08420121297240257,
+        0.06433022394776344,
+        0.005172749515622854
+      ],
+      "volumeM3": 1.4683821304650384e-05,
+      "centroidM": [
+        -1.4635799620508366e-09,
+        -6.3461164881773475e-09,
+        3.0660093474627986e-11
+      ],
+      "centroidErrorMm": 6.512772130833766e-06,
+      "triangles": 1024,
+      "vertices": 514,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.08420121297240257,
+        0.005172749515622854,
+        0.06433022394776344
+      ],
+      "gltfVolumeM3": 1.4683821304650384e-05,
+      "gltfCentroidErrorMm": 6.512772130843139e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.042100606486201286,
+      "b": 0.03216511197388172,
+      "h": 0.002586374757811427,
+      "density": 2550,
+      "massKg": 0.03744374432685848,
+      "flatness": 0.07028372052481575,
+      "aspect": 0.7640059053406754,
+      "fileBytes": 158356,
+      "sha256": "1db8fe3caf7cff603bb3af00b1f3c0eccfa72f416884ca432cbcb8c2786f87cd",
+      "highPolyTriangles": 38784,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4624,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.5764706134796143,
+          0.6549019813537598
+        ],
+        "srgbLuminanceMinMax": [
+          0.2208125656604767,
+          0.4482525819063187
+        ]
+      }
+    },
+    {
+      "id": "thin_shale_02",
+      "passed": true,
+      "dimensionsM": [
+        0.08596142753958702,
+        0.061684537678956985,
+        0.005347477970644832
+      ],
+      "volumeM3": 1.447481430351451e-05,
+      "centroidM": [
+        -2.5420882646410767e-09,
+        -1.4279873883509128e-09,
+        7.675110562957755e-11
+      ],
+      "centroidErrorMm": 2.9167192972122813e-06,
+      "triangles": 1024,
+      "vertices": 514,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.08596142753958702,
+        0.005347477970644832,
+        0.061684537678956985
+      ],
+      "gltfVolumeM3": 1.4474814303514508e-05,
+      "gltfCentroidErrorMm": 2.9167192956273043e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.04298071376979351,
+      "b": 0.030842268839478493,
+      "h": 0.002673738985322416,
+      "density": 2550,
+      "massKg": 0.036910776473962,
+      "flatness": 0.07343600412319391,
+      "aspect": 0.7175839146057686,
+      "fileBytes": 159148,
+      "sha256": "88717d2e052bf48eb766af4fc643f50bd9aa7a4ad33221a9a8b94992a01844a0",
+      "highPolyTriangles": 38784,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4773,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.5764706134796143,
+          0.6549019813537598
+        ],
+        "srgbLuminanceMinMax": [
+          0.2380831528663635,
+          0.46217885558605193
+        ]
+      }
+    },
+    {
+      "id": "thin_shale_03",
+      "passed": true,
+      "dimensionsM": [
+        0.08206747472286224,
+        0.06532863155007362,
+        0.005048169754445553
+      ],
+      "volumeM3": 1.4329695691403238e-05,
+      "centroidM": [
+        -2.0245418258438254e-09,
+        -2.1450446123134276e-09,
+        -2.5126899954075623e-11
+      ],
+      "centroidErrorMm": 2.9496808902841027e-06,
+      "triangles": 1024,
+      "vertices": 514,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.08206747472286224,
+        0.005048169754445553,
+        0.06532863155007362
+      ],
+      "gltfVolumeM3": 1.4329695691403238e-05,
+      "gltfCentroidErrorMm": 2.9496808900785287e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.04103373736143112,
+      "b": 0.03266431577503681,
+      "h": 0.0025240848772227764,
+      "density": 2550,
+      "massKg": 0.03654072401307826,
+      "flatness": 0.06894402510971614,
+      "aspect": 0.7960356008355947,
+      "fileBytes": 165716,
+      "sha256": "355ed7f84634aab8df1cde310bc149ced220b9c0e2d792aa7ddf0c5d337e7f32",
+      "highPolyTriangles": 38784,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.5025,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.5764706134796143,
+          0.6549019813537598
+        ],
+        "srgbLuminanceMinMax": [
+          0.23370981979370115,
+          0.45857650285959245
+        ]
+      }
+    },
+    {
+      "id": "thin_shale_04",
+      "passed": true,
+      "dimensionsM": [
+        0.08793081343173981,
+        0.06544654816389084,
+        0.004885584814473987
+      ],
+      "volumeM3": 1.458611917420748e-05,
+      "centroidM": [
+        -2.1443431775455496e-10,
+        2.5979306477279985e-10,
+        -1.5409278640223417e-11
+      ],
+      "centroidErrorMm": 3.3721203863907e-07,
+      "triangles": 1024,
+      "vertices": 514,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.08793081343173981,
+        0.004885584814473987,
+        0.06544654816389084
+      ],
+      "gltfVolumeM3": 1.458611917420748e-05,
+      "gltfCentroidErrorMm": 3.372120383593257e-07,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.043965406715869904,
+      "b": 0.03272327408194542,
+      "h": 0.0024427924072369933,
+      "density": 2550,
+      "massKg": 0.03719460389422907,
+      "flatness": 0.06440248704651594,
+      "aspect": 0.7442959482536418,
+      "fileBytes": 161336,
+      "sha256": "5a9c44c301679a045c7aa73db7f72be06d432fead6d0f4edf50cdc02ffb839a7",
+      "highPolyTriangles": 38784,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4717,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.5764706134796143,
+          0.6549019813537598
+        ],
+        "srgbLuminanceMinMax": [
+          0.21434275895655155,
+          0.4535788560986519
+        ]
+      }
+    },
+    {
+      "id": "heavy_basalt_01",
+      "passed": true,
+      "dimensionsM": [
+        0.08764956146478653,
+        0.08492757752537727,
+        0.010987632907927036
+      ],
+      "volumeM3": 4.355515853548138e-05,
+      "centroidM": [
+        -1.6809693561102685e-09,
+        -3.0306203230895765e-09,
+        4.919298838721588e-11
+      ],
+      "centroidErrorMm": 3.4659396228168494e-06,
+      "triangles": 1080,
+      "vertices": 542,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.08764956146478653,
+        0.010987632907927036,
+        0.08492757752537727
+      ],
+      "gltfVolumeM3": 4.355515853548137e-05,
+      "gltfCentroidErrorMm": 3.4659396209240256e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.043824780732393265,
+      "b": 0.04246378876268864,
+      "h": 0.005493816453963518,
+      "density": 2950,
+      "massKg": 0.12848771767967007,
+      "flatness": 0.12735174478744365,
+      "aspect": 0.9689446941442734,
+      "fileBytes": 202552,
+      "sha256": "1b00df84a7640ce69088fd5e77371a678f211020a0adbba8b2469d7b238336d3",
+      "highPolyTriangles": 41040,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4874,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.6078431606292725,
+          0.6745098233222961
+        ],
+        "srgbLuminanceMinMax": [
+          0.15519529976844787,
+          0.3756572836279869
+        ]
+      }
+    },
+    {
+      "id": "heavy_basalt_02",
+      "passed": true,
+      "dimensionsM": [
+        0.08986186981201172,
+        0.08220075443387032,
+        0.011232791468501091
+      ],
+      "volumeM3": 4.557506205426346e-05,
+      "centroidM": [
+        -5.585542674045174e-09,
+        5.563425276327933e-09,
+        -1.156583767659836e-10
+      ],
+      "centroidErrorMm": 7.88437471388698e-06,
+      "triangles": 1080,
+      "vertices": 542,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.08986186981201172,
+        0.011232791468501091,
+        0.08220075443387032
+      ],
+      "gltfVolumeM3": 4.557506205426346e-05,
+      "gltfCentroidErrorMm": 7.884374713058457e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.04493093490600586,
+      "b": 0.04110037721693516,
+      "h": 0.0056163957342505455,
+      "density": 2950,
+      "massKg": 0.1344464330600772,
+      "flatness": 0.13069593174979877,
+      "aspect": 0.91474564913719,
+      "fileBytes": 199992,
+      "sha256": "bc6292c0cf0836b0b3ff2bbd59541d3db8ad514ce0c5e6140e50ce66980cf406",
+      "highPolyTriangles": 41040,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4753,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.6078431606292725,
+          0.6745098233222961
+        ],
+        "srgbLuminanceMinMax": [
+          0.15318824106454848,
+          0.3682925632059574
+        ]
+      }
+    },
+    {
+      "id": "heavy_basalt_03",
+      "passed": true,
+      "dimensionsM": [
+        0.08625403791666031,
+        0.08513648808002472,
+        0.01075204461812973
+      ],
+      "volumeM3": 4.20517341008311e-05,
+      "centroidM": [
+        -2.2360436912128616e-09,
+        -2.6745891423817767e-09,
+        2.274185893839059e-11
+      ],
+      "centroidErrorMm": 3.486235170166709e-06,
+      "triangles": 1080,
+      "vertices": 542,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.08625403791666031,
+        0.01075204461812973,
+        0.08513648808002472
+      ],
+      "gltfVolumeM3": 4.20517341008311e-05,
+      "gltfCentroidErrorMm": 3.486235171833391e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.043127018958330154,
+      "b": 0.04256824404001236,
+      "h": 0.005376022309064865,
+      "density": 2950,
+      "massKg": 0.12405261559745175,
+      "flatness": 0.12547103329018483,
+      "aspect": 0.9870435070214871,
+      "fileBytes": 203492,
+      "sha256": "d375d4ffe0c7d69ec10831d00dd70256ea2cc548e8982bb6611c5169d78400a9",
+      "highPolyTriangles": 41040,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4899,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.6078431606292725,
+          0.6745098233222961
+        ],
+        "srgbLuminanceMinMax": [
+          0.16135529940128324,
+          0.3809631656646728
+        ]
+      }
+    },
+    {
+      "id": "heavy_basalt_04",
+      "passed": true,
+      "dimensionsM": [
+        0.08762691169977188,
+        0.08391837775707245,
+        0.011620851699262857
+      ],
+      "volumeM3": 4.628186869924607e-05,
+      "centroidM": [
+        -2.18843391787747e-09,
+        6.877837854270873e-09,
+        2.0880439611152305e-10
+      ],
+      "centroidErrorMm": 7.220629878230389e-06,
+      "triangles": 1080,
+      "vertices": 542,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.08762691169977188,
+        0.011620851699262857,
+        0.08391837775707245
+      ],
+      "gltfVolumeM3": 4.628186869924607e-05,
+      "gltfCentroidErrorMm": 7.22062987780445e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.04381345584988594,
+      "b": 0.041959188878536224,
+      "h": 0.005810425849631429,
+      "density": 2950,
+      "massKg": 0.1365315126627759,
+      "flatness": 0.1355160286829194,
+      "aspect": 0.9576781393893505,
+      "fileBytes": 200132,
+      "sha256": "cb38b6dc134f7e4fcc16adae773a2ea8a13522bb2f8927caf8e1daa972669f36",
+      "highPolyTriangles": 41040,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4862,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.6078431606292725,
+          0.6745098233222961
+        ],
+        "srgbLuminanceMinMax": [
+          0.1546603978395462,
+          0.3524109891891479
+        ]
+      }
+    },
+    {
+      "id": "willow_leaf_01",
+      "passed": true,
+      "dimensionsM": [
+        0.10395082831382751,
+        0.04387635737657547,
+        0.007462809327989817
+      ],
+      "volumeM3": 1.8159502747842384e-05,
+      "centroidM": [
+        -3.3352269501425093e-09,
+        -1.1910425591200338e-09,
+        9.94917070774111e-12
+      ],
+      "centroidErrorMm": 3.5415279432174297e-06,
+      "triangles": 1040,
+      "vertices": 522,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.10395082831382751,
+        0.007462809327989817,
+        0.04387635737657547
+      ],
+      "gltfVolumeM3": 1.8159502747842384e-05,
+      "gltfCentroidErrorMm": 3.541527943815083e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.05197541415691376,
+      "b": 0.021938178688287735,
+      "h": 0.0037314046639949083,
+      "density": 2650,
+      "massKg": 0.04812268228178232,
+      "flatness": 0.11050274996026792,
+      "aspect": 0.42208761669616296,
+      "fileBytes": 144840,
+      "sha256": "667e0042261c04343f912d43ecde4835649aa01f2873bb0f5640ec3a39bd9dac",
+      "highPolyTriangles": 39840,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4449,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.545098066329956,
+          0.615686297416687
+        ],
+        "srgbLuminanceMinMax": [
+          0.3252682457089424,
+          0.45968238514661786
+        ]
+      }
+    },
+    {
+      "id": "willow_leaf_02",
+      "passed": true,
+      "dimensionsM": [
+        0.10679414123296738,
+        0.04245481453835964,
+        0.007706641219556332
+      ],
+      "volumeM3": 1.7645391449755282e-05,
+      "centroidM": [
+        -5.142863458553972e-09,
+        4.193606345228727e-10,
+        4.3413353895937176e-11
+      ],
+      "centroidErrorMm": 5.160115562118124e-06,
+      "triangles": 1040,
+      "vertices": 522,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.10679414123296738,
+        0.007706641219556332,
+        0.04245481453835964
+      ],
+      "gltfVolumeM3": 1.7645391449755282e-05,
+      "gltfCentroidErrorMm": 5.160115563012737e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.05339707061648369,
+      "b": 0.02122740726917982,
+      "h": 0.003853320609778166,
+      "density": 2650,
+      "massKg": 0.046760287341851496,
+      "flatness": 0.11445320354850294,
+      "aspect": 0.3975387979921677,
+      "fileBytes": 147712,
+      "sha256": "1b5b4a90c87232cfbac0f92dd7f357cc07bf0fbaf58f1813cb78358f65556bee",
+      "highPolyTriangles": 39840,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4579,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.545098066329956,
+          0.615686297416687
+        ],
+        "srgbLuminanceMinMax": [
+          0.3038690312981605,
+          0.4534549345374107
+        ]
+      }
+    },
+    {
+      "id": "willow_leaf_03",
+      "passed": true,
+      "dimensionsM": [
+        0.10187234356999397,
+        0.045134445652365685,
+        0.0072885537520051
+      ],
+      "volumeM3": 1.733387811899515e-05,
+      "centroidM": [
+        3.649066203019623e-09,
+        -1.6110540862024363e-09,
+        1.3964039265433607e-10
+      ],
+      "centroidErrorMm": 3.991325451770411e-06,
+      "triangles": 1040,
+      "vertices": 522,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.10187234356999397,
+        0.0072885537520051,
+        0.045134445652365685
+      ],
+      "gltfVolumeM3": 1.733387811899515e-05,
+      "gltfCentroidErrorMm": 3.991325452162725e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.050936171784996986,
+      "b": 0.022567222826182842,
+      "h": 0.00364427687600255,
+      "density": 2650,
+      "massKg": 0.045934777015337144,
+      "flatness": 0.10748779552619583,
+      "aspect": 0.4430490560115064,
+      "fileBytes": 139468,
+      "sha256": "53756134bba49cbf407a455d37d40e61dc846025418890b375e760d2539451f0",
+      "highPolyTriangles": 39840,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4316,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.545098066329956,
+          0.615686297416687
+        ],
+        "srgbLuminanceMinMax": [
+          0.33117648065090177,
+          0.46274513006210327
+        ]
+      }
+    },
+    {
+      "id": "willow_leaf_04",
+      "passed": true,
+      "dimensionsM": [
+        0.1089586652815342,
+        0.045400574803352356,
+        0.007036595838144422
+      ],
+      "volumeM3": 1.8456915522738852e-05,
+      "centroidM": [
+        4.59619050038412e-09,
+        -2.2586626598068468e-10,
+        -1.9582392918600822e-10
+      ],
+      "centroidErrorMm": 4.60590161609767e-06,
+      "triangles": 1040,
+      "vertices": 522,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.1089586652815342,
+        0.007036595838144422,
+        0.045400574803352356
+      ],
+      "gltfVolumeM3": 1.8456915522738852e-05,
+      "gltfCentroidErrorMm": 4.605901617753543e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.0544793326407671,
+      "b": 0.022700287401676178,
+      "h": 0.003518297919072211,
+      "density": 2650,
+      "massKg": 0.048910826135257955,
+      "flatness": 0.10004630283938568,
+      "aspect": 0.41667704616281337,
+      "fileBytes": 146496,
+      "sha256": "1f29705991b41c28d3c9c58640890dbec28157df1a820242d84d492dd0872e8b",
+      "highPolyTriangles": 39840,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4429,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.545098066329956,
+          0.615686297416687
+        ],
+        "srgbLuminanceMinMax": [
+          0.32719844167232515,
+          0.4591114047884941
+        ]
+      }
+    },
+    {
+      "id": "master_disc_01",
+      "passed": true,
+      "dimensionsM": [
+        0.09208627045154572,
+        0.08777235075831413,
+        0.006217811489477754
+      ],
+      "volumeM3": 2.6509139252562653e-05,
+      "centroidM": [
+        7.287100979991578e-09,
+        -1.5190506629499048e-09,
+        -1.208989134222735e-10
+      ],
+      "centroidErrorMm": 7.444727809427921e-06,
+      "triangles": 1200,
+      "vertices": 602,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.09208627045154572,
+        0.006217811489477754,
+        0.08777235075831413
+      ],
+      "gltfVolumeM3": 2.650913925256265e-05,
+      "gltfCentroidErrorMm": 7.444727808741959e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.04604313522577286,
+      "b": 0.043886175379157066,
+      "h": 0.003108905744738877,
+      "density": 2750,
+      "massKg": 0.0729001329445473,
+      "flatness": 0.0691609967931398,
+      "aspect": 0.9531534975618162,
+      "fileBytes": 125484,
+      "sha256": "6f661c8f7adfe1d48e57a3fc125e8ed2cc69c82d023997ddd2741614dcbbabb0",
+      "highPolyTriangles": 45600,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4773,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.40000003576278687,
+          0.458823561668396
+        ],
+        "srgbLuminanceMinMax": [
+          0.19249177986681462,
+          0.2770517779946327
+        ]
+      }
+    },
+    {
+      "id": "master_disc_02",
+      "passed": true,
+      "dimensionsM": [
+        0.09318169578909874,
+        0.0861198641359806,
+        0.006295228376984596
+      ],
+      "volumeM3": 2.67498440249324e-05,
+      "centroidM": [
+        -4.577969816683875e-09,
+        2.8555890004760223e-09,
+        7.752234029865935e-11
+      ],
+      "centroidErrorMm": 5.396128787876881e-06,
+      "triangles": 1200,
+      "vertices": 602,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.09318169578909874,
+        0.006295228376984596,
+        0.0861198641359806
+      ],
+      "gltfVolumeM3": 2.67498440249324e-05,
+      "gltfCentroidErrorMm": 5.396128787973152e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.04659084789454937,
+      "b": 0.0430599320679903,
+      "h": 0.003147614188492298,
+      "density": 2750,
+      "massKg": 0.0735620710685641,
+      "flatness": 0.07027397455815976,
+      "aspect": 0.9242143900331948,
+      "fileBytes": 120124,
+      "sha256": "06908c3ea24ad24b2037d3dcddfd9720428cce00da8633f2b5d1c6f9fc0c4819",
+      "highPolyTriangles": 45600,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4626,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.40000003576278687,
+          0.458823561668396
+        ],
+        "srgbLuminanceMinMax": [
+          0.1946423700660467,
+          0.27474589577913283
+        ]
+      }
+    },
+    {
+      "id": "master_disc_03",
+      "passed": true,
+      "dimensionsM": [
+        0.09102017804980278,
+        0.08822448924183846,
+        0.006108399014919996
+      ],
+      "volumeM3": 2.592145613717994e-05,
+      "centroidM": [
+        6.343409946582089e-09,
+        2.0030243058753465e-09,
+        9.884494233441777e-11
+      ],
+      "centroidErrorMm": 6.652873547794899e-06,
+      "triangles": 1200,
+      "vertices": 602,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.09102017804980278,
+        0.006108399014919996,
+        0.08822448924183846
+      ],
+      "gltfVolumeM3": 2.592145613717994e-05,
+      "gltfCentroidErrorMm": 6.652873548450174e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.04551008902490139,
+      "b": 0.04411224462091923,
+      "h": 0.003054199507459998,
+      "density": 2750,
+      "massKg": 0.07128400437724483,
+      "flatness": 0.06816539908421623,
+      "aspect": 0.9692849556234154,
+      "fileBytes": 123320,
+      "sha256": "45544705c93a8d754f3cf03df8a7ab098e64876efb6113e0c400af8749ca9ff1",
+      "highPolyTriangles": 45600,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4771,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.40000003576278687,
+          0.458823561668396
+        ],
+        "srgbLuminanceMinMax": [
+          0.19865177949965,
+          0.29774040421247483
+        ]
+      }
+    },
+    {
+      "id": "master_disc_04",
+      "passed": true,
+      "dimensionsM": [
+        0.09470423683524132,
+        0.08909488469362259,
+        0.005980170099064708
+      ],
+      "volumeM3": 2.673864849004704e-05,
+      "centroidM": [
+        2.4525019713369094e-09,
+        2.2284029555477944e-10,
+        1.1233291717395267e-10
+      ],
+      "centroidErrorMm": 2.4651657958472445e-06,
+      "triangles": 1200,
+      "vertices": 602,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensionsM": [
+        0.09470423683524132,
+        0.005980170099064708,
+        0.08909488469362259
+      ],
+      "gltfVolumeM3": 2.673864849004704e-05,
+      "gltfCentroidErrorMm": 2.4651657957272517e-06,
+      "gltfClosedManifold": true,
+      "identityTransform": true,
+      "a": 0.04735211841762066,
+      "b": 0.044547442346811295,
+      "h": 0.002990085049532354,
+      "density": 2750,
+      "massKg": 0.07353128334762936,
+      "flatness": 0.06510321677619747,
+      "aspect": 0.9407697867691239,
+      "fileBytes": 120448,
+      "sha256": "14367adab732d519b0282826bf6f2433b229e26349d5769b7a4b989c16540de1",
+      "highPolyTriangles": 45600,
+      "textures": {
+        "resolution": [
+          512,
+          512
+        ],
+        "embedded": [
+          "image/webp",
+          "image/webp",
+          "image/webp"
+        ],
+        "normalSpace": "OpenGL tangent (+Y)",
+        "metallic": 0,
+        "uvCoverage": 0.4601,
+        "uvOverlap": 0.0,
+        "roughnessP001P999": [
+          0.40000003576278687,
+          0.458823561668396
+        ],
+        "srgbLuminanceMinMax": [
+          0.18967609376013278,
+          0.2672376609325409
+        ]
+      }
+    }
+  ]
+}
