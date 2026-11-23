@@ -517,264 +517,278 @@ canvas {
 .rarity-tag.rarity-fine { background: rgba(94, 176, 178, 0.22); color: #9de8e8; border: 1px solid rgba(120, 210, 212, 0.36); }
 .rarity-tag.rarity-rare { background: rgba(243, 164, 93, 0.26); color: #ffdfa8; border: 1px solid rgba(255, 206, 132, 0.58); box-shadow: 0 0 10px rgba(243, 164, 93, 0.28); }
 
-/* Shore Foraging & Stone Box Modal */
-.stone-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background: rgba(8, 11, 20, 0.62);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.22s ease;
+/* 3D Twilight Riverbank Foraging HUD (replaces modal shop) */
+body.forage-open .cinema-header,
+body.forage-open .hud-score,
+body.forage-open .hud-top-right,
+body.forage-open .hud-dock,
+body.forage-open #hand-panel,
+body.forage-open #gesture-hud,
+body.forage-open #result-toast,
+body.forage-open #bounce-markers {
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
-.stone-modal.open {
+.forage-hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+  z-index: 25;
+}
+
+body.forage-open .forage-hud {
   opacity: 1;
+}
+
+.forage-top-bar {
+  position: fixed;
+  top: 20px;
+  left: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.forage-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--text-main);
+  box-shadow: var(--shadow-soft);
+}
+
+.forage-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   pointer-events: auto;
 }
 
-.stone-sheet {
-  width: min(860px, 100%);
-  max-height: min(86vh, 760px);
-  overflow-y: auto;
-  padding: 22px 24px 20px;
-  border-radius: 22px;
-  background: rgba(13, 17, 29, 0.90);
-  border: 1px solid rgba(255, 206, 158, 0.24);
-  box-shadow: 0 24px 64px rgba(2, 4, 10, 0.72);
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.stone-sheet-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(255, 206, 158, 0.14);
-}
-
-.stone-sheet-head .eyebrow {
-  display: block;
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  color: var(--accent);
-  margin-bottom: 4px;
-}
-
-.stone-sheet-head h2 {
-  margin: 0;
-  font-family: "Songti SC", "Noto Serif SC", Georgia, serif;
-  font-size: 20px;
-  font-weight: 500;
-  color: #fff6ec;
-}
-
-.stone-sheet-head-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
 .career-pill {
-  padding: 4px 10px;
+  padding: 6px 12px;
   border-radius: 999px;
-  background: rgba(255, 206, 158, 0.12);
-  border: 1px solid rgba(255, 206, 158, 0.22);
+  background: rgba(14, 18, 30, 0.56);
+  border: 1px solid rgba(255, 206, 158, 0.2);
   font-size: 11px;
   color: var(--accent-bright);
   font-variant-numeric: tabular-nums;
 }
 
-.stone-section {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.forage-caption {
+  position: fixed;
+  left: 50%;
+  bottom: 92px;
+  transform: translate(-50%, 10px);
+  width: min(460px, calc(100vw - 32px));
+  padding: 13px 18px;
+  border-radius: 18px;
+  background: rgba(13, 17, 29, 0.72);
+  border: 1px solid rgba(255, 206, 158, 0.26);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 16px 40px rgba(4, 6, 14, 0.55);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.section-row {
+.forage-caption.visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.forage-caption.inspecting {
+  border-color: rgba(255, 198, 134, 0.52);
+  background: rgba(13, 17, 29, 0.82);
+}
+
+.forage-cap-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.section-row h3 {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-main);
-}
-
-.section-row h3 span {
-  font-size: 12px;
-  color: var(--accent-bright);
-  margin-left: 6px;
-}
-
-.section-sub {
-  margin: 3px 0 0;
-  font-size: 11px;
-  color: var(--text-dim);
-}
-
-.ghost-amber-btn {
-  padding: 7px 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 206, 158, 0.34);
-  background: rgba(243, 164, 93, 0.16);
-  color: var(--accent-bright);
-  font-size: 12px;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.ghost-amber-btn:hover {
-  background: rgba(243, 164, 93, 0.30);
-}
-
-.stone-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(236px, 1fr));
-  gap: 10px;
-}
-
-.stone-card {
-  padding: 11px 12px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 206, 158, 0.14);
-  display: flex;
-  flex-direction: column;
   gap: 8px;
-  transition: border-color 0.16s ease, background 0.16s ease;
-}
-
-.stone-card.equipped {
-  border-color: var(--accent);
-  background: rgba(243, 164, 93, 0.10);
-}
-
-.stone-card.rarity-rare {
-  border-color: rgba(255, 206, 132, 0.42);
-}
-
-.stone-card-top {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.stone-glyph {
-  width: 48px;
-  height: 40px;
-  flex-shrink: 0;
-  border-radius: 8px;
-  background: rgba(8, 12, 22, 0.55);
-  border: 1px solid rgba(255, 206, 158, 0.10);
-}
-
-.stone-card-meta {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.stone-name-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
   flex-wrap: wrap;
 }
 
-.stone-name-row strong {
-  font-size: 13px;
+.forage-cap-head strong {
+  font-family: "Songti SC", "Noto Serif SC", Georgia, serif;
+  font-size: 16px;
   font-weight: 500;
   color: #fff6ec;
 }
 
-.slot-key {
+.forage-dims {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.forage-feel {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.forage-inspect-actions {
+  display: none;
+  margin-top: 11px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 206, 158, 0.14);
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.forage-caption.inspecting .forage-inspect-actions {
+  display: flex;
+}
+
+.inspect-tip {
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+}
+
+.inspect-btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.inspect-btns button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.forage-msg {
+  margin: 6px 0 0;
+  min-height: 0;
+  font-size: 11px;
+  color: var(--accent-bright);
+  text-align: center;
+}
+
+.forage-pocket {
+  position: fixed;
+  left: 24px;
+  right: 24px;
+  bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  border-radius: 16px;
+  background: rgba(13, 17, 29, 0.68);
+  border: 1px solid rgba(255, 206, 158, 0.18);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  pointer-events: auto;
+  overflow-x: auto;
+}
+
+.forage-pocket-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+  padding-right: 8px;
+  border-right: 1px solid rgba(255, 206, 158, 0.14);
+  font-size: 11px;
+  color: var(--text-main);
+}
+
+.forage-pocket-head small {
+  font-size: 10px;
+  color: var(--accent-bright);
+  font-variant-numeric: tabular-nums;
+}
+
+.forage-pocket-list {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: nowrap;
+}
+
+.pocket-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 206, 158, 0.18);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.pocket-chip.active {
+  border-color: var(--accent);
+  background: rgba(243, 164, 93, 0.20);
+}
+
+.pocket-chip.rarity-rare {
+  border-color: rgba(255, 206, 132, 0.52);
+}
+
+.pocket-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 0;
+  background: transparent;
+  color: var(--text-main);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.pocket-pick:hover {
+  color: var(--accent-bright);
+}
+
+.pocket-pick kbd {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 10px;
-  padding: 1px 5px;
+  padding: 0 4px;
   border-radius: 4px;
   background: rgba(255, 255, 255, 0.10);
   color: var(--accent-bright);
 }
 
-.stone-dims {
-  font-size: 10px;
-  color: var(--text-muted);
-  font-variant-numeric: tabular-nums;
-}
-
-.stone-best {
+.pocket-best {
+  font-style: normal;
   font-size: 10px;
   color: var(--accent-bright);
-  font-variant-numeric: tabular-nums;
 }
 
-.stone-feel {
-  margin: 0;
-  font-size: 11px;
-  line-height: 1.5;
+.pocket-drop {
+  padding: 5px 8px 5px 4px;
+  border: 0;
+  border-left: 1px solid rgba(255, 206, 158, 0.12);
+  background: transparent;
   color: var(--text-dim);
-}
-
-.stone-card-actions {
-  display: flex;
-  gap: 6px;
-  margin-top: auto;
-}
-
-.stone-card-actions button {
-  flex: 1;
-  padding: 6px 8px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 206, 158, 0.22);
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text-main);
-  font-size: 11px;
+  font-size: 12px;
   cursor: pointer;
 }
 
-.stone-card-actions button:hover:not(:disabled) {
-  background: rgba(243, 164, 93, 0.24);
-  border-color: var(--accent);
-}
-
-.stone-card-actions button:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-
-.stone-card-actions button.collect-btn,
-.stone-card-actions button.active-equip {
-  background: rgba(243, 164, 93, 0.18);
-  border-color: rgba(255, 206, 158, 0.4);
-  color: var(--accent-bright);
-}
-
-.stone-card-actions button.drop-btn {
-  flex: 0.7;
-  color: var(--text-dim);
-}
-
-.stone-feedback {
-  margin: 0;
-  min-height: 16px;
-  font-size: 12px;
-  color: var(--accent-bright);
-  text-align: center;
+.pocket-drop:hover {
+  color: #ffb09c;
 }
 
 /* End-of-throw summary toast */

@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync, existsSync } from 'node:fs';
 import { DEFAULT, Simulation } from '../src/simulation/physics';
 import {
     forageShoreStones,
@@ -8,6 +9,8 @@ import {
     STANDARD_STONE,
     STONE_ARCHETYPES,
     StoneBox,
+    stoneFromManifestEntry,
+    type StoneManifest,
 } from '../src/simulation/stones';
 import { parseSnapshot, sampleThrow } from '../src/simulation/launch-randomness';
 import { Session } from '../src/app/session';
@@ -93,4 +96,30 @@ test('PullThrowGesture maps pull-back to speed, preserves spin sign, and rewards
     const released = g.release({ pointerId: 1, clientX: 600, clientY: 640, timeStamp: 450 });
     assert.ok(released);
     assert.ok(released.temperatureScale > 0 && released.temperatureScale <= 1);
+});
+
+test('Blender 36-stone manifest loads cleanly, every GLB exists on disk, and plunge_boulder vs master_disc behave physically', () => {
+    const manifestUrl = new URL('../public/assets/stones/manifest.json', import.meta.url);
+    const manifest = JSON.parse(readFileSync(manifestUrl, 'utf8')) as StoneManifest;
+    assert.equal(manifest.count, 36);
+    assert.equal(manifest.stones.length, 36);
+
+    for (const entry of manifest.stones) {
+        const glbUrl = new URL(`../public${entry.glbPath}`, import.meta.url);
+        assert.ok(existsSync(glbUrl), `missing GLB asset: ${entry.glbPath}`);
+        assert.ok(entry.a >= entry.b && entry.b >= entry.h && entry.mass > 0.01);
+    }
+
+    const shore16 = forageShoreStones(120, 4242, 16, manifest.stones);
+    assert.equal(shore16.length, 16);
+    assert.ok(shore16.every(s => s.glbPath?.startsWith('/assets/stones/')));
+
+    const boulder = stoneFromManifestEntry(manifest.stones.find(s => s.archetypeId === 'plunge_boulder')!, 1);
+    const master = stoneFromManifestEntry(manifest.stones.find(s => s.archetypeId === 'master_disc')!, 2);
+    const launch = { speed: 15, elevation: 2, tilt: 8, spin: 26, direction: 0 };
+    const simBoulder = new Simulation(launch, undefined, true, true, 4, boulder).run();
+    const simMaster = new Simulation(launch, undefined, true, true, 4, master).run();
+
+    assert.equal(simBoulder.skips, 0, `340g plunge_boulder should plunge straight in (got ${simBoulder.skips} skips)`);
+    assert.ok(simMaster.skips >= 5 && simMaster.p.x > simBoulder.p.x * 2, `master_disc (${simMaster.skips} skips, ${simMaster.p.x.toFixed(1)}m) should vastly outperform plunge_boulder (${simBoulder.p.x.toFixed(1)}m)`);
 });

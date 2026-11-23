@@ -342,6 +342,33 @@ export class CinemaAudioEngine {
         return { input: filter, gain, sp };
     }
 
+    /** Tactile soft pebble-clink sound when picking up or pocketing a stone on the riverbank. */
+    playStoneClink(stoneMass = 0.06) {
+        if (this.muted || !this.ctx || !this.sfxGain) return;
+        const ctx = this.ctx;
+        if (ctx.state !== 'running') return;
+        const now = ctx.currentTime;
+        const massRatio = THREE.MathUtils.clamp(stoneMass / 0.06, 0.35, 3.2);
+        const pitch = Math.pow(1 / massRatio, 0.26);
+
+        // Dual short stony click resonances (like two dry river pebbles gently touching)
+        for (const [offset, mult, amp] of [[0, 1.0, 0.14], [0.018, 1.38, 0.09]] as const) {
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            const f = (1280 + Math.random() * 240) * pitch * mult;
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(f, now + offset);
+            osc.frequency.exponentialRampToValueAtTime(f * 0.62, now + offset + 0.032);
+            g.gain.setValueAtTime(0.0005, now + offset);
+            g.gain.linearRampToValueAtTime(amp, now + offset + 0.002);
+            g.gain.exponentialRampToValueAtTime(0.0005, now + offset + 0.036);
+            osc.connect(g);
+            g.connect(this.sfxGain);
+            osc.start(now + offset);
+            osc.stop(now + offset + 0.042);
+        }
+    }
+
     playThrow(speed: number) {
         if (this.muted || !this.ctx || !this.sfxGain) return;
         const ctx = this.ctx;

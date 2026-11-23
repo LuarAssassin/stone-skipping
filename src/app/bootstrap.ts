@@ -14,7 +14,7 @@ import { createBounceMarkers } from '../ui/bounce-markers';
 import { CinemaAudioEngine } from '../audio/engine';
 import { formatStoneDimensions, StoneBox, type StoneSpec } from '../simulation/stones';
 import { createStonePreviewStage } from '../rendering/stone-mesh';
-import { mountStoneDrawer } from '../ui/stone-drawer';
+import { createShoreForaging } from '../rendering/shore-foraging';
 import { setupDevReview } from './dev-review';
 
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
@@ -76,16 +76,32 @@ export function boot() {
         syncHandPanel();
     }
 
-    const stoneDrawer = mountStoneDrawer(stoneBox, {
-        onEquip(stone) {
+    const shoreForaging = createShoreForaging(world.scene, camera, renderer.domElement, stoneBox, {
+        onEquipAndStandUp(stone) {
+            applyEquippedStone(stone);
+            rig.beginThrow(SHORE_ORIGIN, false, parameters.direction, camera.aspect);
+        },
+        onEquipStay(stone) {
             applyEquippedStone(stone);
         },
+        onClink(mass) {
+            audio.unlock();
+            audio.playStoneClink(mass);
+        },
+        onExit() {
+            syncHandPanel();
+        },
     });
+    world.hideFromTransmission(shoreForaging.rootGroup);
     applyEquippedStone(stoneBox.equipped);
 
     document.querySelector<HTMLButtonElement>('#open-stones')!.onclick = () => {
-        if (stoneDrawer.isOpen()) stoneDrawer.close();
-        else stoneDrawer.open();
+        if (shoreForaging.isOpen()) shoreForaging.close();
+        else {
+            cancelGesture();
+            setLabOpen(false);
+            shoreForaging.open();
+        }
     };
     document.querySelector<HTMLButtonElement>('#hand-spin-dir')!.onclick = () => {
         parameters.spin = parameters.spin === 0 ? 18 : -parameters.spin;
@@ -257,7 +273,7 @@ export function boot() {
         timeStamp: event.timeStamp > 0 ? event.timeStamp : performance.now(),
     });
     canvas.addEventListener('pointerdown', event => {
-        if (stoneDrawer.isOpen()) return;
+        if (shoreForaging.isOpen()) return;
         if (gesture.pointerId !== undefined) {
             if (event.pointerId !== gesture.pointerId) cancelGesture();
             return;
@@ -287,7 +303,7 @@ export function boot() {
 
     // Mouse wheel on the lake quickly tunes stone pitch (tilt), or Shift+wheel tunes side bank (roll)
     canvas.addEventListener('wheel', event => {
-        if (stoneDrawer.isOpen() || mouseMode.checked) return;
+        if (shoreForaging.isOpen() || mouseMode.checked) return;
         event.preventDefault();
         const step = event.deltaY < 0 ? 1 : -1;
         if (event.shiftKey) {
@@ -347,7 +363,7 @@ export function boot() {
             lastFinishedDuration = undefined;
             const equipped = stoneBox.equipped;
             session.start(target, effectiveTemperature, launch.visual, equipped);
-            stoneDrawer.consumeEphemeralAfterThrow();
+            shoreForaging.consumeEphemeralAfterThrow();
             playbackSelect.value = 'normal';
         }
         if (overrideMode) {
@@ -404,8 +420,9 @@ export function boot() {
     };
     window.addEventListener('keydown', event => {
         if (event.code === 'Escape') {
-            if (stoneDrawer.isOpen()) {
-                stoneDrawer.close();
+            if (shoreForaging.isOpen()) {
+                if (shoreForaging.isInspecting()) shoreForaging.putBackInspected();
+                else shoreForaging.close();
                 return;
             }
             cancelGesture();
@@ -414,17 +431,34 @@ export function boot() {
         if (event.code === 'Tab') {
             if (event.target instanceof HTMLElement && event.target.closest('input, textarea, select')) return;
             event.preventDefault();
+            if (shoreForaging.isOpen()) shoreForaging.close();
             setLabOpen(!document.body.classList.contains('lab-open'));
             return;
         }
         if (event.target instanceof HTMLElement && event.target.closest('input, textarea, select, button, summary')) return;
         if (event.code === 'KeyF') {
             event.preventDefault();
-            if (stoneDrawer.isOpen()) stoneDrawer.close();
-            else stoneDrawer.open();
+            if (shoreForaging.isOpen()) shoreForaging.close();
+            else {
+                cancelGesture();
+                setLabOpen(false);
+                shoreForaging.open();
+            }
             return;
         }
-        if (stoneDrawer.isOpen()) return;
+        if (/^Digit[1-8]$/.test(event.code)) {
+            const slot = Number(event.code.slice(5)) - 1;
+            const picked = stoneBox.stones[slot];
+            if (picked) {
+                stoneBox.equipSaved(picked.id);
+                audio.unlock();
+                audio.playStoneClink(picked.mass);
+                applyEquippedStone(stoneBox.equipped);
+                if (shoreForaging.isOpen()) shoreForaging.close();
+            }
+            return;
+        }
+        if (shoreForaging.isOpen()) return;
         if (event.code === 'Space') {
             event.preventDefault();
             toggle();
@@ -451,13 +485,6 @@ export function boot() {
         } else if (event.code === 'KeyE') {
             parameters.spin = Math.max(12, Math.abs(parameters.spin || 18));
             syncControls(); syncHandPanel();
-        } else if (/^Digit[1-8]$/.test(event.code)) {
-            const slot = Number(event.code.slice(5)) - 1;
-            const picked = stoneBox.stones[slot];
-            if (picked) {
-                stoneBox.equipSaved(picked.id);
-                applyEquippedStone(stoneBox.equipped);
-            }
         }
     });
     document.addEventListener('visibilitychange', () => {
@@ -507,22 +534,27 @@ export function boot() {
         world.waterField.setTime(envTime);
         world.sunset.update(envTime);
 
-        // When pulling back to aim after a far throw, smoothly return camera to shore so the golden aim guide is framed!
-        const aimAtShore = isAiming && (sim.ended || sim.p.x > 2.5);
-        if (aimAtShore && !wasAiming) {
-            rig.beginThrow(SHORE_ORIGIN, false, preview!.target.direction, camera.aspect);
-        }
-        wasAiming = aimAtShore;
-        if (aimAtShore) {
-            rig.update(camera, SHORE_ORIGIN, session.presentationTime, false, elapsed, false, []);
+        // Camera orchestration: 3D riverbank foraging vs aiming at shore vs throwing/replay
+        if (shoreForaging.isOpen()) {
+            const foragePose = shoreForaging.update(elapsed);
+            rig.updateToPose(camera, foragePose, elapsed);
         } else {
-            rig.update(camera, sim.p, session.presentationTime, session.mode === 'bullet', elapsed, paused, sim.contacts);
+            const aimAtShore = isAiming && (sim.ended || sim.p.x > 2.5);
+            if (aimAtShore && !wasAiming) {
+                rig.beginThrow(SHORE_ORIGIN, false, preview!.target.direction, camera.aspect);
+            }
+            wasAiming = aimAtShore;
+            if (aimAtShore) {
+                rig.update(camera, SHORE_ORIGIN, session.presentationTime, false, elapsed, false, []);
+            } else {
+                rig.update(camera, sim.p, session.presentationTime, session.mode === 'bullet', elapsed, paused, sim.contacts);
+            }
         }
         dev.applySideCamera(camera);
         updateTelemetry(session, visibleDrops);
 
-        // Throttle handheld 3D preview to ~20fps during active stone flight to keep GPU headroom for water
-        if (!dev.isReferenceMode) {
+        // Throttle handheld 3D preview during flight; pause it completely while crouching on the 3D shore
+        if (!dev.isReferenceMode && !shoreForaging.isOpen()) {
             previewAccum += elapsed;
             const inFlight = !paused && !sim.ended && !stageDrag && !isAiming;
             if (!inFlight || previewAccum >= 0.05) {
