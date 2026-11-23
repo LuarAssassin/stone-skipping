@@ -98,11 +98,11 @@ test('PullThrowGesture maps pull-back to speed, preserves spin sign, and rewards
     assert.ok(released.temperatureScale > 0 && released.temperatureScale <= 1);
 });
 
-test('Blender 36-stone manifest loads cleanly, every GLB exists on disk, and plunge_boulder vs master_disc behave physically', () => {
+test('Blender stone manifest loads cleanly, every GLB exists on disk, foraging is strictly unique, and plunge_boulder vs master_disc behave physically', () => {
     const manifestUrl = new URL('../public/assets/stones/manifest.json', import.meta.url);
     const manifest = JSON.parse(readFileSync(manifestUrl, 'utf8')) as StoneManifest;
-    assert.equal(manifest.count, 36);
-    assert.equal(manifest.stones.length, 36);
+    assert.ok(manifest.count >= 36, `expected at least 36 stones in manifest, got ${manifest.count}`);
+    assert.equal(manifest.stones.length, manifest.count);
 
     for (const entry of manifest.stones) {
         const glbUrl = new URL(`../public${entry.glbPath}`, import.meta.url);
@@ -110,9 +110,21 @@ test('Blender 36-stone manifest loads cleanly, every GLB exists on disk, and plu
         assert.ok(entry.a >= entry.b && entry.b >= entry.h && entry.mass > 0.01);
     }
 
-    const shore16 = forageShoreStones(120, 4242, 16, manifest.stones);
-    assert.equal(shore16.length, 16);
-    assert.ok(shore16.every(s => s.glbPath?.startsWith('/assets/stones/')));
+    // Strict uniqueness: 34 stones sampled from a >=36-stone manifest must have 34 distinct GLBs
+    const shore34 = forageShoreStones(120, 4242, 34, manifest.stones);
+    assert.equal(shore34.length, 34);
+    assert.ok(shore34.every(s => s.glbPath?.startsWith('/assets/stones/')));
+    const uniqueGlbs = new Set(shore34.map(s => s.glbPath));
+    assert.equal(uniqueGlbs.size, 34, `expected 34 strictly unique stones on shore, got ${uniqueGlbs.size}`);
+
+    // Exclude previous batch prefers unseen stones when catalog has spare entries
+    const prevIds = new Set(shore34.slice(0, 16).map(s => s.id.replace(/-[a-z0-9]+$/, '')));
+    const fresh16 = forageShoreStones(120, 9999, 16, manifest.stones, prevIds);
+    const freshGlbs = new Set(fresh16.map(s => s.glbPath));
+    assert.equal(freshGlbs.size, 16);
+    const prevGlbs = new Set(shore34.slice(0, 16).map(s => s.glbPath));
+    const overlap = fresh16.filter(s => prevGlbs.has(s.glbPath)).length;
+    assert.equal(overlap, 0, `expected fresh batch to avoid all 16 excluded stones when ${manifest.stones.length - 16} unseen exist, got ${overlap} overlap`);
 
     const boulder = stoneFromManifestEntry(manifest.stones.find(s => s.archetypeId === 'plunge_boulder')!, 1);
     const master = stoneFromManifestEntry(manifest.stones.find(s => s.archetypeId === 'master_disc')!, 2);

@@ -300,13 +300,15 @@ function pickWeighted<T>(items: readonly T[], weights: number[], rng: () => numb
     return items[items.length - 1];
 }
 
-/** Generate naturally mixed riverbank stones (`count` defaults to 5 for unit compat, 16 for 3D shore).
- *  When the 36-stone Blender manifest is provided, every stone uses its exact baked GLB & measured physics. */
+/** Generate naturally mixed riverbank stones (`count` defaults to 5 for unit compat, 34 for 3D shore).
+ *  When the Blender manifest is provided, every stone uses its exact baked GLB & measured physics,
+ *  sampling strictly without replacement so every pickable stone on the shore is unique. */
 export function forageShoreStones(
     careerSkips = 0,
     seed = Math.floor(Math.random() * 0xffffffff),
     count = 5,
-    catalog?: readonly ManifestStoneEntry[]
+    catalog?: readonly ManifestStoneEntry[],
+    excludeIds?: ReadonlySet<string>
 ): StoneSpec[] {
     const rng = mulberry32(seed);
     const rareBonus = Math.min(0.10, careerSkips * 0.0010);
@@ -319,30 +321,66 @@ export function forageShoreStones(
         rare: list.filter(s => s.rarity === 'rare'),
     });
 
-    const useManifest = catalog && catalog.length > 0;
-    const pools = useManifest ? byRarity(catalog) : byRarity(STONE_ARCHETYPES);
+    const useManifest = Boolean(catalog && catalog.length > 0);
+    const pools = useManifest ? byRarity(catalog!) : byRarity(STONE_ARCHETYPES);
+    const usedIds = new Set<string>();
+
+    const fallbackOrder: Record<StoneRarity, StoneRarity[]> = {
+        common: ['common', 'usable', 'fine', 'rare'],
+        usable: ['usable', 'common', 'fine', 'rare'],
+        fine: ['fine', 'usable', 'rare', 'common'],
+        rare: ['rare', 'fine', 'usable', 'common'],
+    };
 
     const pickFrom = (rarity: StoneRarity): StoneSpec => {
-        const pool = pools[rarity].length ? pools[rarity] : (useManifest ? catalog : STONE_ARCHETYPES);
-        const item = pool[Math.floor(rng() * pool.length)];
         const itemSeed = (seed ^ Math.floor(rng() * 0xffffffff)) >>> 0;
-        return useManifest
-            ? stoneFromManifestEntry(item as ManifestStoneEntry, itemSeed)
-            : instantiateStone(item as StoneArchetype, itemSeed);
+        if (useManifest) {
+            const manifestPools = pools as Record<StoneRarity, ManifestStoneEntry[]>;
+            // Prefer unseen unique stones first, then remaining unused in this batch (strictly no duplicates while catalog permits)
+            const chooseUnused = (preferFresh: boolean): ManifestStoneEntry | undefined => {
+                for (const r of fallbackOrder[rarity]) {
+                    const candidates = manifestPools[r].filter(
+                        entry => !usedIds.has(entry.id) && (!preferFresh || !excludeIds?.has(entry.id))
+                    );
+                    if (candidates.length > 0) {
+                        return candidates[Math.floor(rng() * candidates.length)];
+                    }
+                }
+                return undefined;
+            };
+            const picked =
+                (excludeIds && excludeIds.size > 0 ? chooseUnused(true) : undefined)
+                ?? chooseUnused(false)
+                ?? catalog![Math.floor(rng() * catalog!.length)];
+            usedIds.add(picked.id);
+            return stoneFromManifestEntry(picked, itemSeed);
+        }
+
+        const archetypePools = pools as Record<StoneRarity, StoneArchetype[]>;
+        const pool = archetypePools[rarity].length ? archetypePools[rarity] : STONE_ARCHETYPES;
+        const item = pool[Math.floor(rng() * pool.length)];
+        return instantiateStone(item, itemSeed);
     };
 
     const result: StoneSpec[] = [];
-    // Guarantee realistic riverbank diversity: blunt rocks + usable skimmers + at least 1 quality find
-    const guaranteed: StoneRarity[] = count >= 12
-        ? ['common', 'common', 'common', 'common', 'usable', 'usable', 'usable', 'fine', 'fine']
-        : ['common', 'usable', 'fine'];
+    // Guarantee realistic riverbank diversity: blunt rocks + usable skimmers + quality finds + rare chance
+    const guaranteed: StoneRarity[] = count >= 24
+        ? [
+            'common', 'common', 'common', 'common', 'common', 'common', 'common', 'common',
+            'usable', 'usable', 'usable', 'usable', 'usable', 'usable',
+            'fine', 'fine', 'fine', 'fine', 'fine',
+            'rare',
+        ]
+        : count >= 12
+            ? ['common', 'common', 'common', 'common', 'usable', 'usable', 'usable', 'fine', 'fine']
+            : ['common', 'usable', 'fine'];
 
     for (let i = 0; i < Math.min(count, guaranteed.length); i++) {
         result.push(pickFrom(guaranteed[i]));
     }
 
     const rarities: StoneRarity[] = ['common', 'usable', 'fine', 'rare'];
-    const weights = [0.42, 0.30, 0.21 + fineBonus, 0.07 + rareBonus];
+    const weights = [0.40, 0.30, 0.22 + fineBonus, 0.08 + rareBonus];
     while (result.length < count) {
         const chosenRarity = pickWeighted(rarities, weights, rng);
         result.push(pickFrom(chosenRarity));
