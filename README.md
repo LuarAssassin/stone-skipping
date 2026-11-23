@@ -10,7 +10,7 @@ Web-first 物理打水漂模拟与风格化小游戏（TypeScript / Three.js / V
 ### 1. 真实米制刚体与接触物理
 - **4000 Hz 零分配标量 RK4 物理**（[src/simulation/physics.ts](src/simulation/physics.ts)）：解析椭圆平面裁剪计算连续湿面积与压力形心，入水/离水/受压跃迁自动二分细化，完整保留三维姿态演化与陀螺进动（全量 24+64 种子校准回归提速 ~4.7×）。
 - **全自由度出手参数**：水平方向 `direction`、初速 `speed`、出手抛角 `elevation`、石面攻角 `tilt`、左右侧倾 `roll`（自然产生侧向弧线轨迹）、正负自旋 `spin`，以及显式 seed 的有界随机温度与 v1 JSON 确定性快照重放。
-- **8 种参差不齐的物理石子**（[src/simulation/stones.ts](src/simulation/stones.ts)、[docs/STONE_DESIGN.md](docs/STONE_DESIGN.md)）：从厚重砸水的圆滚鹅卵石、棱角碎石到轻薄页岩、玄武重圆饼、柳叶长扁石与溪磨黑曜圆盘；每块石子的尺寸 `(a, b, h)`、质量、密度、水阻与重心偏心直接联动物理轨迹、GPU 排水深度、水花能量预算与声音响度/音高。
+- **9 大类 × 4 变体 = 36 块真实 Blender PBR 河岸石子**（[src/simulation/stones.ts](src/simulation/stones.ts)、[docs/BLENDER_STONE_FACTORY.md](docs/BLENDER_STONE_FACTORY.md)）：从 340g 纯砸大水花的重拳河卵石、歪斜磕碰的棱角碎石，到轻薄页岩、玄武重圆饼、柳叶长扁石与 72g 溪磨黑曜圆盘；每块 `.glb` 的真实尺寸 `(a, b, h)`、实测闭合体积 × 岩性密度质量、水阻与重心偏心直接联动物理轨迹、GPU 排水深度、水花能量预算与声音响度/音高。
 
 ### 2. 64×32 m 连续 GPU 高度场与水幕闭环
 - **固定全域 GPU 水波求解 + Cauchy–Poisson 色散多环涟漪**（[src/rendering/coherent.ts](src/rendering/coherent.ts)、[src/simulation/water-grid.ts](src/simulation/water-grid.ts)、[src/simulation/ripples.ts](src/simulation/ripples.ts)）：`4096×1024 RGBA32F` 双缓冲负责近场压坑、滑移尾迹、落滴次级波、鼠标拨水与焦散；叠加真实接触冲量驱动的深水色散多环波包（波速 `0.46–0.74 m/s`，360° 全向扩散带前向动量加强，持续 6–9 秒无网格锯齿）。
@@ -23,7 +23,7 @@ Web-first 物理打水漂模拟与风格化小游戏（TypeScript / Three.js / V
 
 ### 4. 直觉键鼠体验、岸边拣石与实验室双态
 - **全屏沉浸玩家态 + `Tab` 实验室抽屉**：默认全屏暮色湖面与悬浮玻璃 HUD；按 `Tab` 或点击右上角「实验室」呼出完整参数滑块、SI 接触诊断、JSON 快照与鼠标拨水验证。
-- **岸边拣石与 8 格随身石匣**（[src/ui/stone-drawer.ts](src/ui/stone-drawer.ts)）：按 `F` 俯身在岸滩刷出 5 块天然石块，端详轮廓与侧厚后可「顺手试投」或「收入石匣」永久练习。
+- **3D 暮色岸滩真实拣石与 8 格随身石匣**（[src/rendering/shore-foraging.ts](src/rendering/shore-foraging.ts)）：按 `F` 丝滑俯身转向暮色湿润砾石岸滩，16 块真实 Blender `.glb` 石子自然散落于岸边；支持拖动/WASD 沿岸漫步、滚轮俯身拉近、3D 射线悬停高亮、点击悬空 **360° 翻转端详薄厚与纹理**，随后一键「拿去投」「收入石匣」或「放回岸滩」。
 - **手边 3D 握石调姿 + 湖面回拉甩投**：左下角独立 3D 视口实时展示手中石子姿态并支持直接拖拽旋转；湖面向下拉蓄力（`6.5–25.5 m/s`）、左右瞄准（淡金色第一落水点引导弧，不剧透后续跳数）并配合手腕切旋甜蜜区游标。
 
 ---

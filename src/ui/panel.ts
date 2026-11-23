@@ -48,8 +48,8 @@ export function mountUI() {
       <span class="posture-chip" title="W/S 调整出手抛射仰角">抛角 <b id="hand-elev">2°</b></span>
       <button id="hand-spin-dir" class="spin-chip" type="button" title="Q/E 切换顺逆自旋">↻ 顺旋</button>
     </div>
-    <button id="open-stones" class="forage-btn" type="button" title="岸边拣石与随身石匣 (F)">
-      拣石头 / 石匣 <kbd>F</kbd>
+    <button id="open-stones" class="forage-btn" type="button" title="低头在暮色岸滩拣石头 (F)">
+      岸滩拣石 · 石匣 <kbd>F</kbd>
     </button>
   </div>
 </section>

@@ -31,18 +31,18 @@ src/
     water.ts              # Three Water 反射/裁剪透射、高度场位移、解析色散涟漪与暮色双瓣高光
     surface-churn.ts      # 沿湿迹沉积的微气泡/白沫光学厚度纹理
     spray.ts              # 逆光水幕网格 (WaterRibbon) 与毛细缩颈细滴 (SprayDrop)
-    stone-mesh.ts         # 程序化多形态米制石子网格、Blender GLB热插拔、触水变湿与3D握石预览台
+    stone-mesh.ts         # Blender 36石GLB热插拔/程序化回退、触水变湿、暖金高亮与3D握石预览台
+    shore-foraging.ts     # 3D暮色岸滩散落、可动低头相机、射线拾取与360°悬空端详交互
     aim-guide.ts          # 回拉瞄准时的淡金色第一落水点引导弧与着水环
     feedback.ts           # 石子、轨迹、水面、色散波包与飞溅的逐帧同步
   audio/
-    engine.ts             # Web Audio + 离线采样混合电影声学引擎（物理沉水、3D衰减、慢放滤波）
-  camera/rig.ts           # 岸后全景、高速长投航道、近景跟随与缓慢微转 (15°–30°) 子弹时间镜头
+    engine.ts             # Web Audio + 离线采样混合电影声学引擎（物理沉水、石子清脆碰撞、3D衰减、慢放滤波）
+  camera/rig.ts           # 岸后全景、高速长投航道、近景跟随、岸滩低头寻石与缓慢微转 (15°–30°) 子弹镜头
   input/
     pull-gesture.ts       # 湖面回拉蓄力、方向瞄准与手腕切旋甜蜜区状态机
     gesture.ts            # 原纯按住手势状态机（保留兼容测试）
   ui/
     panel.ts              # 全屏电影HUD、左下角握石台与可折叠实验室抽屉骨架
-    stone-drawer.ts       # 岸边拣石与8格随身石匣交互浮层
     bounce-markers.ts     # 水面空间跳数微标投影层
     launch-panel.ts       # 实验室投掷参数（含roll/signed spin）与快照控件
     camera-panel.ts       # 视角、播放倍率与全景参数控件

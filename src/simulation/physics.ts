@@ -111,6 +111,7 @@ export class Simulation {
  private readonly buoyancy:number;
  private readonly airDrag:number;
  private readonly thicknessDrag:number;
+ private readonly planingLift:number;
  private readonly wobbleScale:number;
  private readonly wobbleX:number;
  private readonly wobbleZ:number;
@@ -132,6 +133,11 @@ export class Simulation {
   this.airDrag=.00012*(this.areaFull/(Math.PI*A*B));
   const thicknessRatio=h/H;
   this.thicknessDrag=thicknessRatio>1?1+.42*(thicknessRatio-1):1;
+  // Blunt, rounded thick rocks lose hydrodynamic planing lift compared to flat skipping discs.
+  // Flat stones (flatness <= standard 0.13) retain exact 1.0 planing lift.
+  const flatness=h/Math.sqrt(Math.max(1e-8,a*b));
+  const bluntExcess=Math.max(0,flatness-H/Math.sqrt(A*B));
+  this.planingLift=1/(1+5.5*bluntExcess);
   this.wobbleScale=stone.wobble>0?a*stone.wobble*.18*.04:0;
   const wAngle=(stone.seed%360)*Math.PI/180;
   this.wobbleX=Math.cos(wAngle);
@@ -196,7 +202,7 @@ export class Simulation {
     const c=-.5*1000*this.areaFull*.8*this.stone.dragScale*speed;
     fx=vx*c; fy=vy*c+this.buoyancy; fz=vz*c;
    } else {
-    const lift=Math.max(0,-vDotN)*speed*1000*out.area*.65;
+    const lift=Math.max(0,-vDotN)*speed*1000*out.area*.65*this.planingLift;
     const drag=-.5*1000*out.area*.075*this.stone.dragScale*this.thicknessDrag*speed;
     fx=nx*lift+vx*drag;
     fy=ny*lift+vy*drag;

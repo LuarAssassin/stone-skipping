@@ -104,7 +104,8 @@ export function createWorld() {
     const spray = createSpray(waterField.mesh.material.uniforms.heightState, COURSE_GRID);
     scene.add(spray.mesh);
     // Underwater refraction pass only needs submerged riverbed & stone; skip sky, distant mountains & airborne spray
-    waterField.setTransmissionHidden([sunset.skyMesh, sunset.mountains, spray.mesh]);
+    const transmissionHidden: THREE.Object3D[] = [sunset.skyMesh, sunset.mountains, spray.mesh];
+    waterField.setTransmissionHidden(transmissionHidden);
 
     // Natural gently-sloping riverbed (shallow warm pebble bank near shore -> deeper twilight basin)
     const naturalBedTex = createNaturalBedTexture();
@@ -160,6 +161,9 @@ export function createWorld() {
 
     return {
         scene, camera, renderer, post, sunset, waterField, churn, spray, stone, halo, trail, trailGeometry, aimGuide,
+        hideFromTransmission(obj: THREE.Object3D) {
+            transmissionHidden.push(obj);
+        },
         setStoneMesh,
         setStoneWet(wet: boolean) {
             setStoneWetness(stone, wet);

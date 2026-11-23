@@ -95,6 +95,17 @@ export class CameraRig {
         }
     }
     reset() { this.settings = { ...DEFAULT_VIEW }; }
+    /** Smoothly glide the camera toward a custom world pose (e.g. crouching riverbank foraging). */
+    updateToPose(camera: PerspectiveCamera, goal: Pose, seconds: number) {
+        this.tracking = false;
+        this.wasBullet = false;
+        this.pose = blendPose(this.pose, goal, seconds);
+        this.pose.position.y = Math.max(0.14, this.pose.position.y);
+        camera.position.copy(this.pose.position);
+        camera.lookAt(this.pose.target);
+        camera.fov = this.pose.fov;
+        camera.updateProjectionMatrix();
+    }
     update(camera: PerspectiveCamera, stone: Vector3, time: number, bullet: boolean, seconds: number, paused: boolean, contacts: readonly {point: Vector3}[] = []) {
         if (bullet && !this.wasBullet)
             this.bulletStart = time;

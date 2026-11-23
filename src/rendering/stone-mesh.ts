@@ -119,8 +119,8 @@ export function populateStoneGroup(group: THREE.Group, stone: StoneSpec, onStatu
         if (group.userData.loadToken !== token) return;
         disposeGroupChildren(group);
         const clone = template.clone(true);
-        // Scale standard.glb gently if it's a varied standard instance
-        if (stone.archetypeId === 'standard') {
+        // Legacy /assets/stone.glb is a single base shape; /assets/stones/*.glb are exact metric exports (scale 1:1:1)
+        if (stone.glbPath === '/assets/stone.glb') {
             clone.scale.set(stone.a / 0.04, stone.h / 0.0045, stone.b / 0.03);
         }
         clone.traverse(obj => {
@@ -156,6 +156,23 @@ export function populateStoneGroup(group: THREE.Group, stone: StoneSpec, onStatu
             }
         }
     );
+}
+
+/** Subtle warm sunset rim highlight when hovering a stone on the 3D shore. */
+export function setStoneHighlight(group: THREE.Group, highlighted: boolean) {
+    if (group.userData.highlighted === highlighted) return;
+    group.userData.highlighted = highlighted;
+    group.traverse(obj => {
+        if (obj instanceof THREE.Mesh && obj.material instanceof THREE.MeshStandardMaterial) {
+            if (highlighted) {
+                obj.material.emissive.setHex(0x8a5120);
+                obj.material.emissiveIntensity = 0.32;
+            } else {
+                obj.material.emissive.setHex(0x000000);
+                obj.material.emissiveIntensity = 0;
+            }
+        }
+    });
 }
 
 /** Visually darken & gloss the stone's surface once it gets wet on first contact. */

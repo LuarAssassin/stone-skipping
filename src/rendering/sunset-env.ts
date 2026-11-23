@@ -212,7 +212,7 @@ function createMountainRings(): THREE.Group {
     return group;
 }
 
-function shoreElevation(x: number, z: number): number {
+export function shoreElevation(x: number, z: number): number {
     // Organic curved shoreline near x ≈ -0.45..-1.25
     const curve = -0.58 - 0.34 * Math.sin(z * 0.24 + 0.6) - 0.18 * Math.cos(z * 0.57 - 0.4);
     const inland = curve - x; // positive inland, negative toward lake
@@ -221,6 +221,14 @@ function shoreElevation(x: number, z: number): number {
         return Math.max(-0.36, inland * 0.28 + micro * 0.35);
     }
     return Math.min(0.92, Math.pow(inland, 0.76) * 0.19 + micro);
+}
+
+/** Approximate upward surface normal of the contoured shoreline at (x, z). */
+export function shoreNormal(x: number, z: number): THREE.Vector3 {
+    const eps = 0.04;
+    const dx = (shoreElevation(x + eps, z) - shoreElevation(x - eps, z)) / (2 * eps);
+    const dz = (shoreElevation(x, z + eps) - shoreElevation(x, z - eps)) / (2 * eps);
+    return new THREE.Vector3(-dx, 1, -dz).normalize();
 }
 
 function createShoreAndReeds() {
