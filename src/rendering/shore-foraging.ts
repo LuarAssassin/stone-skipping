@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { shoreElevation, shoreNormal } from './sunset-env';
+import { shoreElevation, shorelineCurveX, shoreNormal } from './sunset-env';
 import { populateStoneGroup, setStoneHighlight } from './stone-mesh';
 import {
     forageShoreStones,
@@ -12,7 +12,8 @@ import {
 } from '../simulation/stones';
 import type { Pose } from '../camera/rig';
 
-const SHORE_STONE_COUNT = 16;
+const SHORE_STONE_COUNT = 34;
+const WALK_Z_LIMIT = 2.85;
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 
 interface ShoreStoneItem {
@@ -33,12 +34,8 @@ export interface ShoreForagingCallbacks {
     onExit(): void;
 }
 
-function shorelineCurveX(z: number): number {
-    return -0.58 - 0.34 * Math.sin(z * 0.24 + 0.6) - 0.18 * Math.cos(z * 0.57 - 0.4);
-}
-
 /** Live 3D twilight riverbank foraging:
- *  - Scatters 16 real Blender GLB stones flush on the wet contoured gravel shore
+ *  - Scatters up to 34 strictly unique Blender GLB stones naturally clustered along the wet gravel shore
  *  - Movable crouching camera (drag / WASD / wheel zoom)
  *  - True 3D Raycaster hover highlight & click-to-levitate 360° close-up inspection */
 export function createShoreForaging(
@@ -124,6 +121,7 @@ export function createShoreForaging(
     let hovered: ShoreStoneItem | undefined;
     let inspected: ShoreStoneItem | undefined;
     let forageSeed = Math.floor(Math.random() * 0xffffffff);
+    let lastBatchManifestIds = new Set<string>();
 
     // Crouching movable camera state along the wet riverbank
     let walkZ = 0;
@@ -176,9 +174,18 @@ export function createShoreForaging(
         hoverRing.visible = false;
     }
 
-    function populateShore(seed: number) {
+    function populateShore(seed: number, avoidPrevious = false) {
         disposeItems();
-        const specs = forageShoreStones(box.careerSkips, seed, SHORE_STONE_COUNT, catalog);
+        const specs = forageShoreStones(
+            box.careerSkips,
+            seed,
+            SHORE_STONE_COUNT,
+            catalog,
+            avoidPrevious ? lastBatchManifestIds : undefined
+        );
+        lastBatchManifestIds = new Set(
+            specs.map(s => (s.variant !== undefined ? `${s.archetypeId}_${String(s.variant).padStart(2, '0')}` : s.id))
+        );
         const placed: { x: number; z: number }[] = [];
 
         // Deterministic PRNG for spatial scatter along the natural shoreline cove
@@ -190,17 +197,39 @@ export function createShoreForaging(
             return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
         };
 
+        // Organic fluvial gravel-bar cluster centers along the wet-to-damp shoreline
+        const clusters = Array.from({ length: 6 }, (_, idx) => {
+            const baseZ = -2.5 + idx * 1.0 + (rand() - 0.5) * 0.45;
+            return {
+                z: clamp(baseZ, -2.8, 2.8),
+                inland: 0.24 + rand() * 0.78,
+            };
+        });
+
         for (let i = 0; i < specs.length; i++) {
             const spec = specs[i];
             let px = -1.2;
             let pz = 0;
-            // Poisson-like non-overlapping placement along the damp-to-dry shoreline strip
-            for (let attempt = 0; attempt < 40; attempt++) {
-                const candidateZ = (rand() - 0.5) * 5.2;
+            // Fluvial clustering + non-overlapping spacing (0.145 m) so every crouching frame holds 10–14 distinct stones
+            for (let attempt = 0; attempt < 60; attempt++) {
+                const useCluster = attempt < 40 && rand() < 0.72;
+                let candidateZ: number;
+                let inlandOffset: number;
+                if (useCluster) {
+                    const c = clusters[Math.floor(rand() * clusters.length)];
+                    const angle = rand() * Math.PI * 2;
+                    const radius = 0.14 + Math.sqrt(rand()) * 0.46;
+                    candidateZ = clamp(c.z + Math.cos(angle) * radius, -3.05, 3.05);
+                    inlandOffset = clamp(c.inland + Math.sin(angle) * radius * 0.68, 0.16, 1.32);
+                } else {
+                    candidateZ = (rand() - 0.5) * 6.1;
+                    // Bias gently toward the damp water edge where flat stones wash ashore
+                    inlandOffset = 0.16 + Math.pow(rand(), 1.18) * 1.18;
+                }
                 const waterEdge = shorelineCurveX(candidateZ);
-                const inlandOffset = 0.24 + rand() * 1.18;
                 const candidateX = waterEdge - inlandOffset;
-                if (placed.every(p => Math.hypot(p.x - candidateX, p.z - candidateZ) >= 0.26)) {
+                const minDist = attempt < 45 ? 0.145 : 0.115;
+                if (placed.every(p => Math.hypot(p.x - candidateX, p.z - candidateZ) >= minDist)) {
                     px = candidateX;
                     pz = candidateZ;
                     break;
@@ -224,7 +253,7 @@ export function createShoreForaging(
             populateStoneGroup(visual, spec);
             root.add(visual);
 
-            const hitRadius = Math.max(spec.a, spec.b) * 1.45 + 0.024;
+            const hitRadius = Math.max(spec.a, spec.b) * 1.24 + 0.015;
             const collider = new THREE.Mesh(new THREE.SphereGeometry(hitRadius, 10, 8), colliderMat);
             collider.userData.shoreIndex = i;
             root.add(collider);
@@ -366,7 +395,7 @@ export function createShoreForaging(
                 inspectPitch = clamp(inspectPitch + dy * 0.011, -1.45, 1.45);
             } else {
                 // Dragging empty shore glides smoothly along the riverbank
-                targetWalkZ = clamp(targetWalkZ - dx * 0.0042 * targetZoom, -2.6, 2.6);
+                targetWalkZ = clamp(targetWalkZ - dx * 0.0042 * targetZoom, -WALK_Z_LIMIT, WALK_Z_LIMIT);
                 targetWalkX = clamp(targetWalkX - dy * 0.0024 * targetZoom, -0.45, 0.45);
             }
             return;
@@ -450,10 +479,10 @@ export function createShoreForaging(
     };
     hud.querySelector<HTMLButtonElement>('#forage-walk-more')!.onclick = () => {
         forageSeed = Math.floor(Math.random() * 0xffffffff);
-        targetWalkZ = clamp((Math.random() - 0.5) * 1.4, -2.0, 2.0);
+        targetWalkZ = clamp((Math.random() - 0.5) * 1.6, -2.2, 2.2);
         targetWalkX = 0;
-        populateShore(forageSeed);
-        setMsg('沿着暮色岸边往前走了一段，地面露出新一批天然河石');
+        populateShore(forageSeed, true);
+        setMsg('沿着暮色岸边往前走了一段，地面露出新一批不重样的天然河石');
     };
     hud.querySelector<HTMLButtonElement>('#forage-putback')!.onclick = putBackInspected;
     hud.querySelector<HTMLButtonElement>('#forage-take')!.onclick = () => {
@@ -556,8 +585,8 @@ export function createShoreForaging(
             // Keyboard stroll along riverbank (when not inspecting)
             if (!inspected) {
                 const walkSpeed = 1.65 * dt;
-                if (keysDown.has('KeyA') || keysDown.has('ArrowLeft')) targetWalkZ = clamp(targetWalkZ - walkSpeed, -2.6, 2.6);
-                if (keysDown.has('KeyD') || keysDown.has('ArrowRight')) targetWalkZ = clamp(targetWalkZ + walkSpeed, -2.6, 2.6);
+                if (keysDown.has('KeyA') || keysDown.has('ArrowLeft')) targetWalkZ = clamp(targetWalkZ - walkSpeed, -WALK_Z_LIMIT, WALK_Z_LIMIT);
+                if (keysDown.has('KeyD') || keysDown.has('ArrowRight')) targetWalkZ = clamp(targetWalkZ + walkSpeed, -WALK_Z_LIMIT, WALK_Z_LIMIT);
                 if (keysDown.has('KeyW') || keysDown.has('ArrowUp')) targetWalkX = clamp(targetWalkX + walkSpeed * 0.55, -0.45, 0.45);
                 if (keysDown.has('KeyS') || keysDown.has('ArrowDown')) targetWalkX = clamp(targetWalkX - walkSpeed * 0.55, -0.45, 0.45);
             }

@@ -212,9 +212,13 @@ function createMountainRings(): THREE.Group {
     return group;
 }
 
+export function shorelineCurveX(z: number): number {
+    return -0.58 - 0.34 * Math.sin(z * 0.24 + 0.6) - 0.18 * Math.cos(z * 0.57 - 0.4);
+}
+
 export function shoreElevation(x: number, z: number): number {
     // Organic curved shoreline near x ≈ -0.45..-1.25
-    const curve = -0.58 - 0.34 * Math.sin(z * 0.24 + 0.6) - 0.18 * Math.cos(z * 0.57 - 0.4);
+    const curve = shorelineCurveX(z);
     const inland = curve - x; // positive inland, negative toward lake
     const micro = 0.028 * Math.sin(x * 1.9 + z * 1.3) * Math.cos(z * 0.8 - x * 0.7);
     if (inland <= 0) {
@@ -273,40 +277,115 @@ function createShoreAndReeds() {
     const shoreMesh = new THREE.Mesh(shoreGeom, shoreMat);
     group.add(shoreMesh);
 
-    // 2. Scattered shoreline pebbles & river stones
-    const pebbleGeom = new THREE.IcosahedronGeometry(1, 1);
-    const pebbleMat = new THREE.MeshStandardMaterial({
-        color: '#524844',
-        roughness: 0.74,
-        metalness: 0.06,
-    });
-    const pebbleCount = 110;
-    const pebbles = new THREE.InstancedMesh(pebbleGeom, pebbleMat, pebbleCount);
+    // 2. River-worn pebble base geometry (gently deformed smooth icosahedron for organic silhouettes)
+    const pebbleGeom = new THREE.IcosahedronGeometry(1, 2);
+    const pPos = pebbleGeom.attributes.position as THREE.BufferAttribute;
+    for (let i = 0; i < pPos.count; i++) {
+        const vx = pPos.getX(i);
+        const vy = pPos.getY(i);
+        const vz = pPos.getZ(i);
+        const w = 1.0
+            + 0.11 * Math.sin(vx * 3.1 + vy * 2.3)
+            + 0.07 * Math.cos(vz * 4.2 - vx * 2.7);
+        pPos.setXYZ(i, vx * w, vy * w, vz * w);
+    }
+    pebbleGeom.computeVertexNormals();
+
     const dummy = new THREE.Object3D();
     const colorAttr = new THREE.Color();
-    for (let i = 0; i < pebbleCount; i++) {
+    const upAxis = new THREE.Vector3(0, 1, 0);
+    const slopeQuat = new THREE.Quaternion();
+    const yawQuat = new THREE.Quaternion();
+    const pebblePalette = [
+        new THREE.Color('#5a544f'), // warm river grey
+        new THREE.Color('#474c51'), // wet slate
+        new THREE.Color('#6b5a4d'), // ochre cobble
+        new THREE.Color('#3b3a3c'), // dark basalt
+        new THREE.Color('#776d63'), // pale quartz-sand
+        new THREE.Color('#5b4a44'), // muted clay
+    ];
+
+    // 2a. Broad shoreline cobbles framing the outer banks (kept clear of the immediate foraging strip)
+    const cobbleMat = new THREE.MeshStandardMaterial({
+        color: '#ffffff',
+        roughness: 0.72,
+        metalness: 0.05,
+    });
+    const cobbleCount = 140;
+    const cobbles = new THREE.InstancedMesh(pebbleGeom, cobbleMat, cobbleCount);
+    for (let i = 0; i < cobbleCount; i++) {
         const r1 = hash2(i * 1.37, 11.4);
         const r2 = hash2(i * 2.13, 29.8);
         const r3 = hash2(i * 3.71, 53.2);
         const r4 = hash2(i * 5.19, 71.6);
         const z = (r1 - 0.5) * 34;
-        const x = -0.68 - r2 * 6.8;
+        const edge = shorelineCurveX(z);
+        const minInland = Math.abs(z) < 3.4 ? 1.45 : 0.22;
+        const x = edge - minInland - r2 * 6.2;
         const y = shoreElevation(x, z);
-        const sx = 0.05 + r3 * 0.16;
-        const sy = sx * (0.28 + r4 * 0.24);
-        const sz = sx * (0.68 + hash2(i, 91.3) * 0.5);
-        dummy.position.set(x, y + sy * 0.35, z);
-        dummy.rotation.set((r4 - 0.5) * 0.3, r1 * Math.PI * 2, (r3 - 0.5) * 0.3);
+        const sx = 0.045 + r3 * 0.12;
+        const sy = sx * (0.28 + r4 * 0.26);
+        const sz = sx * (0.68 + hash2(i, 91.3) * 0.45);
+        dummy.position.set(x, y + sy * 0.28, z);
+        slopeQuat.setFromUnitVectors(upAxis, shoreNormal(x, z));
+        yawQuat.setFromAxisAngle(upAxis, r1 * Math.PI * 2);
+        dummy.quaternion.copy(slopeQuat).multiply(yawQuat);
         dummy.scale.set(sx, sy, sz);
         dummy.updateMatrix();
-        pebbles.setMatrixAt(i, dummy.matrix);
-        const shade = 0.52 + 0.48 * hash2(i, 103.7);
-        colorAttr.setRGB(shade * 0.95, shade * 0.86, shade * 0.82);
-        pebbles.setColorAt(i, colorAttr);
+        cobbles.setMatrixAt(i, dummy.matrix);
+        const baseCol = pebblePalette[i % pebblePalette.length];
+        const shade = 0.76 + 0.34 * hash2(i, 103.7);
+        const wetDark = 1 - 0.38 * (1 - THREE.MathUtils.smoothstep(y, -0.02, 0.09));
+        colorAttr.copy(baseCol).multiplyScalar(shade * wetDark);
+        cobbles.setColorAt(i, colorAttr);
     }
-    pebbles.instanceMatrix.needsUpdate = true;
-    if (pebbles.instanceColor) pebbles.instanceColor.needsUpdate = true;
-    group.add(pebbles);
+    cobbles.instanceMatrix.needsUpdate = true;
+    if (cobbles.instanceColor) cobbles.instanceColor.needsUpdate = true;
+    group.add(cobbles);
+
+    // 2b. Dense fine riverbank gravel bed (460 small 1.8–5.6 cm pebbles nestled into the wet shoreline)
+    const gravelMat = new THREE.MeshStandardMaterial({
+        color: '#ffffff',
+        roughness: 0.64,
+        metalness: 0.06,
+    });
+    const gravelCount = 460;
+    const gravel = new THREE.InstancedMesh(pebbleGeom, gravelMat, gravelCount);
+    for (let i = 0; i < gravelCount; i++) {
+        const r1 = hash2(i * 1.91 + 7.1, 19.3);
+        const r2 = hash2(i * 3.17 + 2.4, 41.7);
+        const r3 = hash2(i * 4.63 + 9.2, 67.1);
+        const r4 = hash2(i * 6.07 + 5.5, 89.4);
+        const r5 = hash2(i * 7.43 + 1.8, 113.9);
+
+        // Concentrate naturally along the walkable z ∈ [-4.4, +4.4] shoreline with thicker packing near wet edge
+        const z = (r1 - 0.5) * 8.8;
+        const edge = shorelineCurveX(z);
+        const inland = -0.14 + Math.pow(r2, 1.35) * 2.15;
+        const x = edge - inland;
+        const y = shoreElevation(x, z);
+
+        // Real small gravel / creek pebbles (radius 0.9–2.8 cm) partially embedded so hero GLB stones stand proud
+        const sx = 0.009 + Math.pow(r3, 1.4) * 0.019;
+        const sy = sx * (0.30 + r4 * 0.28);
+        const sz = sx * (0.66 + r5 * 0.42);
+        dummy.position.set(x, y + sy * 0.20, z);
+        slopeQuat.setFromUnitVectors(upAxis, shoreNormal(x, z));
+        yawQuat.setFromAxisAngle(upAxis, r5 * Math.PI * 2);
+        dummy.quaternion.copy(slopeQuat).multiply(yawQuat);
+        dummy.scale.set(sx, sy, sz);
+        dummy.updateMatrix();
+        gravel.setMatrixAt(i, dummy.matrix);
+
+        const baseCol = pebblePalette[Math.floor(r4 * pebblePalette.length) % pebblePalette.length];
+        const shade = 0.72 + 0.42 * hash2(i * 2.3, 151.7);
+        const wetness = 1 - THREE.MathUtils.smoothstep(y, -0.02, 0.095);
+        colorAttr.copy(baseCol).multiplyScalar(shade * (1 - 0.42 * wetness));
+        gravel.setColorAt(i, colorAttr);
+    }
+    gravel.instanceMatrix.needsUpdate = true;
+    if (gravel.instanceColor) gravel.instanceColor.needsUpdate = true;
+    group.add(gravel);
 
     // 3. Swaying lakeside reeds along left & right shore margins (safely clear of throw corridor & camera)
     const bladeGeom = new THREE.PlaneGeometry(0.024, 1.0, 1, 6);
