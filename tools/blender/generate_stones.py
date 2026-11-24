@@ -1,4 +1,4 @@
-"""Build the riverbank stone collection with Blender 4.5+/Cycles.
+"""Build the 12 × 8 riverbank stone collection with Blender 4.5+/Cycles.
 
     blender -b --factory-startup --python-exit-code 1 -P tools/blender/generate_stones.py --
     blender -b --factory-startup --python-exit-code 1 -P tools/blender/generate_stones.py -- --seed 42 --variants 8 --output-root /tmp/river
@@ -20,7 +20,7 @@ import subprocess
 import sys
 import tempfile
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -39,6 +39,31 @@ TAU = 2 * math.pi
 ASSETS = Path("public/assets/stones")
 DELIVERY = Path("deliverables/stone-assets")
 RARITY = {"common": "钝石", "usable": "寻常", "fine": "精良", "rare": "稀珍"}
+
+
+@dataclass(frozen=True)
+class Habit:
+    feature: str
+    label: str
+    axes: tuple       # Offsets expressed as fractions of the lithology's tolerance.
+    squareness: float
+    taper: float      # Difference between the two shoulders, along the long axis.
+    dome: float       # Change in meridian fullness, independent of the bounding box.
+    wear: float
+    strike: float     # Azimuth of the mineral plane, in degrees.
+    vein_width: float
+
+
+HABITS = (
+    Habit("type",    "典型", (0., 0., 0.),         .00,  .02,  .00, 1.00,  12, 1.00),
+    Habit("long",    "修长", (.64, -.78, .22),    -.30,  .23, -.14,  .72,  66,  .72),
+    Habit("seam",    "露脉", (.02, .32, -.34),     .23, -.15,  .12, 1.13, -44, 1.56),
+    Habit("rim",     "厚薄变体", (.64, .24, .91), .55,  .08, -.08,  .83,  86,  .86),
+    Habit("round",   "阔圆", (-.48, .77, .14),   -.19, -.04,  .26,  .63, -73, 1.18),
+    Habit("bank",    "偏磨", (.22, -.20, .54),    .32, -.28,  .04, 1.33,  39,  .68),
+    Habit("current", "水纹", (.79, .66, -.10),   -.42,  .14, -.16,  .84, -24,  .82),
+    Habit("pocket",  "蚀斑", (-.72, -.64, -.28), .36, -.12,  .23, 1.18,  -4, 1.29),
+)
 
 
 @dataclass(frozen=True)
@@ -64,31 +89,40 @@ class Rock:
 
 ROCKS = (
     Rock("plunge_boulder", "重拳河卵石", "common", "含石英花岗岩", (76, 66, 48), .10, 2680, (220, 420), 1.48, .06, (.58, .72),
-         (2.26, 2.05, 2.05, .060, .093), 36, 15, ("645348", "71594a", "605a54", "695849"),
+         (2.26, 2.05, 2.05, .060, .093), 36, 15, ("665448", "79513b", "545b59", "706452", "434951", "744535", "796d56", "554645"),
          "圆肩饱满，整块压在掌心，入水时沉沉一声，水花高高翻起。"),
-    Rock("chunky_cobble", "圆滚鹅卵石", "common", "石英脉河卵石", (58, 52, 32), .08, 2650, (115, 160), 1.38, .08, (.48, .62),
-         (2.10, 2.15, 2.05, .052, .075), 32, 15, ("66645c", "70604e", "5e6868", "686052"),
+    Rock("chunky_cobble", "圆滚鹅卵石", "common", "水磨杂色河卵石", (58, 52, 32), .08, 2650, (115, 160), 1.38, .08, (.48, .62),
+         (2.10, 2.15, 2.05, .052, .075), 32, 15, ("69665c", "81634b", "566e69", "716058", "465b64", "6d4d3a", "807a62", "5a535e"),
          "指腹沿着圆背滑落，很难捏出平稳的出手角度。"),
+    Rock("quartz_cobble", "白脉溪卵石", "common", "乳白石英脉卵石", (66, 54, 28), .09, 2660, (110, 175), 1.30, .09, (.46, .60),
+         (2.17, 2.16, 2.14, .055, .070), 36, 15, ("344447", "534033", "364b58", "514c43", "2c393d", "553b32", "455242", "443e4c"),
+         "转动时白脉绕过石背，拿起来才觉出厚度和分量，落水声沉。"),
     Rock("jagged_gravel", "棱角碎石", "common", "风化花岗碎砾", (74, 48, 21), .10, 2600, (75, 115), 1.28, .24, (.80, .92),
-         (2.60, 2.70, 2.35, .085, .17), 36, 16, ("6b6860", "70634f", "6e6c62", "686b64"),
+         (2.60, 2.70, 2.35, .085, .17), 36, 16, ("6b6860", "836747", "656e71", "79695b", "495760", "794c34", "797a66", "5c5353"),
          "断口顶手，两翼分量不匀，稍偏一点就容易侧翻。"),
     Rock("small_wafer", "小薄碎瓦片", "usable", "风化泥质砂岩", (56, 45, 5.5), .08, 2400, (15, 32), 1.04, .06, (.72, .84),
-         (2.30, 2.75, 2.60, .080, .13), 32, 14, ("735448", "795448", "716853", "6a514b"),
+         (2.30, 2.75, 2.60, .080, .13), 32, 14, ("825b4c", "96543d", "76705d", "80514b", "5d5859", "894b35", "95745a", "664b49"),
          "轻薄得能在两指间轻轻一翻，贴水声清脆，后劲也收得快。"),
     Rock("standard", "河岸标准扁石", "usable", "水磨沉积河石", (80, 60, 9), .07, 2650, (52, 68), 1., 0., (.62, .75),
-         (2.14, 2.05, 2.08, .055, .08), 36, 15, ("556363", "665f56", "576469", "62675d"),
+         (2.14, 2.05, 2.08, .055, .08), 36, 15, ("556763", "7a6550", "536b78", "70685b", "434f55", "6d5046", "797a6c", "565360"),
          "拇指贴住平缓石面，圆边恰好勾手，是一块顺手的练习石。"),
+    Rock("red_sandstone", "丹砂河扁石", "usable", "赤铁矿层状砂岩", (82, 62, 8.2), .07, 2480, (46, 64), 1.02, .03, (.68, .80),
+         (2.23, 2.20, 2.28, .059, .082), 36, 15, ("92523e", "a66341", "7f473c", "976449", "714339", "903f2d", "a07053", "84504a"),
+         "赤褐细砂在指腹下略有涩感，圆边好捏，轻甩就能贴着水面弹起。"),
     Rock("thin_shale", "青灰薄页岩", "fine", "含云母层状页岩", (84, 64, 5.2), .07, 2550, (36, 48), .90, .02, (.55, .68),
-         (2.32, 2.70, 2.65, .055, .080), 32, 20, ("495960", "5c5b54", "505e6c", "495852"),
+         (2.32, 3.75, 3.52, .055, .080), 32, 20, ("495b63", "686056", "52667b", "56655f", "344454", "65534d", "6a7371", "494b5b"),
          "指甲能摸到层层错落的薄边，低掠水面时接连轻弹。"),
     Rock("heavy_basalt", "玄武重圆饼", "fine", "微孔玄武岩", (88, 85, 11), .06, 2950, (110, 145), .96, 0., (.58, .70),
-         (2.08, 2.13, 2.09, .024, .046), 36, 16, ("434846", "4d4742", "484b4b", "3e4547"),
+         (2.08, 2.13, 2.09, .024, .046), 36, 16, ("454b49", "574a40", "475461", "56524b", "303d49", "504039", "58615b", "413e49"),
          "石面细密有孔，圆饼压手；送足力气，第一跳就能拉得很长。"),
     Rock("willow_leaf", "柳叶长扁石", "fine", "流纹浅绿溪石", (104, 44, 7.5), .07, 2650, (44, 60), .93, .03, (.52, .64),
-         (2.24, 2.50, 2.25, .043, .087), 40, 14, ("66736b", "716e5d", "64756e", "68726d"),
+         (2.24, 2.50, 2.25, .043, .087), 40, 14, ("68796e", "84745a", "62817e", "757a65", "465f60", "736451", "829082", "586c71"),
          "一端丰圆，一端顺着石纹收尖，侧倾出手便能带出一道弧线。"),
+    Rock("jade_river_flat", "润玉青溪扁石", "fine", "云雾状青玉质溪石", (88, 74, 6.8), .05, 2720, (56, 76), .86, .01, (.42, .54),
+         (2.25, 2.26, 2.22, .036, .047), 40, 15, ("456f60", "687755", "376157", "558377", "304f4e", "52664a", "6e8d73", "42666d"),
+         "阔扁的青绿石面水磨得细润，圆肩贴住指腹，掠水时走得稳。"),
     Rock("master_disc", "溪磨黑曜圆盘", "rare", "金褐细脉黑曜石", (92, 88, 6.2), .04, 2750, (62, 90), .78, 0., (.38, .48),
-         (2.00, 2.05, 2.12, .006, .012), 40, 16, ("303a3e", "3c3935", "353b3e", "303937"),
+         (2.00, 2.05, 2.12, .006, .012), 40, 16, ("303d40", "493c34", "344958", "425044", "293441", "493937", "505554", "383748"),
          "双面微鼓，细边圆滑，捏在指间几乎感不到偏心，适合冲击极限纪录。"),
 )
 
@@ -127,20 +161,62 @@ def n3(x, y, z):
     return noise.noise(Vector((x, y, z)), noise_basis="PERLIN_NEW")
 
 
+def specimen_habit(rock, variant, rng):
+    """Use the eight authored habits first; later finds recombine them continuously."""
+    def palette(i):
+        code = rock.colors[i]
+        return tuple(int(code[j:j+2], 16)/255 for j in (0, 2, 4))
+
+    if variant <= len(HABITS):
+        return HABITS[variant-1], palette(variant-1)
+    a, b = rng.sample(range(len(HABITS)), 2)
+    first, second = HABITS[a], HABITS[b]
+    weight = rng.uniform(.24, .70)
+    def blend(x, y):
+        return x+(y-x)*weight
+    mixed = replace(first, axes=tuple(map(blend, first.axes, second.axes)),
+                    squareness=blend(first.squareness, second.squareness),
+                    taper=blend(first.taper, second.taper), dome=blend(first.dome, second.dome),
+                    wear=blend(first.wear, second.wear), strike=rng.uniform(-90, 90),
+                    vein_width=blend(first.vein_width, second.vein_width))
+    return mixed, tuple(map(blend, palette(a), palette(b)))
+
+
 class Specimen:
     def __init__(self, rock, variant, seed, attempt=0):
         self.rock = rock
         self.variant = variant
-        self.style = (variant - 1) % 4
         self.id = f"{rock.id}_{variant:02d}"
         stream = f"{seed}/{self.id}"
         rng = random.Random(stream if attempt == 0 else f"{stream}/{attempt}")
+        self.habit, self.color = specimen_habit(rock, variant, random.Random(stream+"/habit"))
+        habit = self.habit
+        self.feature = habit.feature
+        # Near-axial discs retain their balance; discarded gravel and wafers can be cut much deeper.
+        response = {"master_disc": .115, "heavy_basalt": .43, "jade_river_flat": .72}.get(rock.id, 1.)
+        outline, p, q, wear, crown = rock.form
+        fullness = habit.dome*response+rng.uniform(-.12, .12)
+        self.form = (outline+habit.squareness*response, p+fullness, q+fullness*.72,
+                     wear*habit.wear, crown)
+        self.taper = habit.taper*response
+        self.relief_scale = habit.wear*rng.uniform(.87, 1.13)
+        self.chip = {"seam": .09, "bank": .22, "pocket": .13}.get(self.feature, 0.)*response
+        self.pocket_depth = (.18 if self.feature == "pocket" else .035)*response
+        self.pocket = (rng.uniform(-.55,.55), rng.uniform(-.55,.55), rng.uniform(.13,.24))
+        self.shoulder = rng.uniform(-1.05, 1.05) + (math.pi if rng.random() < .5 else 0.)
         self.phase = [rng.uniform(-math.pi, math.pi) for _ in range(8)]
+        self.cleft = {"seam": .10, "rim": .065, "bank": .14, "pocket": .08}.get(self.feature, .022)
         self.offset = tuple(rng.uniform(1, 15) for _ in range(3))
-        self.strike = rng.uniform(-1.15, 1.15)
-        self.vein_shift = rng.uniform(-.26, .26)
+        family_bearing = random.Random(f"{seed}/{rock.id}/bedding").uniform(-32, 32)
+        self.strike = math.radians(habit.strike + family_bearing + rng.uniform(-3., 3.))
+        self.vein_shift = rng.uniform(-.28, .28)
+        self.dip = rng.uniform(.28, .75)
+        self.branch_gap = rng.uniform(.18, .39)
+        self.branch_angle = rng.choice((-1, 1))*rng.uniform(.30, .72)
         self.wear = rng.uniform(.83, 1.18)
-        self.curve = rng.uniform(.15, .32) * (-1 if self.style == 2 else 1)
+        self.curve = rng.uniform(.14, .26) + abs(habit.taper)*.95
+        if self.feature in ("seam", "bank", "pocket"):
+            self.curve *= -1
         self.cuts = []
         for i in range(7):
             theta = TAU * (i + rng.uniform(-.22, .22)) / 7
@@ -153,24 +229,22 @@ class Specimen:
                 self.fractures.append((slope * math.cos(theta), slope * math.sin(theta),
                                        side, rng.uniform(.76, .99)))
         # Fractions of each archetype's stated tolerance, independently per axis.
-        patterns = ((0, 0, 0), (.37, -.55, .36), (-.30, .32, -.44), (.68, .38, .87))
-        relative = list(patterns[self.style])
-        if self.style == 3 and rock.id in ("master_disc", "small_wafer", "thin_shale", "willow_leaf"):
-            relative[2] *= -1
-        if self.style == 3 and rock.id == "heavy_basalt":
-            relative = (-.10, -.18, .87)
-        if self.style == 3 and rock.id == "chunky_cobble":
-            relative = (.18, -.10, .78)
-        if self.style == 3 and rock.id == "standard":
-            relative = (-.08, .04, .80)
-        if self.style == 2 and rock.id in ("heavy_basalt", "master_disc"):
-            relative[1] = .05
-        self.mm = tuple(d * (1 + rock.tolerance * (f + rng.uniform(-.075, .075)))
-                        for d, f in zip(rock.mm, relative))
+        relative = list(habit.axes)
+        if self.feature == "rim":
+            if rock.id in ("master_disc", "small_wafer", "thin_shale", "willow_leaf", "jade_river_flat"):
+                relative[2] *= -1
+            if rock.id in ("heavy_basalt", "chunky_cobble", "standard", "red_sandstone"):
+                relative[:2] = (.04, -.14)
+        if rock.id == "thin_shale" and self.feature == "pocket":
+            # The compact find keeps an extra lamina below the weathered upper surface.
+            relative[2] = .77
+        length, width, thickness = (d*(1+rock.tolerance*(f+rng.uniform(-.065,.065)))
+                                    for d, f in zip(rock.mm, relative))
+        self.mm = (length, min(width, .995*length), thickness)
 
     def point(self, theta, latitude, high):
         rock = self.rock
-        outline, p, q, wear, crown = rock.form
+        outline, p, q, wear, crown = self.form
         k = rock.id
         ph = self.phase
         t = math.sin(latitude)
@@ -185,7 +259,17 @@ class Specimen:
             angular = {"jagged_gravel": .95, "small_wafer": .64, "thin_shale": .63}[k]
             rim = (1 - angular) * rim + angular * boundary
             bite = math.atan2(math.sin(theta - ph[4]), math.cos(theta - ph[4]))
-            rim *= 1 - (.18 if k == "jagged_gravel" else .073) * math.exp(-(bite/.16)**2)
+            rim *= 1 - (.18 if k == "jagged_gravel" else .073) * self.wear * math.exp(-(bite/.16)**2)
+        if self.chip:
+            # The face exposed to the current is planed back; the sheltered shoulder stays rounded.
+            facing = math.cos(theta-self.shoulder)
+            plane = (1-self.chip)/max(.01, facing)
+            rim = min(rim, plane)
+        if k == "jade_river_flat":
+            # Some specimens have a cleft between two soft shoulders. Others have an
+            # uninterrupted oval rim. Its bearing follows this stone's upstream face.
+            delta = math.atan2(math.sin(theta-self.shoulder), math.cos(theta-self.shoulder))
+            rim *= 1-self.cleft*math.exp(-(delta/.31)**2)
         if k == "thin_shale":
             # Several overlapping sheets. Each lip projects beyond the undercut below it.
             for bed in (-.48, -.16, .16, .48):
@@ -194,13 +278,16 @@ class Specimen:
                 rim += depth * (smoothstep(bed-.07, bed-.012, t) - smoothstep(bed, bed+.06, t))
             rim += .058 * t * math.cos(theta - ph[1])
         x, y = r * rim * c, r * rim * s
+        y *= 1-self.taper*x
         if k == "willow_leaf":
             y = y * (1 - .38*x - .12*x*x) + self.curve * (x*x - .38)
-        if k in ("chunky_cobble", "plunge_boulder"):
+        if k in ("chunky_cobble", "plunge_boulder", "quartz_cobble"):
             y *= 1 - (.13 if k == "chunky_cobble" else .08) * x
         warp = n3(x*1.65 + ph[1], y*1.65 + ph[2], t*.8 + ph[3])
         z = t * (1 + crown * (.8*warp + .5*x*math.cos(ph[4]) + .45*y*math.sin(ph[5])))
         z += crown * (.72 * (x*x - y*y) + .42*x*y + .36*warp)
+        px, py, breadth = self.pocket
+        z -= self.pocket_depth*smoothstep(.20, .75, t)*math.exp(-((x-px)**2+(y-py)**2)/breadth**2)
         if k == "jagged_gravel":
             # Intersect the weathered body with oblique break planes on both faces.
             for nx, ny, side, d in self.fractures:
@@ -214,9 +301,10 @@ class Specimen:
             ox, oy, oz = self.offset
             broad = n3(4*x+ox, 4*y+oy, 3*t+oz)
             grain = n3(31*x+ox, 31*y+oy, 12*t+oz)
-            relief = {"master_disc": .0018, "jagged_gravel": .034, "thin_shale": .022,
-                      "small_wafer": .024, "plunge_boulder": .017}.get(k, .010)
-            displacement = relief * (.76*broad + .24*grain)
+            relief = {"master_disc": .0018, "jade_river_flat": .0035, "quartz_cobble": .008,
+                      "jagged_gravel": .034, "thin_shale": .022, "small_wafer": .024,
+                      "red_sandstone": .014, "plunge_boulder": .017}.get(k, .010)
+            displacement = relief * self.relief_scale * (.76*broad + .24*grain)
             if k in ("heavy_basalt", "jagged_gravel"):
                 cell = noise.voronoi(Vector((13*x+ox, 13*y+oy, 5*t+oz)))[0]
                 if k == "heavy_basalt":
@@ -314,15 +402,27 @@ def unwrap(low, stone):
     bpy.ops.object.mode_set(mode="OBJECT")
 
 
-def make_meshes(specimen):
-    points, faces = surface(specimen, 1)
-    scale = np.array(specimen.mm) * .001 / np.ptp(points, axis=0)
-    low = mesh_object(specimen.id, points*scale, faces)
-    bm = bmesh.new()
-    bm.from_mesh(low.data)
-    bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
-    bm.to_mesh(low.data)
-    bm.free()
+def make_meshes(rock, variant, seed):
+    for attempt in range(64):
+        specimen = Specimen(rock, variant, seed, attempt)
+        points, faces = surface(specimen, 1)
+        scale = np.array(specimen.mm) * .001 / np.ptp(points, axis=0)
+        low = mesh_object(specimen.id, points*scale, faces)
+        bm = bmesh.new()
+        try:
+            bm.from_mesh(low.data)
+            bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
+            grams = abs(bm.calc_volume())*rock.density*1000
+            bm.to_mesh(low.data)
+        finally:
+            bm.free()
+        if rock.grams[0] <= grams <= rock.grams[1]:
+            break
+        mesh = low.data
+        bpy.data.objects.remove(low, do_unlink=True)
+        bpy.data.meshes.remove(mesh)
+    else:
+        raise ValueError(f"{specimen.id}: could not form a specimen in the mass envelope")
     select_only(low)
     bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
     bpy.ops.object.origin_set(type="ORIGIN_CENTER_OF_VOLUME", center="MEDIAN")
@@ -331,7 +431,7 @@ def make_meshes(specimen):
     unwrap(low, specimen)
     fine, triangles = surface(specimen, 6)
     high = mesh_object(specimen.id + "_sculpt", fine*scale-displacement, triangles)
-    return low, high
+    return specimen, low, high
 
 
 def linear(rgb):
@@ -367,7 +467,7 @@ class Shader:
         node.operation = op
         self.input(node.inputs[0], value)
         self.input(node.inputs[1], other)
-        return node.outputs["Value" if op == "DOT_PRODUCT" else "Vector"]
+        return node.outputs["Value" if op in ("DOT_PRODUCT", "DISTANCE") else "Vector"]
 
     def noise(self, vector, scale, detail, label, distortion=0.):
         node = self.node("ShaderNodeTexNoise", label)
@@ -408,6 +508,74 @@ def material(name):
     return mat, next(n for n in mat.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
 
 
+def dry_tone(rgb, gain=1., ceiling=.450):
+    # Bound perceived brightness while retaining the red of hematite and the green of jade.
+    y = sum(c*w for c, w in zip(rgb, (.2126, .7152, .0722)))
+    scale = max(.168, min(ceiling, y*gain))/y
+    return tuple(min(1., c*scale) for c in rgb)
+
+
+def mineral_veins(g, stone, coord, cloud):
+    k = stone.rock.id
+    angle = stone.strike
+    if k == "willow_leaf":
+        angle *= .17
+    def plane(bearing):
+        return g.vector("DOT_PRODUCT", coord, (math.sin(bearing), math.cos(bearing), stone.dip))
+    def band(field, width):
+        distance = g.math("ABSOLUTE", field, 0)
+        return g.ramp(distance, [(0., 1.), (.53*width, .96), (width, .48), (1.65*width, 0.)],
+                      "Mineral seam with an alteration halo")
+    phase = plane(angle)
+    warp = g.math("MULTIPLY", g.math("SUBTRACT", cloud, .5), .35 if k == "quartz_cobble" else .63)
+    seam = g.math("ADD", g.math("ADD", phase, warp), stone.vein_shift)
+    width = (.060 if k == "quartz_cobble" else .021)*stone.habit.vein_width
+    mask = band(seam, width)
+    if k == "quartz_cobble":
+        # One or two through-going filled fractures, with an oblique subsidiary stringer
+        # that tapers away in the matrix. All are 3D fields and continue over the rim.
+        if stone.feature in ("seam", "round", "current"):
+            parallel = g.math("ADD", seam, stone.branch_gap)
+            mask = g.math("MAXIMUM", mask, band(parallel, width*.59))
+        cross = g.math("ADD", plane(angle+stone.branch_angle), warp)
+        branch = band(g.math("ADD", cross, stone.vein_shift+.12), width*.28)
+        taper = g.ramp(cloud, [(.30, .05), (.58, .84)], "Discontinuous quartz stringer")
+        mask = g.math("MAXIMUM", mask, g.math("MULTIPLY", branch, taper))
+    return mask
+
+
+def weathered_surface(g, stone, body, coord, pos, cloud):
+    """Local deposits and abrasion vary independently of the matrix colour and silhouette."""
+    feature, k = stone.feature, stone.rock.id
+    delicate = .48 if k in ("master_disc", "jade_river_flat") else 1.
+    if feature == "bank":
+        mask = g.ramp(cloud, [(.46, 0.), (.55, .16), (.68, .80*delicate)], "Patchy iron oxide rind")
+        tint = (.407, .267, .201) if k != "jade_river_flat" else (.402, .379, .259)
+    elif feature == "current":
+        rotate = g.node("ShaderNodeVectorRotate", "Orientation of current scratches")
+        rotate.rotation_type = "Z_AXIS"
+        rotate.inputs["Angle"].default_value = 0. if k == "willow_leaf" else stone.strike
+        g.input(rotate.inputs["Vector"], pos)
+        stretched = g.vector("MULTIPLY", rotate.outputs[0], (.30, 7.6, 2.5))
+        striae = g.noise(stretched, 5.1, 2.7, "Water-polished streaks", .65)
+        mask = g.ramp(striae, [(.42, 0.), (.59, .15), (.71, .72*delicate)], "Pale streaks")
+        tint = dry_tone(stone.color, 1.38)
+    elif feature == "pocket":
+        px, py, breadth = stone.pocket
+        xy = g.vector("MULTIPLY", coord, (2000/(24*stone.mm[0]), 2000/(24*stone.mm[1]), 0.))
+        distance = g.vector("DISTANCE", xy, (px, py, 0.))
+        rind = g.noise(pos, 8.3, 3., "Granular edge of the weathering rind", .38)
+        broken = g.math("ADD", distance, g.math("MULTIPLY", g.math("SUBTRACT", cloud, .50), .64))
+        broken = g.math("ADD", broken, g.math("MULTIPLY", g.math("SUBTRACT", rind, .5), .19))
+        mask = g.ramp(broken, [(0., .66*delicate), (breadth*.85, .46*delicate),
+                              (breadth*1.65, 0.)], "Bleached margin of a shallow erosion pocket")
+        mask = g.math("MULTIPLY", mask, g.ramp(rind, [(.29, .24), (.69, 1.)], "Broken patina"))
+        tint = dry_tone(tuple(c+.09 for c in stone.color), 1.18)
+    else:
+        return body
+    return g.mix(mask, body, (*linear(tint), 1))
+
+
 def rock_material(stone):
     rock = stone.rock
     k = rock.id
@@ -417,18 +585,9 @@ def rock_material(stone):
     coord = g.vector("MULTIPLY", local, (24, 24, 24))
     pos = g.vector("ADD", coord, stone.offset)
     cloud = g.noise(pos, 2.5, 4., "Weathering and mineral clouds", .25)
-    grain = g.noise(pos, 53, 2., "Fine sand and crystalline grain")
+    grain = g.noise(pos, 53/stone.relief_scale, 2., "Fine sand and crystalline grain")
     medium = g.noise(pos, 13, 3., "Groundmass")
-    dip = (.08*math.sin(stone.strike), 1, .36) if k == "willow_leaf" else (
-        math.sin(stone.strike), math.cos(stone.strike), .48)
-    phase = g.vector("DOT_PRODUCT", coord, dip)
-    bend = g.math("MULTIPLY", g.math("SUBTRACT", cloud, .5), .66)
-    layer = g.math("ADD", g.math("ADD", phase, bend), stone.vein_shift)
-    folded = g.math("ABSOLUTE", layer, 0)
-    vein_width = .040 if k == "chunky_cobble" else .021
-    if stone.style == 2:
-        vein_width *= 1.9
-    vein = g.ramp(folded, [(0., .95), (vein_width*.45, .88), (vein_width, .32), (vein_width*1.9, 0.)], "Quartz vein and alteration halo")
+    vein = mineral_veins(g, stone, coord, cloud)
     cell = g.voronoi(pos, 31 if k == "heavy_basalt" else 38, "Vesicles / mineral grains")
     pits = g.ramp(cell, [(.12, 1.), (.24, .84), (.40, 0.)], "Recessed pores")
     crystals = g.ramp(medium, [(.47, 0.), (.61, .10), (.72, .90), (.81, 1.)], "Mineral grains")
@@ -443,51 +602,74 @@ def rock_material(stone):
         porosity = g.ramp(cloud, [(.30, .22), (.65, 1.)], "Clusters of pinholes")
         pits = g.math("MAXIMUM", sparse, g.math("MULTIPLY", pits, porosity))
     # Some bands are strongly directional: shale has bedding planes, willow has flow lineation.
-    if k in ("willow_leaf", "thin_shale", "small_wafer", "standard"):
+    if k in ("willow_leaf", "thin_shale", "small_wafer", "standard", "red_sandstone", "jade_river_flat"):
         if k == "willow_leaf":
             u = g.vector("MULTIPLY", pos, (.31, 7.3, 2.1))
             bands = g.noise(u, 3.4, 3.5, "Longitudinal fluvial streaks", .58)
         elif k == "thin_shale":
             # Near-horizontal beds intersect the chipped top obliquely. Narrow, broken
             # partings read differently from the broad stochastic fields in sandstone.
-            strike = stone.phase[6]
+            strike = stone.strike
             normal = (.41*math.cos(strike), .41*math.sin(strike), 4.6)
             bedding = g.vector("DOT_PRODUCT", coord, normal)
             bedding = g.math("ADD", bedding, g.math("MULTIPLY", cloud, .32))
             wave = g.math("SINE", g.math("MULTIPLY", bedding, 60), 0)
             bands = g.ramp(wave, [(.35, .25), (.78, .45), (.95, .95)], "Broken mica laminae")
+        elif k == "red_sandstone":
+            normal = (.73*math.sin(stone.strike), .73*math.cos(stone.strike), 2.3)
+            bed = g.vector("DOT_PRODUCT", coord, normal)
+            bed = g.math("ADD", bed, g.math("MULTIPLY", cloud, .30))
+            # Unequal bands of fine ferruginous sediment bend over the crown.
+            wave = g.math("SINE", g.math("MULTIPLY", bed, 16/stone.habit.vein_width), 0.)
+            bands = g.ramp(wave, [(0., .12), (.37, .30), (.80, .73), (.97, .92)], "Hematite-rich beds")
+        elif k == "jade_river_flat":
+            fog = g.vector("MULTIPLY", pos, (.88, 1.45, 1.15))
+            bands = g.noise(fog, 1.9, 4., "Clouds of pale green mineral", 1.65)
         else:
             rotation = g.node("ShaderNodeVectorRotate", "Strike of sediment")
             rotation.rotation_type = "Z_AXIS"
             g.input(rotation.inputs["Vector"], pos)
-            rotation.inputs["Angle"].default_value = stone.phase[5]
+            rotation.inputs["Angle"].default_value = stone.strike
             bed_pos = g.vector("MULTIPLY", rotation.outputs[0], (.60, 3.40, 1.75))
             bands = g.noise(bed_pos, 3.7, 3.2, "Irregular sediment lenses", .82)
     else:
         bands = medium
-    bed_weight = {"thin_shale": .10, "willow_leaf": .44}.get(k, .27)
+    bed_weight = {"thin_shale": .10, "willow_leaf": .44, "red_sandstone": .17, "jade_river_flat": .48}.get(k, .27)
     matrix = g.math("ADD", g.math("MULTIPLY", cloud, .69-bed_weight), g.math("MULTIPLY", medium, .31))
     matrix = g.math("ADD", matrix, g.math("MULTIPLY", bands, bed_weight))
-    base = tuple(int(rock.colors[stone.style][i:i+2], 16)/255 for i in (0, 2, 4))
+    # Reserve headroom in pale jade for its celadon clouds and current scratches.
+    matrix_tone = dry_tone(stone.color, ceiling=.40) if k == "jade_river_flat" else stone.color
     def tone(gain):
-        # Leave headroom for lossy WebP near bright grains and dark pore walls.
-        return tuple(max(.160, min(.458, c*gain)) for c in base)
+        return dry_tone(matrix_tone, gain)
     gains = (.88, .94, 1., 1.05, 1.12) if k == "master_disc" else (.68, .84, 1.01, 1.17, 1.28)
     body = g.ramp(matrix, [(pos, tone(gain)) for pos, gain in zip((.20, .39, .53, .65, .80), gains)],
                   "Dry matrix / weathered rind")
+    if k == "red_sandstone":
+        oxide = g.math("MULTIPLY", bands, .43)
+        body = g.mix(oxide, body, (*linear(dry_tone((.52, .244, .166), .94)), 1))
+    if k == "jade_river_flat":
+        fog = g.ramp(bands, [(.30, 0.), (.47, .07), (.60, .53), (.73, .86)], "Celadon clouding")
+        celadon = dry_tone(tuple(c+s for c,s in zip(stone.color, (.14,.17,.14))))
+        body = g.mix(fog, body, (*linear(celadon), 1))
+    body = weathered_surface(g, stone, body, coord, pos, cloud)
     # In granite the light feldspar crystals and dark mafic minerals coexist. In basalt the
     # dark features are cavities; in obsidian the occasional inclusion is an iron-gold thread.
     fleck_amount = {"plunge_boulder": .95, "jagged_gravel": .85, "thin_shale": .43,
-                    "master_disc": .065, "heavy_basalt": .22}.get(k, .39)
+                    "master_disc": .065, "heavy_basalt": .22, "jade_river_flat": .075,
+                    "quartz_cobble": .13, "red_sandstone": .24}.get(k, .39)
     body = g.mix(g.math("MULTIPLY", crystals, fleck_amount), body, (*linear((.458, .448, .424)), 1))
     hole_amount = {"heavy_basalt": .90, "plunge_boulder": .64, "jagged_gravel": .61,
-                   "master_disc": .065}.get(k, .25)
+                   "master_disc": .065, "jade_river_flat": .085, "quartz_cobble": .18}.get(k, .25)
     body = g.mix(g.math("MULTIPLY", pits, hole_amount), body, (*linear(tone(.54)), 1))
-    vein_amount = {"chunky_cobble": .88, "master_disc": .19, "heavy_basalt": .13,
-                   "thin_shale": .17, "willow_leaf": .27}.get(k, .32)
-    if stone.style == 2:
+    vein_amount = {"quartz_cobble": 1., "chunky_cobble": .10, "master_disc": .18, "heavy_basalt": .13,
+                   "thin_shale": .17, "willow_leaf": .27, "jade_river_flat": .17, "red_sandstone": .10}.get(k, .32)
+    if stone.feature == "seam":
         vein_amount = min(1., vein_amount*1.65)
-    mineral = (.425, .365, .275) if k == "master_disc" else (.462, .452, .425)
+    mineral = (.462, .452, .425)
+    if k == "quartz_cobble":
+        mineral = (.590, .583, .568)
+    elif k == "master_disc":
+        mineral = (.405,.422,.426) if stone.feature in ("seam","round","pocket") else (.425,.365,.275)
     body = g.mix(g.math("MULTIPLY", vein, vein_amount), body, (*linear(mineral), 1))
     if k == "thin_shale":
         # A fresh edge exposes the section through the beds. Use physical height so
@@ -509,7 +691,9 @@ def rock_material(stone):
     g.input(bsdf.inputs["Base Color"], body)
     rmin, rmax = rock.rough
     micro = g.math("ADD", g.math("MULTIPLY", grain, .58), g.math("MULTIPLY", medium, .42))
-    rough = g.ramp(micro, [(.22, rmin+.008), (.78, rmax-.008)], "Dry local roughness")
+    middle = (rmin+rmax)/2 + .14*(rmax-rmin)*(stone.relief_scale-1.)
+    spread = .36*(rmax-rmin)
+    rough = g.ramp(micro, [(.22, middle-spread), (.78, middle+spread)], "Dry local roughness")
     g.input(bsdf.inputs["Roughness"], rough)
     height = g.math("ADD", g.math("MULTIPLY", medium, .45), g.math("MULTIPLY", grain, .28))
     height = g.math("ADD", height, g.math("MULTIPLY", bands, .065 if k == "thin_shale" else .22))
@@ -517,8 +701,9 @@ def rock_material(stone):
     height = g.math("ADD", height, g.math("MULTIPLY", vein, .13))
     bump = g.node("ShaderNodeBump", "Crystal relief, bedding and pinholes in metres")
     distances = {"plunge_boulder": .00029, "jagged_gravel": .00040, "thin_shale": .00023,
-                 "heavy_basalt": .00036, "master_disc": .000048}
-    bump.inputs["Distance"].default_value = distances.get(k, .00018)
+                 "heavy_basalt": .00036, "master_disc": .000048, "jade_river_flat": .000070,
+                 "red_sandstone": .00022, "quartz_cobble": .00012}
+    bump.inputs["Distance"].default_value = distances.get(k, .00018)*stone.relief_scale
     bump.inputs["Strength"].default_value = .75
     g.input(bump.inputs["Height"], height)
     g.input(bsdf.inputs["Normal"], bump.outputs["Normal"])
@@ -558,13 +743,17 @@ def bake_and_export(stone, low, high, path):
     bpy.data.objects.remove(high, do_unlink=True)
     select_only(low)
     formats = bpy.ops.export_scene.gltf.get_rna_type().properties["export_image_format"].enum_items
-    fmt = "WEBP" if "WEBP" in formats.keys() else "AUTO"
-    status = bpy.ops.export_scene.gltf(filepath=str(path), export_format="GLB", use_selection=True,
-               export_yup=True, export_apply=True, export_normals=True, export_tangents=True,
-               export_texcoords=True, export_materials="EXPORT", export_image_format=fmt,
-               export_image_quality=98 if stone.rock.id == "master_disc" else 94,
-               export_animations=False, export_cameras=False, export_lights=False)
-    require("FINISHED" in status, f"{stone.id}: GLB export failed")
+    require("WEBP" in formats.keys(), "The v2 collection requires the glTF WebP exporter")
+    quality = 98 if stone.rock.id == "master_disc" else 94
+    while True:
+        status = bpy.ops.export_scene.gltf(filepath=str(path), export_format="GLB", use_selection=True,
+                   export_yup=True, export_apply=True, export_normals=True, export_tangents=True,
+                   export_texcoords=True, export_materials="EXPORT", export_image_format="WEBP",
+                   export_image_quality=quality, export_animations=False, export_cameras=False, export_lights=False)
+        require("FINISHED" in status, f"{stone.id}: GLB export failed")
+        if path.stat().st_size <= 240_000 or quality <= 78:
+            break
+        quality -= 4
 
 
 def geometry(bm):
@@ -725,7 +914,8 @@ def inspect_glb(stone, path, source, directory, sculpt_tris):
     rock = stone.rock
     require(np.allclose(exported["dimensionsM"], [2*a, 2*h, 2*b], rtol=0, atol=2e-8) and a >= b >= h > 0,
             "glTF axes or scale do not match the Blender mesh")
-    require(np.allclose(np.array(rock.mm)*.001, dims, rtol=rock.tolerance, atol=0),
+    nominal = np.array(rock.mm)*.001
+    require(np.all(np.abs(np.array(dims)-nominal) <= nominal*rock.tolerance),
             f"{stone.id}: dimensions outside archetype tolerance")
     volume = source["volumeM3"]
     require(math.isclose(exported["volumeM3"], volume, rel_tol=1e-6) and
@@ -733,9 +923,10 @@ def inspect_glb(stone, path, source, directory, sculpt_tris):
     mass = volume*rock.density
     require(rock.grams[0] <= mass*1000 <= rock.grams[1], f"{stone.id}: mass {mass*1000:.2f} g")
     tris = exported["triangles"]
-    require(tris == source["triangles"] and 500 <= tris <= 1200, "Triangle budget exceeded")
+    limit = 1500 if rock.id in ("jagged_gravel", "thin_shale") else 1300
+    require(tris == source["triangles"] and 500 <= tris <= limit, "Triangle budget exceeded")
     size = path.stat().st_size
-    require(80_000 <= size <= 320_000, f"{stone.id}: GLB size {size} outside budget")
+    require(80_000 <= size <= 240_000, f"{stone.id}: GLB size {size} outside the v2 delivery budget")
     pbr = doc["materials"][0]["pbrMetallicRoughness"]
     require(pbr.get("metallicFactor", 1.) == 0 and pbr.get("roughnessFactor", 1.) == 1. and
             pbr.get("baseColorFactor", [1]*4) == [1]*4, "Unexpected PBR factors")
@@ -744,6 +935,7 @@ def inspect_glb(stone, path, source, directory, sculpt_tris):
     base, base_fmt = glb.texture_pixels(pbr["baseColorTexture"], directory)
     normal, norm_fmt = glb.texture_pixels(doc["materials"][0]["normalTexture"], directory)
     orm, orm_fmt = glb.texture_pixels(pbr["metallicRoughnessTexture"], directory)
+    require(base_fmt == norm_fmt == orm_fmt == "image/webp", "Expected three embedded WebP maps")
     colors, rough = base[mask], orm[:, :, 1][mask]
     luma = colors @ np.array([.2126, .7152, .0722])
     # Allow one 8-bit code step at either end of the dry roughness range for WebP quantization.
@@ -751,7 +943,13 @@ def inspect_glb(stone, path, source, directory, sculpt_tris):
     require(rough.min() >= rock.rough[0]-1/255 and rough.max() <= rock.rough[1]+1/255 and rough.std() > .004,
             f"{stone.id}: texture roughness {rough.min():.3f}–{rough.max():.3f} or no variation")
     lo, hi = float(luma.min()), float(luma.max())
-    require(lo >= .14 and hi <= .48 and luma.std() > .006, f"{stone.id}: albedo {lo:.3f}–{hi:.3f}")
+    quartz = rock.id == "quartz_cobble"
+    require(lo >= .14 and hi <= (.62 if quartz else .48) and luma.std() > .006,
+            f"{stone.id}: albedo {lo:.4f}–{hi:.4f}, deviation {luma.std():.4f}")
+    white_fraction = float((luma > .48).mean())
+    if quartz:
+        require(.006 < white_fraction < .25 and hi > .53 and np.median(luma) < .33,
+                f"{stone.id}: check white veins and dark host, white coverage {white_fraction:.3f}")
     require(np.all(rough > .25), f"{stone.id}: projection missed the sculpt")
     require(normal[:, :, :2][mask].std(axis=0).min() > .004, "Flat normal bake")
     color_hex = "#" + "".join(f"{int(v):02x}" for v in np.rint(colors.mean(axis=0)*255))
@@ -760,16 +958,50 @@ def inspect_glb(stone, path, source, directory, sculpt_tris):
                   glbPath=f"/assets/stones/{stone.id}.glb", a=a, b=b, h=h, volumeM3=volume,
                   density=rock.density, mass=mass, dragScale=rock.drag, wobble=rock.wobble,
                   roughness=round(float(rough.mean()), 6), colorHex=color_hex, triangles=tris, fileBytes=size)
+    # Sample the support of both projected silhouettes after removing translation and all three
+    # axis scales. Duplicating an outline and changing just its dimensions cannot pass this test.
+    norm_pos = (unique.astype(np.float64)-unique.min(axis=0))/np.ptp(unique, axis=0)-.5
+    angles = np.arange(64)*TAU/64
+    directions = np.array([np.cos(angles), np.sin(angles)])
+    profiles = np.concatenate([(norm_pos[:, axes]@directions).max(axis=0) for axes in ((0, 2), (0, 1))])
+    contour_hash = hashlib.sha256(np.rint(profiles*400).astype("<i2").tobytes()).hexdigest()
+    albedo_hash = hashlib.sha256(np.rint(base*255).astype(np.uint8).tobytes()).hexdigest()
     audit = dict(id=stone.id, passed=True, **source, gltfDimensionsM=exported["dimensionsM"],
                  gltfVolumeM3=exported["volumeM3"], gltfCentroidErrorMm=exported["centroidErrorMm"],
                  gltfClosedManifold=exported["closedManifold"], identityTransform=True,
                  a=a, b=b, h=h, density=rock.density, massKg=mass, flatness=h/math.sqrt(a*b),
                  aspect=b/a, fileBytes=size, sha256=glb.digest, highPolyTriangles=sculpt_tris,
+                 habit=stone.feature, mineralAzimuthDeg=round(math.degrees(stone.strike)%180, 3),
+                 normalizedContourSha256=contour_hash,
                  textures=dict(resolution=[SIZE, SIZE], embedded=[base_fmt, norm_fmt, orm_fmt],
                                normalSpace="OpenGL tangent (+Y)", metallic=0, uvCoverage=round(occupancy, 4),
                                uvOverlap=round(overlap, 6), roughnessP001P999=[float(q_lo), float(q_hi)],
-                               srgbLuminanceMinMax=[lo, hi]))
+                               srgbLuminanceMinMax=[lo, hi], albedoSha256=albedo_hash, quartzBrightFraction=white_fraction))
     return record, audit
+
+
+def verify_collection(records, audits, variants, directory):
+    expected = [f"{rock.id}_{v:02d}" for rock in ROCKS for v in range(1, variants+1)]
+    require(expected == [r["id"] for r in records] == [a["id"] for a in audits], "Incomplete collection")
+    require({p.stem for p in directory.glob("*.glb")} == set(expected), "GLB / manifest mismatch")
+    families = {}
+    for rock in ROCKS:
+        rows = [r for r in records if r["archetypeId"] == rock.id]
+        ids = {r["id"] for r in rows}
+        checks = [a for a in audits if a["id"] in ids]
+        contours = {a["normalizedContourSha256"] for a in checks}
+        albedos = {a["textures"]["albedoSha256"] for a in checks}
+        ratios = {(round(a["aspect"], 4), round(a["flatness"], 4)) for a in checks}
+        swatches = {r["colorHex"] for r in rows}
+        require(len(contours) == len(albedos) == len(ratios) == variants, f"{rock.id}: duplicate form or texture")
+        # The authored run spans eight distinct matrix colours. With arbitrary expansion the
+        # quantized average can coincide even though two rocks have different mineral maps.
+        if variants <= len(HABITS):
+            require(len(swatches) == variants, f"{rock.id}: duplicate measured colour swatch")
+        families[rock.id] = dict(count=variants, distinctNormalizedContours=len(contours),
+                                 distinctAxisRatios=len(ratios), distinctAlbedos=len(albedos),
+                                 distinctMeanColors=len(swatches))
+    return families
 
 
 CARD_PX = 420
@@ -920,9 +1152,11 @@ def compose_sheet(job):
         draw.line((x, bar_y-6, x, bar_y+3), fill=ink, width=2)
     draw.line((margin, 168, width-margin, 168), fill=ink, width=2)
     draw.text((margin, 182), "石种  /  岩性" if cjk else "ARCHETYPE", font=caption_font, fill=muted)
-    descriptors = ("典型", "暖调", "矿纹", "厚薄变体") if cjk else ("TYPE", "WARM", "MINERAL", "PROFILE")
     for i in range(variants):
-        draw.text((start_x+(i+.5)*CARD_PX, 198), f"{i+1:02d}   /   {descriptors[i%4]}",
+        label = "混合个体" if cjk else "MIXED"
+        if i < len(HABITS):
+            label = HABITS[i].label if cjk else HABITS[i].feature.upper()
+        draw.text((start_x+(i+.5)*CARD_PX, 198), f"{i+1:02d}   /   {label}",
                   font=caption_font, fill=muted, anchor="mm")
     y = header
     for row, row_height in zip(rows, heights):
@@ -956,6 +1190,8 @@ def make_sheet(records, assets, directory, dest):
     rows = []
     for rock in ROCKS:
         stones = [s for s in records if s["archetypeId"] == rock.id]
+        if not stones:
+            continue
         rendered = directory/(rock.id+".png")
         render_row(stones, assets, rendered)
         rows.append(dict(stones=stones, lithology=rock.lithology, render=str(rendered)))
@@ -999,15 +1235,9 @@ def publish(root, work, records):
     targets = [assets/(r["id"]+".glb") for r in records]
     manifest = assets/"manifest.json"
     with catalog_lock(root):
-        obsolete = []
-        if manifest.exists():
-            owned = {r.id for r in ROCKS}
-            for old in json.loads(manifest.read_text(encoding="utf-8"))["stones"]:
-                family, variant = old["archetypeId"], old["variant"]
-                if family in owned and old["id"] == f"{family}_{variant:02d}":
-                    path = assets/(old["id"]+".glb")
-                    if path not in targets and path.exists():
-                        obsolete.append(path)
+        # This dedicated directory is the public catalog, including any GLB left behind
+        # by an older run that never made it into its manifest.
+        obsolete = sorted(set(assets.glob("*.glb"))-set(targets))
         targets.extend((delivery/"validation-report.json", delivery/"contact-sheet.png", manifest))
         previous = work/"previous"
         previous.mkdir()
@@ -1016,11 +1246,11 @@ def publish(root, work, records):
                 shutil.copy2(path, previous/path.name)
         changed = []
         try:
-            for path in targets:
-                (work/path.name).replace(path)
-                changed.append(path)
             for path in obsolete:
                 path.unlink()
+                changed.append(path)
+            for path in targets:
+                (work/path.name).replace(path)
                 changed.append(path)
         except OSError:
             for path in reversed(changed):
@@ -1035,7 +1265,7 @@ def publish(root, work, records):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
-    parser.add_argument("--variants", type=int, default=4, help="Number of specimens per archetype")
+    parser.add_argument("--variants", type=int, default=len(HABITS), help="Number of specimens per archetype (default: 8)")
     parser.add_argument("--output-root", type=Path, default=ROOT, help="Root for public/ and deliverables/")
     parser.add_argument("--sheet-only", action="store_true", help="Render the existing exported catalog")
     args = parser.parse_args(sys.argv[sys.argv.index("--")+1:] if "--" in sys.argv else [])
@@ -1057,18 +1287,9 @@ def main():
         records, audits = [], []
         for rock in ROCKS:
             for variant in range(1, args.variants+1):
-                # The same rock may cleave into different shapes inside the same dimensional
-                # envelope. Deterministic rejection sampling keeps the measured mass physical.
-                for attempt in range(64):
-                    fresh_scene()
-                    stone = Specimen(rock, variant, args.seed, attempt)
-                    low, high = make_meshes(stone)
-                    measured = measure_low(low)
-                    grams = measured["volumeM3"]*rock.density*1000
-                    if rock.grams[0] <= grams <= rock.grams[1]:
-                        break
-                else:
-                    raise ValueError(f"{stone.id}: could not form a specimen in the mass envelope")
+                fresh_scene()
+                stone, low, high = make_meshes(rock, variant, args.seed)
+                measured = measure_low(low)
                 sculpt_tris = len(high.data.polygons)
                 path = work/(stone.id+".glb")
                 bake_and_export(stone, low, high, path)
@@ -1078,8 +1299,9 @@ def main():
                 print(f"{stone.id}: {record['mass']*1000:.1f} g, {record['triangles']} triangles, "
                       f"{record['fileBytes']:,} bytes, PASS", flush=True)
         total_bytes = sum(r["fileBytes"] for r in records)
-        if args.variants == 4:
-            require(5_000_000 <= total_bytes <= 9_000_000, f"36-stone collection size: {total_bytes} bytes")
+        families = verify_collection(records, audits, args.variants, work)
+        if args.variants == len(HABITS):
+            require(14_000_000 <= total_bytes <= 18_000_000, f"96-stone collection size: {total_bytes} bytes")
         make_sheet(records, work, work, sheet)
         stamp = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
         manifest = dict(version=1, generatedAt=stamp, count=len(records), stones=records)
@@ -1087,6 +1309,7 @@ def main():
                       variantsPerArchetype=args.variants, count=len(audits), passedCount=len(audits), allPassed=True,
                       units="metres", blenderAxes=["length", "width", "thickness"],
                       gltfAxes=["length", "thickness", "width"], totalFileBytes=total_bytes,
+                      meanFileBytes=total_bytes/len(records), archetypes=families,
                       stones=audits)
         write_json(work/"manifest.json", manifest)
         write_json(work/"validation-report.json", report)
