@@ -10,7 +10,7 @@ Web-first 物理打水漂模拟与风格化小游戏（TypeScript / Three.js / V
 ### 1. 真实米制刚体与接触物理
 - **4000 Hz 零分配标量 RK4 物理**（[src/simulation/physics.ts](src/simulation/physics.ts)）：解析椭圆平面裁剪计算连续湿面积与压力形心，入水/离水/受压跃迁自动二分细化，完整保留三维姿态演化与陀螺进动（全量 24+64 种子校准回归提速 ~4.7×）。
 - **全自由度出手参数**：水平方向 `direction`、初速 `speed`、出手抛角 `elevation`、石面攻角 `tilt`、左右侧倾 `roll`（自然产生侧向弧线轨迹）、正负自旋 `spin`，以及显式 seed 的有界随机温度与 v1 JSON 确定性快照重放。
-- **9 大类 × 4 变体 = 36 块真实 Blender PBR 河岸石子**（[src/simulation/stones.ts](src/simulation/stones.ts)、[docs/BLENDER_STONE_FACTORY.md](docs/BLENDER_STONE_FACTORY.md)）：从 340g 纯砸大水花的重拳河卵石、歪斜磕碰的棱角碎石，到轻薄页岩、玄武重圆饼、柳叶长扁石与 72g 溪磨黑曜圆盘；每块 `.glb` 的真实尺寸 `(a, b, h)`、实测闭合体积 × 岩性密度质量、水阻与重心偏心直接联动物理轨迹、GPU 排水深度、水花能量预算与声音响度/音高。
+- **12 大类 × 8 变体 = 96 块独一无二 Blender PBR 河岸石子**（[src/simulation/stones.ts](src/simulation/stones.ts)、[docs/BLENDER_STONE_FACTORY.md](docs/BLENDER_STONE_FACTORY.md)）：从 340g 纯砸大水花的重拳河卵石、醒目白脉溪卵石、歪斜磕碰的棱角碎石，到丹砂河扁石、轻薄页岩、玄武重圆饼、柳叶长扁石、润玉青溪扁石与 75g 溪磨黑曜圆盘；每块 `.glb` 的真实尺寸 `(a, b, h)`、实测闭合体积 × 岩性密度质量、水阻与重心偏心直接联动物理轨迹、GPU 排水深度、水花能量预算与声音响度/音高。
 
 ### 2. 64×32 m 连续 GPU 高度场与水幕闭环
 - **固定全域 GPU 水波求解 + Cauchy–Poisson 色散多环涟漪**（[src/rendering/coherent.ts](src/rendering/coherent.ts)、[src/simulation/water-grid.ts](src/simulation/water-grid.ts)、[src/simulation/ripples.ts](src/simulation/ripples.ts)）：`4096×1024 RGBA32F` 双缓冲负责近场压坑、滑移尾迹、落滴次级波、鼠标拨水与焦散；叠加真实接触冲量驱动的深水色散多环波包（波速 `0.46–0.74 m/s`，360° 全向扩散带前向动量加强，持续 6–9 秒无网格锯齿）。
