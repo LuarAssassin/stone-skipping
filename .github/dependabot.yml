@@ -12,6 +12,11 @@ updates:
         dependency-type: production
     commit-message:
       prefix: "chore(deps)"
+    ignore:
+      # three 0.x minors are breaking: 0.187 fails typecheck in
+      # src/app/bootstrap.ts (WebGLProgram). Upgrade deliberately in a branch.
+      - dependency-name: three
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
 
   # Keep the pinned action commits current once a month.
   - package-ecosystem: github-actions
