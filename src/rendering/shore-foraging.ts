@@ -12,8 +12,8 @@ import {
 } from '../simulation/stones';
 import type { Pose } from '../camera/rig';
 
-const SHORE_STONE_COUNT = 34;
-const WALK_Z_LIMIT = 2.85;
+const SHORE_STONE_COUNT = 28;
+const RECENT_HISTORY_BATCHES = 2;
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 
 interface ShoreStoneItem {
@@ -34,10 +34,20 @@ export interface ShoreForagingCallbacks {
     onExit(): void;
 }
 
+/** Fixed crouching camera framing at z = 0 so every scattered stone sits directly within sight & reach. */
+function computeForageCameraFrame() {
+    const waterEdge = shorelineCurveX(0);
+    const focusX = waterEdge - 0.48;
+    const focusY = shoreElevation(focusX, 0) + 0.02;
+    const camX = focusX - 0.90;
+    const camY = Math.max(0.45, focusY + 0.80);
+    return { waterEdge, focusX, focusY, camX, camY };
+}
+
 /** Live 3D twilight riverbank foraging:
- *  - Scatters up to 34 strictly unique Blender GLB stones naturally clustered along the wet gravel shore
- *  - Movable crouching camera (drag / WASD / wheel zoom)
- *  - True 3D Raycaster hover highlight & click-to-levitate 360° close-up inspection */
+ *  - Scatters 28 strictly unique Blender GLB stones inside the fixed crouching viewport ("目之所及")
+ *  - Pure mouse interaction (no WASD / no camera panning): hover to preview, click to lift & 360° inspect
+ *  - One-click refresh cycles through fresh unseen batches across the full 96-stone library */
 export function createShoreForaging(
     scene: THREE.Scene,
     camera: THREE.PerspectiveCamera,
@@ -77,11 +87,11 @@ export function createShoreForaging(
       <div class="forage-top-bar">
         <div class="forage-banner">
           <span class="pill-dot"></span>
-          <span>暮色浅滩寻石 · 拖动/WASD 沿岸移动 · 滚轮俯身拉近 · 点击石子端详</span>
+          <span>暮色浅滩寻石 · 鼠标直接点选石子 · 抬起后可 360° 翻转看薄厚</span>
         </div>
         <div class="forage-top-actions">
           <span class="career-pill" id="forage-career">累计 0 跳</span>
-          <button id="forage-walk-more" class="glass-pill" type="button">往前再走走</button>
+          <button id="forage-walk-more" class="glass-pill" type="button">换一批河石</button>
           <button id="forage-return" class="glass-pill active" type="button">回到湖面 <kbd>F</kbd></button>
         </div>
       </div>
@@ -94,7 +104,7 @@ export function createShoreForaging(
         </div>
         <p id="forage-stone-feel" class="forage-feel"></p>
         <div id="forage-inspect-actions" class="forage-inspect-actions">
-          <span class="inspect-tip">按住拖动 360° 翻转看薄厚</span>
+          <span class="inspect-tip">按住拖动 360° 翻转看薄厚 · 右键或点空白处放回</span>
           <div class="inspect-btns">
             <button id="forage-take" class="dock-btn primary" type="button">拿去投</button>
             <button id="forage-collect" class="dock-btn" type="button">收入石匣</button>
@@ -121,15 +131,8 @@ export function createShoreForaging(
     let hovered: ShoreStoneItem | undefined;
     let inspected: ShoreStoneItem | undefined;
     let forageSeed = Math.floor(Math.random() * 0xffffffff);
-    let lastBatchManifestIds = new Set<string>();
+    const recentBatches: string[][] = [];
 
-    // Crouching movable camera state along the wet riverbank
-    let walkZ = 0;
-    let walkX = 0;
-    let zoom = 1.0;
-    let targetWalkZ = 0;
-    let targetWalkX = 0;
-    let targetZoom = 1.0;
     let cursorNdcX = 0;
     let cursorNdcY = 0;
 
@@ -139,7 +142,6 @@ export function createShoreForaging(
     const inspectEuler = new THREE.Euler();
     const inspectQuat = new THREE.Quaternion();
 
-    const keysDown = new Set<string>();
     const raycaster = new THREE.Raycaster();
     const ndc = new THREE.Vector2();
     const upAxis = new THREE.Vector3(0, 1, 0);
@@ -176,19 +178,25 @@ export function createShoreForaging(
 
     function populateShore(seed: number, avoidPrevious = false) {
         disposeItems();
+        const excludeIds = avoidPrevious && recentBatches.length > 0
+            ? new Set(recentBatches.flat())
+            : undefined;
         const specs = forageShoreStones(
             box.careerSkips,
             seed,
             SHORE_STONE_COUNT,
             catalog,
-            avoidPrevious ? lastBatchManifestIds : undefined
+            excludeIds
         );
-        lastBatchManifestIds = new Set(
-            specs.map(s => (s.variant !== undefined ? `${s.archetypeId}_${String(s.variant).padStart(2, '0')}` : s.id))
+        const batchIds = specs.map(s =>
+            s.variant !== undefined ? `${s.archetypeId}_${String(s.variant).padStart(2, '0')}` : s.id
         );
+        recentBatches.push(batchIds);
+        while (recentBatches.length > RECENT_HISTORY_BATCHES) recentBatches.shift();
+
         const placed: { x: number; z: number }[] = [];
 
-        // Deterministic PRNG for spatial scatter along the natural shoreline cove
+        // Deterministic PRNG for organic non-overlapping scatter strictly inside the visible trapezoid
         let rngState = (seed ^ 0x51f23a9b) >>> 0;
         const rand = () => {
             rngState = (rngState + 0x6d2b79f5) >>> 0;
@@ -197,43 +205,43 @@ export function createShoreForaging(
             return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
         };
 
-        // Organic fluvial gravel-bar cluster centers along the wet-to-damp shoreline
-        const clusters = Array.from({ length: 6 }, (_, idx) => {
-            const baseZ = -2.5 + idx * 1.0 + (rand() - 0.5) * 0.45;
-            return {
-                z: clamp(baseZ, -2.8, 2.8),
-                inland: 0.24 + rand() * 0.78,
-            };
-        });
+        // Adapt visible trapezoid width safely to current viewport aspect so every stone stays on-screen
+        const safeAspect = clamp(camera.aspect || 1.6, 0.55, 1.75);
+        const tanHalfFov = Math.tan(THREE.MathUtils.degToRad(44 * 0.5));
+        const inlandMin = 0.10; // near damp waterline (upper-middle of frame)
+        const inlandMax = 0.82; // foreground bank (cleanly above bottom pocket strip)
+        const halfZFar = 1.54 * tanHalfFov * safeAspect * 0.78;
+        const halfZNear = 0.88 * tanHalfFov * safeAspect * 0.74;
 
         for (let i = 0; i < specs.length; i++) {
             const spec = specs[i];
-            let px = -1.2;
+            let px = -1.4;
             let pz = 0;
-            // Fluvial clustering + non-overlapping spacing (0.145 m) so every crouching frame holds 10–14 distinct stones
-            for (let attempt = 0; attempt < 60; attempt++) {
-                const useCluster = attempt < 40 && rand() < 0.72;
-                let candidateZ: number;
-                let inlandOffset: number;
-                if (useCluster) {
-                    const c = clusters[Math.floor(rand() * clusters.length)];
-                    const angle = rand() * Math.PI * 2;
-                    const radius = 0.14 + Math.sqrt(rand()) * 0.46;
-                    candidateZ = clamp(c.z + Math.cos(angle) * radius, -3.05, 3.05);
-                    inlandOffset = clamp(c.inland + Math.sin(angle) * radius * 0.68, 0.16, 1.32);
-                } else {
-                    candidateZ = (rand() - 0.5) * 6.1;
-                    // Bias gently toward the damp water edge where flat stones wash ashore
-                    inlandOffset = 0.16 + Math.pow(rand(), 1.18) * 1.18;
-                }
+            let found = false;
+
+            // Perspective-matched trapezoid Poisson-disc scatter: organic feel, zero clipping, zero overlap
+            for (let attempt = 0; attempt < 90; attempt++) {
+                // Slight bias toward the wider wet waterline half so visual density looks uniform on screen
+                const t = Math.pow(rand(), 1.15);
+                const inlandOffset = inlandMin + t * (inlandMax - inlandMin);
+                const maxZ = halfZFar + (halfZNear - halfZFar) * t;
+                const candidateZ = (rand() * 2 - 1) * maxZ;
                 const waterEdge = shorelineCurveX(candidateZ);
                 const candidateX = waterEdge - inlandOffset;
-                const minDist = attempt < 45 ? 0.145 : 0.115;
+                const minDist = attempt < 45 ? 0.145 : attempt < 70 ? 0.12 : 0.095;
                 if (placed.every(p => Math.hypot(p.x - candidateX, p.z - candidateZ) >= minDist)) {
                     px = candidateX;
                     pz = candidateZ;
+                    found = true;
                     break;
                 }
+            }
+            if (!found) {
+                const t = (i + 0.5) / specs.length;
+                const inlandOffset = inlandMin + t * (inlandMax - inlandMin);
+                const maxZ = halfZFar + (halfZNear - halfZFar) * t;
+                pz = (rand() * 2 - 1) * maxZ * 0.85;
+                px = shorelineCurveX(pz) - inlandOffset;
             }
             placed.push({ x: px, z: pz });
 
@@ -253,7 +261,7 @@ export function createShoreForaging(
             populateStoneGroup(visual, spec);
             root.add(visual);
 
-            const hitRadius = Math.max(spec.a, spec.b) * 1.24 + 0.015;
+            const hitRadius = Math.max(spec.a, spec.b) * 1.24 + 0.014;
             const collider = new THREE.Mesh(new THREE.SphereGeometry(hitRadius, 10, 8), colliderMat);
             collider.userData.shoreIndex = i;
             root.add(collider);
@@ -350,118 +358,108 @@ export function createShoreForaging(
             if (hovered) setStoneHighlight(hovered.visual, false);
             hovered = nextHover;
             if (hovered) setStoneHighlight(hovered.visual, true);
-            canvas.style.cursor = hovered ? 'pointer' : 'grab';
+            canvas.style.cursor = hovered ? 'pointer' : 'default';
             setMsg('');
             syncCaption();
         }
     }
 
-    // Pointer interaction on the main canvas while Forage Mode is active (capture phase to isolate from throw gesture)
-    let dragState:
-        | { pointerId: number; kind: 'pan' | 'rotate'; startX: number; startY: number; lastX: number; lastY: number; moved: number }
+    // Pure mouse interaction (capture phase isolates foraging from lake pull-to-throw)
+    let rotateDrag:
+        | { pointerId: number; lastX: number; lastY: number; moved: number }
         | undefined;
 
     canvas.addEventListener('pointerdown', event => {
         if (!active) return;
         event.stopImmediatePropagation();
         if (!event.isPrimary) return;
-        const kind = inspected && event.button === 0 ? 'rotate' : 'pan';
-        dragState = {
-            pointerId: event.pointerId,
-            kind,
-            startX: event.clientX,
-            startY: event.clientY,
-            lastX: event.clientX,
-            lastY: event.clientY,
-            moved: 0,
-        };
-        canvas.setPointerCapture(event.pointerId);
-        canvas.style.cursor = 'grabbing';
-        event.preventDefault();
+
+        // Right-click while inspecting puts the stone back immediately
+        if (event.button === 2) {
+            if (inspected) putBackInspected();
+            event.preventDefault();
+            return;
+        }
+        if (event.button !== 0) return;
+
+        if (inspected) {
+            rotateDrag = {
+                pointerId: event.pointerId,
+                lastX: event.clientX,
+                lastY: event.clientY,
+                moved: 0,
+            };
+            canvas.setPointerCapture(event.pointerId);
+            canvas.style.cursor = 'grabbing';
+            event.preventDefault();
+            return;
+        }
+
+        // Clicking directly on any visible stone lifts it into 360° hand inspection
+        updateRaycast(event.clientX, event.clientY);
+        if (hovered) {
+            inspected = hovered;
+            setStoneHighlight(inspected.visual, false);
+            hovered = undefined;
+            hoverRing.visible = false;
+            inspectYaw = 0.45;
+            inspectPitch = 0.38;
+            setMsg('');
+            callbacks.onClink(inspected.spec.mass);
+            syncCaption();
+            canvas.style.cursor = 'grab';
+            event.preventDefault();
+        }
     }, true);
 
     canvas.addEventListener('pointermove', event => {
         if (!active) return;
         event.stopImmediatePropagation();
-        if (dragState && dragState.pointerId === event.pointerId) {
-            const dx = event.clientX - dragState.lastX;
-            const dy = event.clientY - dragState.lastY;
-            dragState.lastX = event.clientX;
-            dragState.lastY = event.clientY;
-            dragState.moved += Math.hypot(dx, dy);
-
-            if (dragState.kind === 'rotate') {
-                inspectYaw += dx * 0.011;
-                inspectPitch = clamp(inspectPitch + dy * 0.011, -1.45, 1.45);
-            } else {
-                // Dragging empty shore glides smoothly along the riverbank
-                targetWalkZ = clamp(targetWalkZ - dx * 0.0042 * targetZoom, -WALK_Z_LIMIT, WALK_Z_LIMIT);
-                targetWalkX = clamp(targetWalkX - dy * 0.0024 * targetZoom, -0.45, 0.45);
-            }
+        if (rotateDrag && rotateDrag.pointerId === event.pointerId) {
+            const dx = event.clientX - rotateDrag.lastX;
+            const dy = event.clientY - rotateDrag.lastY;
+            rotateDrag.lastX = event.clientX;
+            rotateDrag.lastY = event.clientY;
+            rotateDrag.moved += Math.hypot(dx, dy);
+            inspectYaw += dx * 0.011;
+            inspectPitch = clamp(inspectPitch + dy * 0.011, -1.45, 1.45);
             return;
         }
         updateRaycast(event.clientX, event.clientY);
     }, true);
 
-    const endDrag = (event: PointerEvent) => {
+    const endRotate = (event: PointerEvent) => {
         if (!active) return;
         event.stopImmediatePropagation();
-        if (!dragState || dragState.pointerId !== event.pointerId) return;
-        const wasClick = dragState.moved < 7;
-        const prevKind = dragState.kind;
+        if (!rotateDrag || rotateDrag.pointerId !== event.pointerId) return;
+        const wasClick = rotateDrag.moved < 7;
         if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
-        dragState = undefined;
+        rotateDrag = undefined;
 
-        if (wasClick) {
-            if (prevKind === 'pan') {
-                updateRaycast(event.clientX, event.clientY);
-                if (hovered) {
-                    inspected = hovered;
-                    setStoneHighlight(inspected.visual, false);
-                    hovered = undefined;
-                    hoverRing.visible = false;
-                    inspectYaw = 0.45;
-                    inspectPitch = 0.38;
-                    setMsg('');
-                    callbacks.onClink(inspected.spec.mass);
-                    syncCaption();
-                }
-            } else if (prevKind === 'rotate' && inspected) {
-                // Clicking empty space away from center while inspecting puts the stone back gently
-                const boxRect = canvas.getBoundingClientRect();
-                const cx = (event.clientX - boxRect.left) / boxRect.width - 0.5;
-                const cy = (event.clientY - boxRect.top) / boxRect.height - 0.5;
-                if (Math.hypot(cx, cy) > 0.22) {
-                    putBackInspected();
-                }
+        if (wasClick && inspected) {
+            // Clicking empty space away from center while inspecting puts the stone back gently
+            const boxRect = canvas.getBoundingClientRect();
+            const cx = (event.clientX - boxRect.left) / boxRect.width - 0.5;
+            const cy = (event.clientY - boxRect.top) / boxRect.height - 0.5;
+            if (Math.hypot(cx, cy) > 0.20) {
+                putBackInspected();
+                return;
             }
         }
-        canvas.style.cursor = inspected ? 'grab' : (hovered ? 'pointer' : 'grab');
+        canvas.style.cursor = inspected ? 'grab' : (hovered ? 'pointer' : 'default');
     };
-    canvas.addEventListener('pointerup', endDrag, true);
-    canvas.addEventListener('pointercancel', endDrag, true);
+    canvas.addEventListener('pointerup', endRotate, true);
+    canvas.addEventListener('pointercancel', endRotate, true);
 
+    // Swallow wheel while foraging so accidental scroll doesn't alter background launch tilt/roll
     canvas.addEventListener('wheel', event => {
         if (!active) return;
         event.stopImmediatePropagation();
         event.preventDefault();
-        targetZoom = clamp(targetZoom + (event.deltaY > 0 ? 0.08 : -0.08), 0.56, 1.38);
     }, { capture: true, passive: false });
 
     canvas.addEventListener('contextmenu', event => {
         if (active) event.preventDefault();
-    });
-
-    window.addEventListener('keydown', event => {
-        if (!active) return;
-        if (event.target instanceof HTMLElement && event.target.closest('input, textarea, select')) return;
-        if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.code)) {
-            keysDown.add(event.code);
-            event.preventDefault();
-        }
-    });
-    window.addEventListener('keyup', event => {
-        keysDown.delete(event.code);
     });
 
     function putBackInspected() {
@@ -469,7 +467,7 @@ export function createShoreForaging(
         inspected = undefined;
         setMsg('');
         syncCaption();
-        canvas.style.cursor = 'grab';
+        canvas.style.cursor = 'default';
     }
 
     // Wire minimal HUD buttons
@@ -479,10 +477,8 @@ export function createShoreForaging(
     };
     hud.querySelector<HTMLButtonElement>('#forage-walk-more')!.onclick = () => {
         forageSeed = Math.floor(Math.random() * 0xffffffff);
-        targetWalkZ = clamp((Math.random() - 0.5) * 1.6, -2.2, 2.2);
-        targetWalkX = 0;
         populateShore(forageSeed, true);
-        setMsg('沿着暮色岸边往前走了一段，地面露出新一批不重样的天然河石');
+        setMsg('已为你换上一批全新的不重样天然河石');
     };
     hud.querySelector<HTMLButtonElement>('#forage-putback')!.onclick = putBackInspected;
     hud.querySelector<HTMLButtonElement>('#forage-take')!.onclick = () => {
@@ -492,7 +488,6 @@ export function createShoreForaging(
             box.equipSaved(picked.id);
         } else {
             box.equipEphemeral(picked);
-            // Remove the taken stone from the shore ground
             const taken = inspected;
             rootGroup.remove(taken.root);
             items = items.filter(i => i !== taken);
@@ -522,7 +517,7 @@ export function createShoreForaging(
             manifestLoaded = true;
             catalog = await loadStoneManifest();
         }
-        if (items.length < 6) {
+        if (items.length < 8) {
             forageSeed = Math.floor(Math.random() * 0xffffffff);
             populateShore(forageSeed);
         } else {
@@ -536,7 +531,7 @@ export function createShoreForaging(
         active = true;
         rootGroup.visible = true;
         document.body.classList.add('forage-open');
-        canvas.style.cursor = 'grab';
+        canvas.style.cursor = 'default';
         setMsg('');
         void ensureManifestAndPopulate();
     }
@@ -550,8 +545,7 @@ export function createShoreForaging(
             hovered = undefined;
         }
         hoverRing.visible = false;
-        keysDown.clear();
-        dragState = undefined;
+        rotateDrag = undefined;
         rootGroup.visible = false;
         document.body.classList.remove('forage-open');
         captionEl.classList.remove('visible', 'inspecting');
@@ -577,39 +571,20 @@ export function createShoreForaging(
             const match = items.find(it => it.spec.id === thrownId);
             if (match) {
                 rootGroup.remove(match.root);
-                items = items.filter(it => it !== match);
+                items = items.filter(i => i !== match);
             }
         },
-        /** Compute smooth crouching riverbank camera pose & animate stone hover/levitation. */
+        /** Compute fixed crouching riverbank camera pose & animate stone hover/levitation. */
         update(dt: number): Pose {
-            // Keyboard stroll along riverbank (when not inspecting)
-            if (!inspected) {
-                const walkSpeed = 1.65 * dt;
-                if (keysDown.has('KeyA') || keysDown.has('ArrowLeft')) targetWalkZ = clamp(targetWalkZ - walkSpeed, -WALK_Z_LIMIT, WALK_Z_LIMIT);
-                if (keysDown.has('KeyD') || keysDown.has('ArrowRight')) targetWalkZ = clamp(targetWalkZ + walkSpeed, -WALK_Z_LIMIT, WALK_Z_LIMIT);
-                if (keysDown.has('KeyW') || keysDown.has('ArrowUp')) targetWalkX = clamp(targetWalkX + walkSpeed * 0.55, -0.45, 0.45);
-                if (keysDown.has('KeyS') || keysDown.has('ArrowDown')) targetWalkX = clamp(targetWalkX - walkSpeed * 0.55, -0.45, 0.45);
-            }
+            const { focusX, focusY, camX, camY } = computeForageCameraFrame();
 
-            const smooth = 1 - Math.exp(-Math.max(0, dt) * 8);
-            walkZ += (targetWalkZ - walkZ) * smooth;
-            walkX += (targetWalkX - walkX) * smooth;
-            zoom += (targetZoom - zoom) * smooth;
-
-            const waterEdge = shorelineCurveX(walkZ);
-            const focusX = waterEdge - 0.68 + walkX * 0.65;
-            const focusY = shoreElevation(focusX, walkZ) + 0.03;
-            const camX = focusX - (1.02 * zoom);
-            const camY = Math.max(0.32, focusY + 0.64 * zoom);
-            const camZ = walkZ + 0.14 * zoom;
-
-            // Gentle alive gaze parallax
-            const parallaxZ = inspected ? 0 : cursorNdcX * 0.06;
-            const parallaxY = inspected ? 0 : cursorNdcY * 0.035;
+            // Subtle alive eye parallax that keeps every stone firmly within the viewport
+            const parallaxZ = inspected ? 0 : cursorNdcX * 0.024;
+            const parallaxY = inspected ? 0 : cursorNdcY * 0.015;
 
             const goalPose: Pose = {
-                position: new THREE.Vector3(camX, camY, camZ),
-                target: new THREE.Vector3(focusX + 0.12, focusY + parallaxY, walkZ + parallaxZ),
+                position: new THREE.Vector3(camX, camY, 0),
+                target: new THREE.Vector3(focusX + 0.10, focusY + parallaxY, parallaxZ),
                 fov: inspected ? 36 : 44,
             };
 

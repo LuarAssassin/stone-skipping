@@ -32,7 +32,7 @@ src/
     surface-churn.ts      # 沿湿迹沉积的微气泡/白沫光学厚度纹理
     spray.ts              # 逆光水幕网格 (WaterRibbon) 与毛细缩颈细滴 (SprayDrop)
     stone-mesh.ts         # Blender 36石GLB热插拔/程序化回退、触水变湿、暖金高亮与3D握石预览台
-    shore-foraging.ts     # 3D暮色岸滩散落、可动低头相机、射线拾取与360°悬空端详交互
+    shore-foraging.ts     # 3D暮色岸滩固定俯视视野散落、纯鼠标射线直拾与360°悬空端详交互
     aim-guide.ts          # 回拉瞄准时的淡金色第一落水点引导弧与着水环
     feedback.ts           # 石子、轨迹、水面、色散波包与飞溅的逐帧同步
   audio/
