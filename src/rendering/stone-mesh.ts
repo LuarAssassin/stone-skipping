@@ -4,6 +4,7 @@ import type { StoneSpec } from '../simulation/stones';
 
 const loader = new GLTFLoader();
 const glbCache = new Map<string, THREE.Group | null>();
+const glbInFlight = new Map<string, Promise<THREE.Group | null>>();
 let grainTexture: THREE.DataTexture | undefined;
 
 function getRockGrainTexture(): THREE.DataTexture {
@@ -91,7 +92,7 @@ function disposeGroupChildren(group: THREE.Group) {
         group.remove(child);
         child.traverse(obj => {
             if (obj instanceof THREE.Mesh) {
-                obj.geometry.dispose();
+                if (!obj.userData.sharedGeometry) obj.geometry.dispose();
                 const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
                 for (const m of mats) {
                     if (m && m !== undefined) m.dispose();
@@ -99,6 +100,30 @@ function disposeGroupChildren(group: THREE.Group) {
             }
         });
     }
+}
+
+function loadGlbTemplate(path: string): Promise<THREE.Group | null> {
+    if (glbCache.has(path)) return Promise.resolve(glbCache.get(path) ?? null);
+    const pending = glbInFlight.get(path);
+    if (pending) return pending;
+    const promise = new Promise<THREE.Group | null>(resolve => {
+        loader.load(
+            path,
+            gltf => {
+                glbCache.set(path, gltf.scene);
+                glbInFlight.delete(path);
+                resolve(gltf.scene);
+            },
+            undefined,
+            () => {
+                glbCache.set(path, null);
+                glbInFlight.delete(path);
+                resolve(null);
+            }
+        );
+    });
+    glbInFlight.set(path, promise);
+    return promise;
 }
 
 /** Populate a THREE.Group with the exact metric procedural stone immediately,
@@ -124,11 +149,15 @@ export function populateStoneGroup(group: THREE.Group, stone: StoneSpec, onStatu
             clone.scale.set(stone.a / 0.04, stone.h / 0.0045, stone.b / 0.03);
         }
         clone.traverse(obj => {
-            if (obj instanceof THREE.Mesh && obj.material instanceof THREE.MeshStandardMaterial) {
-                obj.material = obj.material.clone();
-                obj.material.envMapIntensity = 1.15;
-                obj.userData.baseRoughness = obj.material.roughness;
-                obj.userData.baseColor = obj.material.color.clone();
+            if (obj instanceof THREE.Mesh) {
+                // BufferGeometry is shared with glbCache template; keep it alive across shore re-scatters
+                obj.userData.sharedGeometry = true;
+                if (obj.material instanceof THREE.MeshStandardMaterial) {
+                    obj.material = obj.material.clone();
+                    obj.material.envMapIntensity = 1.15;
+                    obj.userData.baseRoughness = obj.material.roughness;
+                    obj.userData.baseColor = obj.material.color.clone();
+                }
             }
         });
         group.add(clone);
@@ -142,20 +171,13 @@ export function populateStoneGroup(group: THREE.Group, stone: StoneSpec, onStatu
         return;
     }
 
-    loader.load(
-        stone.glbPath,
-        gltf => {
-            glbCache.set(stone.glbPath!, gltf.scene);
-            applyGlb(gltf.scene);
-        },
-        undefined,
-        () => {
-            glbCache.set(stone.glbPath!, null);
-            if (group.userData.loadToken === token) {
-                onStatus?.(`✓ 程序化米制模型（待 Blender 替换）· ${stone.name}`);
-            }
+    void loadGlbTemplate(stone.glbPath).then(template => {
+        if (template) {
+            applyGlb(template);
+        } else if (group.userData.loadToken === token) {
+            onStatus?.(`✓ 程序化米制模型（待 Blender 替换）· ${stone.name}`);
         }
-    );
+    });
 }
 
 /** Subtle warm sunset rim highlight when hovering a stone on the 3D shore. */

@@ -110,19 +110,19 @@ test('Blender stone manifest loads cleanly, every GLB exists on disk, foraging i
         assert.ok(entry.a >= entry.b && entry.b >= entry.h && entry.mass > 0.01);
     }
 
-    // Strict uniqueness: 34 stones sampled from a >=36-stone manifest must have 34 distinct GLBs
-    const shore34 = forageShoreStones(120, 4242, 34, manifest.stones);
-    assert.equal(shore34.length, 34);
-    assert.ok(shore34.every(s => s.glbPath?.startsWith('/assets/stones/')));
-    const uniqueGlbs = new Set(shore34.map(s => s.glbPath));
-    assert.equal(uniqueGlbs.size, 34, `expected 34 strictly unique stones on shore, got ${uniqueGlbs.size}`);
+    // Strict uniqueness: laying out the entire manifest (all 96 stones) produces 100% unique GLBs
+    const shoreAll = forageShoreStones(120, 4242, manifest.stones.length, manifest.stones);
+    assert.equal(shoreAll.length, manifest.stones.length);
+    assert.ok(shoreAll.every(s => s.glbPath?.startsWith('/assets/stones/')));
+    const uniqueGlbs = new Set(shoreAll.map(s => s.glbPath));
+    assert.equal(uniqueGlbs.size, manifest.stones.length, `expected ${manifest.stones.length} strictly unique stones on shore, got ${uniqueGlbs.size}`);
 
     // Exclude previous batch prefers unseen stones when catalog has spare entries
-    const prevIds = new Set(shore34.slice(0, 16).map(s => s.id.replace(/-[a-z0-9]+$/, '')));
+    const prevIds = new Set(shoreAll.slice(0, 16).map(s => s.id.replace(/-[a-z0-9]+$/, '')));
     const fresh16 = forageShoreStones(120, 9999, 16, manifest.stones, prevIds);
     const freshGlbs = new Set(fresh16.map(s => s.glbPath));
     assert.equal(freshGlbs.size, 16);
-    const prevGlbs = new Set(shore34.slice(0, 16).map(s => s.glbPath));
+    const prevGlbs = new Set(shoreAll.slice(0, 16).map(s => s.glbPath));
     const overlap = fresh16.filter(s => prevGlbs.has(s.glbPath)).length;
     assert.equal(overlap, 0, `expected fresh batch to avoid all 16 excluded stones when ${manifest.stones.length - 16} unseen exist, got ${overlap} overlap`);
 

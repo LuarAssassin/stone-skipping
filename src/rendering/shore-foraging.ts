@@ -12,8 +12,8 @@ import {
 } from '../simulation/stones';
 import type { Pose } from '../camera/rig';
 
-const SHORE_STONE_COUNT = 28;
-const RECENT_HISTORY_BATCHES = 2;
+const FALLBACK_STONE_COUNT = 28;
+const FORAGE_FOV = 46;
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 
 interface ShoreStoneItem {
@@ -34,20 +34,20 @@ export interface ShoreForagingCallbacks {
     onExit(): void;
 }
 
-/** Fixed crouching camera framing at z = 0 so every scattered stone sits directly within sight & reach. */
+/** Fixed crouching camera framing at z = 0 giving a ~1.9 m² wet riverbank view so all 96 unique stones sit within sight & reach. */
 function computeForageCameraFrame() {
     const waterEdge = shorelineCurveX(0);
-    const focusX = waterEdge - 0.48;
+    const focusX = waterEdge - 0.66;
     const focusY = shoreElevation(focusX, 0) + 0.02;
-    const camX = focusX - 0.90;
-    const camY = Math.max(0.45, focusY + 0.80);
+    const camX = focusX - 1.12;
+    const camY = Math.max(0.55, focusY + 1.06);
     return { waterEdge, focusX, focusY, camX, camY };
 }
 
 /** Live 3D twilight riverbank foraging:
- *  - Scatters 28 strictly unique Blender GLB stones inside the fixed crouching viewport ("目之所及")
+ *  - Scatters ALL 96 unique Blender GLB stones simultaneously inside the fixed crouching viewport ("目之所及")
  *  - Pure mouse interaction (no WASD / no camera panning): hover to preview, click to lift & 360° inspect
- *  - One-click refresh cycles through fresh unseen batches across the full 96-stone library */
+ *  - Radius-aware natural pebble-beach packing with zero overlap and zero off-screen clipping */
 export function createShoreForaging(
     scene: THREE.Scene,
     camera: THREE.PerspectiveCamera,
@@ -87,11 +87,11 @@ export function createShoreForaging(
       <div class="forage-top-bar">
         <div class="forage-banner">
           <span class="pill-dot"></span>
-          <span>暮色浅滩寻石 · 鼠标直接点选石子 · 抬起后可 360° 翻转看薄厚</span>
+          <span id="forage-banner-text">暮色浅滩寻石 · 眼前全部天然河石 · 鼠标直接点选 360° 端详薄厚</span>
         </div>
         <div class="forage-top-actions">
           <span class="career-pill" id="forage-career">累计 0 跳</span>
-          <button id="forage-walk-more" class="glass-pill" type="button">换一批河石</button>
+          <button id="forage-walk-more" class="glass-pill" type="button">重排岸滩</button>
           <button id="forage-return" class="glass-pill active" type="button">回到湖面 <kbd>F</kbd></button>
         </div>
       </div>
@@ -131,7 +131,6 @@ export function createShoreForaging(
     let hovered: ShoreStoneItem | undefined;
     let inspected: ShoreStoneItem | undefined;
     let forageSeed = Math.floor(Math.random() * 0xffffffff);
-    const recentBatches: string[][] = [];
 
     let cursorNdcX = 0;
     let cursorNdcY = 0;
@@ -152,6 +151,7 @@ export function createShoreForaging(
 
     const captionEl = hud.querySelector<HTMLElement>('#forage-caption')!;
     const msgEl = hud.querySelector<HTMLElement>('#forage-msg')!;
+    const bannerTextEl = hud.querySelector<HTMLElement>('#forage-banner-text')!;
     const collectBtn = hud.querySelector<HTMLButtonElement>('#forage-collect')!;
 
     function setMsg(text: string) {
@@ -164,7 +164,7 @@ export function createShoreForaging(
             item.collider.geometry.dispose();
             item.visual.traverse(obj => {
                 if (obj instanceof THREE.Mesh) {
-                    obj.geometry.dispose();
+                    if (!obj.userData.sharedGeometry) obj.geometry.dispose();
                     const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
                     for (const m of mats) m?.dispose();
                 }
@@ -176,27 +176,19 @@ export function createShoreForaging(
         hoverRing.visible = false;
     }
 
-    function populateShore(seed: number, avoidPrevious = false) {
+    function populateShore(seed: number) {
         disposeItems();
-        const excludeIds = avoidPrevious && recentBatches.length > 0
-            ? new Set(recentBatches.flat())
-            : undefined;
+        // Lay out the entire unique Blender stone library (all 96 stones) right in front of the player
+        const targetCount = catalog.length > 0 ? catalog.length : FALLBACK_STONE_COUNT;
         const specs = forageShoreStones(
             box.careerSkips,
             seed,
-            SHORE_STONE_COUNT,
-            catalog,
-            excludeIds
+            targetCount,
+            catalog
         );
-        const batchIds = specs.map(s =>
-            s.variant !== undefined ? `${s.archetypeId}_${String(s.variant).padStart(2, '0')}` : s.id
-        );
-        recentBatches.push(batchIds);
-        while (recentBatches.length > RECENT_HISTORY_BATCHES) recentBatches.shift();
+        const placed: { x: number; z: number; r: number }[] = [];
 
-        const placed: { x: number; z: number }[] = [];
-
-        // Deterministic PRNG for organic non-overlapping scatter strictly inside the visible trapezoid
+        // Deterministic PRNG for organic non-overlapping pebble-beach scatter strictly inside the visible trapezoid
         let rngState = (seed ^ 0x51f23a9b) >>> 0;
         const rand = () => {
             rngState = (rngState + 0x6d2b79f5) >>> 0;
@@ -205,31 +197,38 @@ export function createShoreForaging(
             return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
         };
 
-        // Adapt visible trapezoid width safely to current viewport aspect so every stone stays on-screen
-        const safeAspect = clamp(camera.aspect || 1.6, 0.55, 1.75);
-        const tanHalfFov = Math.tan(THREE.MathUtils.degToRad(44 * 0.5));
-        const inlandMin = 0.10; // near damp waterline (upper-middle of frame)
-        const inlandMax = 0.82; // foreground bank (cleanly above bottom pocket strip)
-        const halfZFar = 1.54 * tanHalfFov * safeAspect * 0.78;
-        const halfZNear = 0.88 * tanHalfFov * safeAspect * 0.74;
+        // Perspective-matched trapezoid bounds adapted to viewport aspect so all 96 stones stay cleanly on-screen
+        const safeAspect = clamp(camera.aspect || 1.6, 0.65, 1.85);
+        const tanHalfFov = Math.tan(THREE.MathUtils.degToRad(FORAGE_FOV * 0.5));
+        const inlandMin = 0.08; // glistening wet waterline at upper-middle of frame
+        const inlandMax = 1.10; // foreground bank safely above bottom pocket strip
+        const halfZFar = 2.05 * tanHalfFov * safeAspect * 0.85;
+        const halfZNear = 1.17 * tanHalfFov * safeAspect * 0.81;
 
-        for (let i = 0; i < specs.length; i++) {
+        // Place larger stones first so small wafers tuck naturally into the remaining pockets without crowding
+        const order = specs.map((_, idx) => idx).sort((a, b) =>
+            Math.max(specs[b].a, specs[b].b) - Math.max(specs[a].a, specs[a].b)
+        );
+        const coords = new Array<{ x: number; z: number }>(specs.length);
+
+        for (const i of order) {
             const spec = specs[i];
-            let px = -1.4;
+            const radius = Math.max(spec.a, spec.b);
+            let px = -1.6;
             let pz = 0;
             let found = false;
 
-            // Perspective-matched trapezoid Poisson-disc scatter: organic feel, zero clipping, zero overlap
-            for (let attempt = 0; attempt < 90; attempt++) {
-                // Slight bias toward the wider wet waterline half so visual density looks uniform on screen
-                const t = Math.pow(rand(), 1.15);
+            for (let attempt = 0; attempt < 110; attempt++) {
+                // Area-weighted depth distribution (far edge is wider than near edge) for uniform visual fullness
+                const u = rand();
+                const t = 1 - Math.sqrt(1 - u * 0.72);
                 const inlandOffset = inlandMin + t * (inlandMax - inlandMin);
                 const maxZ = halfZFar + (halfZNear - halfZFar) * t;
                 const candidateZ = (rand() * 2 - 1) * maxZ;
                 const waterEdge = shorelineCurveX(candidateZ);
                 const candidateX = waterEdge - inlandOffset;
-                const minDist = attempt < 45 ? 0.145 : attempt < 70 ? 0.12 : 0.095;
-                if (placed.every(p => Math.hypot(p.x - candidateX, p.z - candidateZ) >= minDist)) {
+                const gap = attempt < 45 ? 0.024 : attempt < 80 ? 0.012 : 0.004;
+                if (placed.every(p => Math.hypot(p.x - candidateX, p.z - candidateZ) >= p.r + radius + gap)) {
                     px = candidateX;
                     pz = candidateZ;
                     found = true;
@@ -237,14 +236,20 @@ export function createShoreForaging(
                 }
             }
             if (!found) {
-                const t = (i + 0.5) / specs.length;
+                // Graceful fallback inside the trapezoid if window is extremely narrow
+                const t = rand();
                 const inlandOffset = inlandMin + t * (inlandMax - inlandMin);
                 const maxZ = halfZFar + (halfZNear - halfZFar) * t;
-                pz = (rand() * 2 - 1) * maxZ * 0.85;
+                pz = (rand() * 2 - 1) * maxZ * 0.92;
                 px = shorelineCurveX(pz) - inlandOffset;
             }
-            placed.push({ x: px, z: pz });
+            placed.push({ x: px, z: pz, r: radius });
+            coords[i] = { x: px, z: pz };
+        }
 
+        for (let i = 0; i < specs.length; i++) {
+            const spec = specs[i];
+            const { x: px, z: pz } = coords[i];
             const py = shoreElevation(px, pz);
             const normal = shoreNormal(px, pz);
             // Seat stone naturally on the gravel surface, gently nestled 20% of its thickness
@@ -261,13 +266,12 @@ export function createShoreForaging(
             populateStoneGroup(visual, spec);
             root.add(visual);
 
-            const hitRadius = Math.max(spec.a, spec.b) * 1.24 + 0.014;
+            const hitRadius = Math.max(spec.a, spec.b) * 1.08 + 0.008;
             const collider = new THREE.Mesh(new THREE.SphereGeometry(hitRadius, 10, 8), colliderMat);
-            collider.userData.shoreIndex = i;
             root.add(collider);
 
             rootGroup.add(root);
-            items.push({
+            const item: ShoreStoneItem = {
                 spec,
                 root,
                 visual,
@@ -276,10 +280,17 @@ export function createShoreForaging(
                 restQuat,
                 hoverAmount: 0,
                 inspectBlend: 0,
-            });
+            };
+            collider.userData.shoreItem = item;
+            items.push(item);
         }
+        syncBannerCount();
         renderPocket();
         syncCaption();
+    }
+
+    function syncBannerCount() {
+        bannerTextEl.textContent = `暮色浅滩寻石 · 眼前 ${items.length} 块不重样天然河石 · 鼠标直接点选 360° 端详`;
     }
 
     function renderPocket() {
@@ -353,7 +364,7 @@ export function createShoreForaging(
         ndc.set(cursorNdcX, cursorNdcY);
         raycaster.setFromCamera(ndc, camera);
         const hits = raycaster.intersectObjects(items.map(it => it.collider), false);
-        const nextHover = hits.length > 0 ? items[hits[0].object.userData.shoreIndex as number] : undefined;
+        const nextHover = hits.length > 0 ? (hits[0].object.userData.shoreItem as ShoreStoneItem | undefined) : undefined;
         if (nextHover !== hovered) {
             if (hovered) setStoneHighlight(hovered.visual, false);
             hovered = nextHover;
@@ -477,8 +488,8 @@ export function createShoreForaging(
     };
     hud.querySelector<HTMLButtonElement>('#forage-walk-more')!.onclick = () => {
         forageSeed = Math.floor(Math.random() * 0xffffffff);
-        populateShore(forageSeed, true);
-        setMsg('已为你换上一批全新的不重样天然河石');
+        populateShore(forageSeed);
+        setMsg(`已重新自然排布全部 ${items.length} 块天然河石`);
     };
     hud.querySelector<HTMLButtonElement>('#forage-putback')!.onclick = putBackInspected;
     hud.querySelector<HTMLButtonElement>('#forage-take')!.onclick = () => {
@@ -491,6 +502,7 @@ export function createShoreForaging(
             const taken = inspected;
             rootGroup.remove(taken.root);
             items = items.filter(i => i !== taken);
+            syncBannerCount();
         }
         inspected = undefined;
         callbacks.onClink(picked.mass);
@@ -572,6 +584,7 @@ export function createShoreForaging(
             if (match) {
                 rootGroup.remove(match.root);
                 items = items.filter(i => i !== match);
+                syncBannerCount();
             }
         },
         /** Compute fixed crouching riverbank camera pose & animate stone hover/levitation. */
@@ -585,7 +598,7 @@ export function createShoreForaging(
             const goalPose: Pose = {
                 position: new THREE.Vector3(camX, camY, 0),
                 target: new THREE.Vector3(focusX + 0.10, focusY + parallaxY, parallaxZ),
-                fov: inspected ? 36 : 44,
+                fov: inspected ? 36 : FORAGE_FOV,
             };
 
             // Animate each stone smoothly between its gravel resting pose, hover lift, and 360° levitation inspection
