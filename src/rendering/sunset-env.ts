@@ -235,19 +235,159 @@ export function shoreNormal(x: number, z: number): THREE.Vector3 {
     return new THREE.Vector3(-dx, 1, -dz).normalize();
 }
 
+/** Generate seamless procedural river sand + fine embedded gravel PBR textures (albedo, normal, roughness). */
+function createShoreGravelTextures() {
+    const size = 256;
+    const height = new Float32Array(size * size);
+    const tone = new Float32Array(size * size);
+    const rough = new Float32Array(size * size);
+
+    // Periodic integer hash for seamless tiling across 0..size
+    const tileHash = (ix: number, iy: number, seed: number) => {
+        const x = ((ix % size) + size) % size;
+        const y = ((iy % size) + size) % size;
+        return hash2(x * 1.13 + seed * 17.3, y * 1.71 + seed * 31.7);
+    };
+    const periodicNoise = (x: number, y: number, freq: number, seed: number) => {
+        const fx = (x / size) * freq;
+        const fy = (y / size) * freq;
+        const ix = Math.floor(fx);
+        const iy = Math.floor(fy);
+        const tx = fx - ix;
+        const ty = fy - iy;
+        const sx = tx * tx * (3 - 2 * tx);
+        const sy = ty * ty * (3 - 2 * ty);
+        const wrap = (n: number) => ((n % freq) + freq) % freq;
+        const n00 = hash2(wrap(ix) + seed * 13.7, wrap(iy) + seed * 29.1);
+        const n10 = hash2(wrap(ix + 1) + seed * 13.7, wrap(iy) + seed * 29.1);
+        const n01 = hash2(wrap(ix) + seed * 13.7, wrap(iy + 1) + seed * 29.1);
+        const n11 = hash2(wrap(ix + 1) + seed * 13.7, wrap(iy + 1) + seed * 29.1);
+        return (n00 * (1 - sx) + n10 * sx) * (1 - sy) + (n01 * (1 - sx) + n11 * sx) * sy;
+    };
+
+    // 1. Multi-scale coarse river sand base
+    for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+            const idx = y * size + x;
+            const n1 = periodicNoise(x, y, 8, 1);
+            const n2 = periodicNoise(x, y, 24, 2);
+            const grit = tileHash(x, y, 3);
+            height[idx] = n1 * 0.28 + n2 * 0.22 + grit * 0.14;
+            tone[idx] = 0.72 + n1 * 0.14 + (grit - 0.5) * 0.18;
+            rough[idx] = 0.86 + (grit - 0.5) * 0.12;
+        }
+    }
+
+    // 2. Stamp 260 toroidal embedded micro-pebbles (3..11 px) into the heightfield for tactile grit relief
+    for (let p = 0; p < 260; p++) {
+        const cx = hash2(p * 1.7, 4.1) * size;
+        const cy = hash2(p * 2.9, 13.7) * size;
+        const rx = 2.6 + Math.pow(hash2(p * 3.3, 27.4), 1.6) * 8.5;
+        const ry = rx * (0.62 + hash2(p * 4.7, 51.2) * 0.52);
+        const ang = hash2(p * 5.1, 73.8) * Math.PI * 2;
+        const ca = Math.cos(ang);
+        const sa = Math.sin(ang);
+        const pebbleTone = 0.58 + hash2(p * 6.3, 91.5) * 0.44;
+        const pebbleRough = 0.66 + hash2(p * 7.1, 108.2) * 0.20;
+        const maxR = Math.ceil(Math.max(rx, ry)) + 2;
+
+        for (let dy = -maxR; dy <= maxR; dy++) {
+            const py = (((Math.floor(cy) + dy) % size) + size) % size;
+            for (let dx = -maxR; dx <= maxR; dx++) {
+                const px = (((Math.floor(cx) + dx) % size) + size) % size;
+                const lx = dx * ca + dy * sa;
+                const ly = -dx * sa + dy * ca;
+                const d2 = (lx * lx) / (rx * rx) + (ly * ly) / (ry * ry);
+                if (d2 < 1.25) {
+                    const idx = py * size + px;
+                    if (d2 < 1.0) {
+                        const dome = Math.sqrt(1 - d2);
+                        const h = 0.34 + dome * 0.64;
+                        if (h > height[idx]) {
+                            height[idx] = h;
+                            tone[idx] = pebbleTone * (0.86 + 0.18 * dome);
+                            rough[idx] = pebbleRough;
+                        }
+                    } else {
+                        // Subtle crevice AO ring around each embedded pebble
+                        const rim = 1 - (d2 - 1.0) / 0.25;
+                        tone[idx] *= 1 - 0.16 * rim;
+                    }
+                }
+            }
+        }
+    }
+
+    const albedoData = new Uint8Array(size * size * 4);
+    const normalData = new Uint8Array(size * size * 4);
+    const roughData = new Uint8Array(size * size * 4);
+
+    for (let y = 0; y < size; y++) {
+        const ym = (y - 1 + size) % size;
+        const yp = (y + 1) % size;
+        for (let x = 0; x < size; x++) {
+            const xm = (x - 1 + size) % size;
+            const xp = (x + 1) % size;
+            const idx = y * size + x;
+            const o = idx * 4;
+
+            // Neutral cool-warm river silt albedo (multiplied by shore vertexColors)
+            const t = THREE.MathUtils.clamp(tone[idx], 0.35, 1.15);
+            const warmShift = (tileHash(x, y, 9) - 0.5) * 10;
+            albedoData[o] = THREE.MathUtils.clamp(Math.round(188 * t + warmShift), 0, 255);
+            albedoData[o + 1] = THREE.MathUtils.clamp(Math.round(183 * t + warmShift * 0.5), 0, 255);
+            albedoData[o + 2] = THREE.MathUtils.clamp(Math.round(177 * t - warmShift * 0.4), 0, 255);
+            albedoData[o + 3] = 255;
+
+            // Tangent-space normal from height gradient
+            const dhx = (height[y * size + xp] - height[y * size + xm]) * 2.4;
+            const dhy = (height[yp * size + x] - height[ym * size + x]) * 2.4;
+            const invLen = 1 / Math.hypot(dhx, dhy, 1);
+            normalData[o] = Math.round(((-dhx * invLen) * 0.5 + 0.5) * 255);
+            normalData[o + 1] = Math.round(((-dhy * invLen) * 0.5 + 0.5) * 255);
+            normalData[o + 2] = Math.round(((invLen) * 0.5 + 0.5) * 255);
+            normalData[o + 3] = 255;
+
+            const rByte = THREE.MathUtils.clamp(Math.round(rough[idx] * 255), 110, 250);
+            roughData[o] = rByte;
+            roughData[o + 1] = rByte;
+            roughData[o + 2] = rByte;
+            roughData[o + 3] = 255;
+        }
+    }
+
+    const setupTex = (data: Uint8Array, isSrgb: boolean) => {
+        const tex = new THREE.DataTexture(data, size, size);
+        tex.wrapS = THREE.RepeatWrapping;
+        tex.wrapT = THREE.RepeatWrapping;
+        tex.repeat.set(22, 52);
+        tex.anisotropy = 4;
+        if (isSrgb) tex.colorSpace = THREE.SRGBColorSpace;
+        tex.needsUpdate = true;
+        return tex;
+    };
+
+    return {
+        map: setupTex(albedoData, true),
+        normalMap: setupTex(normalData, false),
+        roughnessMap: setupTex(roughData, false),
+    };
+}
+
 function createShoreAndReeds() {
     const group = new THREE.Group();
 
-    // 1. Contoured natural gravel/pebble shoreline bank
+    // 1. Contoured natural gravel/pebble shoreline bank with crisp procedural sand & micro-gravel PBR
     const cols = 48, rows = 96;
     const widthX = 24, widthZ = 56;
     const shoreGeom = new THREE.PlaneGeometry(widthX, widthZ, cols, rows);
     shoreGeom.rotateX(-Math.PI / 2);
     const pos = shoreGeom.attributes.position as THREE.BufferAttribute;
     const colors = new Float32Array(pos.count * 3);
-    const dryColor = new THREE.Color('#5a4e46');
-    const wetColor = new THREE.Color('#272223');
-    const pebbleTint = new THREE.Color('#6f5d52');
+    // Authentic muted cool-neutral river silt/gravel tones (sunset light provides natural warmth)
+    const dryColor = new THREE.Color('#645e58');
+    const wetColor = new THREE.Color('#232428');
+    const pebbleTint = new THREE.Color('#736c64');
     const tmp = new THREE.Color();
 
     for (let i = 0; i < pos.count; i++) {
@@ -259,9 +399,9 @@ function createShoreAndReeds() {
 
         const grain = hash2(Math.floor(x * 7), Math.floor(z * 7));
         tmp.copy(dryColor).lerp(pebbleTint, grain * 0.45);
-        // Dark wet waterline band near y = 0..0.065m
-        const wetness = 1 - THREE.MathUtils.smoothstep(y, -0.02, 0.085);
-        tmp.lerp(wetColor, wetness * 0.78);
+        // Dark wet waterline band near y = -0.02..0.095 m
+        const wetness = 1 - THREE.MathUtils.smoothstep(y, -0.02, 0.095);
+        tmp.lerp(wetColor, wetness * 0.80);
         colors[i * 3] = tmp.r;
         colors[i * 3 + 1] = tmp.g;
         colors[i * 3 + 2] = tmp.b;
@@ -269,10 +409,16 @@ function createShoreAndReeds() {
     shoreGeom.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     shoreGeom.computeVertexNormals();
 
+    const shoreTex = createShoreGravelTextures();
     const shoreMat = new THREE.MeshStandardMaterial({
         vertexColors: true,
-        roughness: 0.86,
-        metalness: 0.04,
+        map: shoreTex.map,
+        normalMap: shoreTex.normalMap,
+        normalScale: new THREE.Vector2(1.15, 1.15),
+        roughnessMap: shoreTex.roughnessMap,
+        roughness: 0.92,
+        metalness: 0.02,
+        envMapIntensity: 0.34,
     });
     const shoreMesh = new THREE.Mesh(shoreGeom, shoreMat);
     group.add(shoreMesh);
@@ -296,22 +442,27 @@ function createShoreAndReeds() {
     const upAxis = new THREE.Vector3(0, 1, 0);
     const slopeQuat = new THREE.Quaternion();
     const yawQuat = new THREE.Quaternion();
+    const tiltQuat = new THREE.Quaternion();
+    const tiltEuler = new THREE.Euler();
+    // Cohesive low-saturation watershed rock palette (cool slate, damp charcoal, river silt, weathered grey-ochre)
     const pebblePalette = [
-        new THREE.Color('#5a544f'), // warm river grey
-        new THREE.Color('#474c51'), // wet slate
-        new THREE.Color('#6b5a4d'), // ochre cobble
-        new THREE.Color('#3b3a3c'), // dark basalt
-        new THREE.Color('#776d63'), // pale quartz-sand
-        new THREE.Color('#5b4a44'), // muted clay
+        new THREE.Color('#535250'), // neutral river grey
+        new THREE.Color('#44484d'), // wet slate
+        new THREE.Color('#5d564f'), // muted silt-ochre
+        new THREE.Color('#38393c'), // dark basalt
+        new THREE.Color('#69655f'), // pale smoky quartz-grey
+        new THREE.Color('#524c48'), // weathered shale-brown
+        new THREE.Color('#474d4c'), // dark river celadon-grey
     ];
 
-    // 2a. Broad shoreline cobbles framing the outer banks (kept clear of the immediate foraging strip)
+    // 2a. Broad shoreline cobbles framing the outer banks beyond the immediate foraging zone
     const cobbleMat = new THREE.MeshStandardMaterial({
         color: '#ffffff',
-        roughness: 0.72,
-        metalness: 0.05,
+        roughness: 0.80,
+        metalness: 0.03,
+        envMapIntensity: 0.36,
     });
-    const cobbleCount = 140;
+    const cobbleCount = 180;
     const cobbles = new THREE.InstancedMesh(pebbleGeom, cobbleMat, cobbleCount);
     for (let i = 0; i < cobbleCount; i++) {
         const r1 = hash2(i * 1.37, 11.4);
@@ -320,22 +471,24 @@ function createShoreAndReeds() {
         const r4 = hash2(i * 5.19, 71.6);
         const z = (r1 - 0.5) * 34;
         const edge = shorelineCurveX(z);
-        const minInland = Math.abs(z) < 3.4 ? 1.45 : 0.22;
+        const minInland = Math.abs(z) < 3.6 ? 1.55 : 0.22;
         const x = edge - minInland - r2 * 6.2;
         const y = shoreElevation(x, z);
-        const sx = 0.045 + r3 * 0.12;
-        const sy = sx * (0.28 + r4 * 0.26);
-        const sz = sx * (0.68 + hash2(i, 91.3) * 0.45);
-        dummy.position.set(x, y + sy * 0.28, z);
+        const sx = 0.042 + r3 * 0.11;
+        const sy = sx * (0.28 + r4 * 0.28);
+        const sz = sx * (0.68 + hash2(i, 91.3) * 0.42);
+        dummy.position.set(x, y + sy * 0.20, z);
         slopeQuat.setFromUnitVectors(upAxis, shoreNormal(x, z));
         yawQuat.setFromAxisAngle(upAxis, r1 * Math.PI * 2);
-        dummy.quaternion.copy(slopeQuat).multiply(yawQuat);
+        tiltEuler.set((r3 - 0.5) * 0.26, 0, (r4 - 0.5) * 0.26);
+        tiltQuat.setFromEuler(tiltEuler);
+        dummy.quaternion.copy(slopeQuat).multiply(yawQuat).multiply(tiltQuat);
         dummy.scale.set(sx, sy, sz);
         dummy.updateMatrix();
         cobbles.setMatrixAt(i, dummy.matrix);
         const baseCol = pebblePalette[i % pebblePalette.length];
-        const shade = 0.76 + 0.34 * hash2(i, 103.7);
-        const wetDark = 1 - 0.38 * (1 - THREE.MathUtils.smoothstep(y, -0.02, 0.09));
+        const shade = 0.72 + 0.34 * hash2(i, 103.7);
+        const wetDark = 1 - 0.40 * (1 - THREE.MathUtils.smoothstep(y, -0.02, 0.095));
         colorAttr.copy(baseCol).multiplyScalar(shade * wetDark);
         cobbles.setColorAt(i, colorAttr);
     }
@@ -343,13 +496,14 @@ function createShoreAndReeds() {
     if (cobbles.instanceColor) cobbles.instanceColor.needsUpdate = true;
     group.add(cobbles);
 
-    // 2b. Dense fine riverbank gravel bed (460 small 1.8–5.6 cm pebbles nestled into the wet shoreline)
+    // 2b. Dense multi-scale riverbank pebble & gravel bed (2,800 embedded stones seamlessly carpeting the entire foraging shore)
     const gravelMat = new THREE.MeshStandardMaterial({
         color: '#ffffff',
-        roughness: 0.64,
-        metalness: 0.06,
+        roughness: 0.78,
+        metalness: 0.03,
+        envMapIntensity: 0.38,
     });
-    const gravelCount = 460;
+    const gravelCount = 2800;
     const gravel = new THREE.InstancedMesh(pebbleGeom, gravelMat, gravelCount);
     for (let i = 0; i < gravelCount; i++) {
         const r1 = hash2(i * 1.91 + 7.1, 19.3);
@@ -357,30 +511,43 @@ function createShoreAndReeds() {
         const r3 = hash2(i * 4.63 + 9.2, 67.1);
         const r4 = hash2(i * 6.07 + 5.5, 89.4);
         const r5 = hash2(i * 7.43 + 1.8, 113.9);
+        const r6 = hash2(i * 8.81 + 3.9, 137.3);
 
-        // Concentrate naturally along the walkable z ∈ [-4.4, +4.4] shoreline with thicker packing near wet edge
-        const z = (r1 - 0.5) * 8.8;
+        // 75% densely carpeting the visible foraging foreground & edges; 25% blending smoothly along the wider shore
+        const inCore = i < Math.floor(gravelCount * 0.78);
+        const z = inCore
+            ? (r1 - 0.5) * 4.8
+            : (r1 - 0.5) * 11.0;
         const edge = shorelineCurveX(z);
-        const inland = -0.14 + Math.pow(r2, 1.35) * 2.15;
+        // Extend naturally from shallow wet water (-0.25m) across the wet bar up into the dry bank (+2.35m)
+        const inland = inCore
+            ? -0.22 + Math.pow(r2, 1.18) * 2.25
+            : -0.18 + Math.pow(r2, 1.25) * 2.85;
         const x = edge - inland;
         const y = shoreElevation(x, z);
 
-        // Real small gravel / creek pebbles (radius 0.9–2.8 cm) partially embedded so hero GLB stones stand proud
-        const sx = 0.009 + Math.pow(r3, 1.4) * 0.019;
-        const sy = sx * (0.30 + r4 * 0.28);
-        const sz = sx * (0.66 + r5 * 0.42);
-        dummy.position.set(x, y + sy * 0.20, z);
+        // Power-law natural pebble gradation: abundant 1.6–3.4 cm gravel + scattered 3.5–7.2 cm half-buried cobbles
+        const sizePow = Math.pow(r3, 2.15);
+        const sx = 0.0085 + sizePow * 0.029;
+        const sy = sx * (0.28 + r4 * 0.34);
+        const sz = sx * (0.62 + r5 * 0.42);
+        // Deeply embedded (half-buried) so pebbles look naturally settled in wet river sand
+        const embedFrac = 0.08 + r6 * 0.22;
+        dummy.position.set(x, y + sy * embedFrac, z);
         slopeQuat.setFromUnitVectors(upAxis, shoreNormal(x, z));
         yawQuat.setFromAxisAngle(upAxis, r5 * Math.PI * 2);
-        dummy.quaternion.copy(slopeQuat).multiply(yawQuat);
+        // Fluvial imbrication tilt (subtle 6–20 deg cant so light catches organic facets)
+        tiltEuler.set((r4 - 0.5) * 0.34, 0, (r6 - 0.5) * 0.34);
+        tiltQuat.setFromEuler(tiltEuler);
+        dummy.quaternion.copy(slopeQuat).multiply(yawQuat).multiply(tiltQuat);
         dummy.scale.set(sx, sy, sz);
         dummy.updateMatrix();
         gravel.setMatrixAt(i, dummy.matrix);
 
         const baseCol = pebblePalette[Math.floor(r4 * pebblePalette.length) % pebblePalette.length];
-        const shade = 0.72 + 0.42 * hash2(i * 2.3, 151.7);
+        const shade = 0.66 + 0.44 * hash2(i * 2.3, 151.7);
         const wetness = 1 - THREE.MathUtils.smoothstep(y, -0.02, 0.095);
-        colorAttr.copy(baseCol).multiplyScalar(shade * (1 - 0.42 * wetness));
+        colorAttr.copy(baseCol).multiplyScalar(shade * (1 - 0.44 * wetness));
         gravel.setColorAt(i, colorAttr);
     }
     gravel.instanceMatrix.needsUpdate = true;

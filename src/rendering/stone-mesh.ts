@@ -126,14 +126,82 @@ function loadGlbTemplate(path: string): Promise<THREE.Group | null> {
     return promise;
 }
 
+export interface StoneVisualOptions {
+    /** 0 = dry upper bank, 1 = dark wet waterline. Omit when in-hand / flying. */
+    shoreWetness?: number;
+}
+
+interface WatershedUniforms {
+    uShoreRoughMin: { value: number };
+    uShoreDryLift: { value: number };
+}
+
+/** Harmonize every stone material into one cohesive low-saturation natural riverbank watershed palette
+ *  and prevent grazing-angle sunset reflections from blowing out into white Bloom blobs on the shore. */
+function applyWatershedMaterialGrading(mat: THREE.MeshStandardMaterial, shoreWetness?: number) {
+    const isOnShore = shoreWetness !== undefined;
+    const w = isOnShore ? THREE.MathUtils.clamp(shoreWetness, 0, 1) : 0;
+
+    const uniforms: WatershedUniforms = {
+        // Resting shore stones stay tactile matte-to-damp; never mirror-flat sun reflectors
+        uShoreRoughMin: { value: isOnShore ? (0.64 - w * 0.18) : 0.42 },
+        uShoreDryLift: { value: isOnShore ? (0.34 - w * 0.24) : 0.10 },
+    };
+
+    mat.envMapIntensity = isOnShore ? (0.36 + w * 0.10) : 0.68;
+    if (isOnShore) {
+        // Damp stones near the waterline darken naturally like real wet creek rocks
+        mat.color.multiplyScalar(1 - 0.34 * w);
+    }
+
+    mat.userData.watershedUniforms = uniforms;
+    mat.userData.shoreWetness = shoreWetness;
+    mat.customProgramCacheKey = () => 'river-stone-watershed-v1';
+    mat.onBeforeCompile = shader => {
+        shader.uniforms.uShoreRoughMin = uniforms.uShoreRoughMin;
+        shader.uniforms.uShoreDryLift = uniforms.uShoreDryLift;
+        shader.fragmentShader = shader.fragmentShader
+            .replace(
+                '#include <common>',
+                `#include <common>
+                uniform float uShoreRoughMin;
+                uniform float uShoreDryLift;`
+            )
+            .replace(
+                '#include <map_fragment>',
+                `#include <map_fragment>
+                {
+                    float stoneLum = dot(diffuseColor.rgb, vec3(0.299, 0.587, 0.114));
+                    vec3 desat = mix(vec3(stoneLum), diffuseColor.rgb, 0.44);
+                    vec3 riverSilt = vec3(0.31, 0.30, 0.29) * (0.48 + 0.96 * stoneLum);
+                    diffuseColor.rgb = mix(desat, riverSilt, 0.28);
+                }`
+            )
+            .replace(
+                '#include <roughnessmap_fragment>',
+                `#include <roughnessmap_fragment>
+                roughnessFactor = clamp(mix(roughnessFactor, 1.0, uShoreDryLift), uShoreRoughMin, 0.96);`
+            );
+    };
+}
+
 /** Populate a THREE.Group with the exact metric procedural stone immediately,
  *  and hot-swap with Blender GLB if available at stone.glbPath. */
-export function populateStoneGroup(group: THREE.Group, stone: StoneSpec, onStatus?: (text: string) => void) {
+export function populateStoneGroup(
+    group: THREE.Group,
+    stone: StoneSpec,
+    onStatus?: (text: string) => void,
+    options?: StoneVisualOptions
+) {
     disposeGroupChildren(group);
     const procedural = buildProceduralStoneMesh(stone);
+    if (procedural.material instanceof THREE.MeshStandardMaterial) {
+        applyWatershedMaterialGrading(procedural.material, options?.shoreWetness);
+    }
     group.add(procedural);
     const token = Symbol('stone-load');
     group.userData.loadToken = token;
+    group.userData.shoreWetness = options?.shoreWetness;
 
     if (!stone.glbPath) {
         onStatus?.(`✓ 程序化米制模型 · ${stone.name}`);
@@ -154,7 +222,7 @@ export function populateStoneGroup(group: THREE.Group, stone: StoneSpec, onStatu
                 obj.userData.sharedGeometry = true;
                 if (obj.material instanceof THREE.MeshStandardMaterial) {
                     obj.material = obj.material.clone();
-                    obj.material.envMapIntensity = 1.15;
+                    applyWatershedMaterialGrading(obj.material, group.userData.shoreWetness as number | undefined);
                     obj.userData.baseRoughness = obj.material.roughness;
                     obj.userData.baseColor = obj.material.color.clone();
                 }
@@ -176,6 +244,23 @@ export function populateStoneGroup(group: THREE.Group, stone: StoneSpec, onStatu
             applyGlb(template);
         } else if (group.userData.loadToken === token) {
             onStatus?.(`✓ 程序化米制模型（待 Blender 替换）· ${stone.name}`);
+        }
+    });
+}
+
+/** Lift specular/env clarity subtly when a stone is picked up for 360° close-up inspection. */
+export function setStoneInspectLook(group: THREE.Group, inspecting: boolean) {
+    if (group.userData.inspectLook === inspecting) return;
+    group.userData.inspectLook = inspecting;
+    const shoreWet = typeof group.userData.shoreWetness === 'number' ? group.userData.shoreWetness : 0;
+    group.traverse(obj => {
+        if (obj instanceof THREE.Mesh && obj.material instanceof THREE.MeshStandardMaterial) {
+            obj.material.envMapIntensity = inspecting ? 0.68 : (0.36 + shoreWet * 0.10);
+            const u = obj.material.userData.watershedUniforms as WatershedUniforms | undefined;
+            if (u) {
+                u.uShoreRoughMin.value = inspecting ? 0.42 : (0.64 - shoreWet * 0.18);
+                u.uShoreDryLift.value = inspecting ? 0.10 : (0.34 - shoreWet * 0.24);
+            }
         }
     });
 }
