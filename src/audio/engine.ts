@@ -4,17 +4,56 @@ import type { ReplayMode } from '../app/session';
 
 const MUTE_STORAGE_KEY = 'stone-skipping-muted-v1';
 
-type SampleKey = 'ambience' | 'skipHeavy' | 'skipLight' | 'skipSkim1' | 'skipSkim2' | 'sink' | 'whoosh';
+type SampleKey =
+    | 'ambience'
+    | 'skipHeavy1' | 'skipHeavy2' | 'skipHeavy3'
+    | 'skipLight1' | 'skipLight2' | 'skipLight3'
+    | 'skipSkim1' | 'skipSkim2' | 'skipSkim3'
+    | 'sinkBoulder1' | 'sinkBoulder2'
+    | 'sinkPlop1' | 'sinkPlop2' | 'sinkPlop3' | 'sinkPlop4'
+    | 'sinkLight1' | 'sinkSlip1'
+    | 'whoosh1' | 'whooshHeavy' | 'whooshLight'
+    | 'stonePick1' | 'stonePick2' | 'stonePickHeavy';
 
-const SAMPLE_URLS: Record<SampleKey, string> = {
+export const SAMPLE_URLS: Record<SampleKey, string> = {
     ambience: '/assets/audio/sunset-lake-ambience.mp3',
-    skipHeavy: '/assets/audio/skip-heavy.mp3',
-    skipLight: '/assets/audio/skip-light.mp3',
+    skipHeavy1: '/assets/audio/skip-heavy.mp3',
+    skipHeavy2: '/assets/audio/skip-heavy-2.mp3',
+    skipHeavy3: '/assets/audio/skip-heavy-3.mp3',
+    skipLight1: '/assets/audio/skip-light.mp3',
+    skipLight2: '/assets/audio/skip-light-2.mp3',
+    skipLight3: '/assets/audio/skip-light-3.mp3',
     skipSkim1: '/assets/audio/skip-skim-1.mp3',
     skipSkim2: '/assets/audio/skip-skim-2.mp3',
-    sink: '/assets/audio/sink-plop.mp3',
-    whoosh: '/assets/audio/throw-whoosh.mp3',
+    skipSkim3: '/assets/audio/skip-skim-3.mp3',
+    sinkBoulder1: '/assets/audio/sink-boulder-1.mp3',
+    sinkBoulder2: '/assets/audio/sink-boulder-2.mp3',
+    sinkPlop1: '/assets/audio/sink-plop.mp3',
+    sinkPlop2: '/assets/audio/sink-plop-2.mp3',
+    sinkPlop3: '/assets/audio/sink-plop-3.mp3',
+    sinkPlop4: '/assets/audio/sink-plop-4.mp3',
+    sinkLight1: '/assets/audio/sink-light-1.mp3',
+    sinkSlip1: '/assets/audio/sink-slip-1.mp3',
+    whoosh1: '/assets/audio/throw-whoosh.mp3',
+    whooshHeavy: '/assets/audio/throw-whoosh-heavy.mp3',
+    whooshLight: '/assets/audio/throw-whoosh-light.mp3',
+    stonePick1: '/assets/audio/stone-pick-1.mp3',
+    stonePick2: '/assets/audio/stone-pick-2.mp3',
+    stonePickHeavy: '/assets/audio/stone-pick-heavy.mp3',
 };
+
+const SKIP_HEAVY_POOL: readonly SampleKey[] = ['skipHeavy1', 'skipHeavy2', 'skipHeavy3'];
+const SKIP_LIGHT_POOL: readonly SampleKey[] = ['skipLight1', 'skipLight2', 'skipLight3'];
+const SKIP_SKIM_POOL: readonly SampleKey[] = ['skipSkim1', 'skipSkim2', 'skipSkim3'];
+const SINK_BOULDER_POOL: readonly SampleKey[] = ['sinkBoulder1', 'sinkBoulder2'];
+const SINK_PLOP_POOL: readonly SampleKey[] = ['sinkPlop1', 'sinkPlop2', 'sinkPlop3', 'sinkPlop4'];
+const SINK_LIGHT_POOL: readonly SampleKey[] = ['sinkLight1', 'sinkPlop2', 'sinkPlop4'];
+const SINK_SLIP_POOL: readonly SampleKey[] = ['sinkSlip1', 'sinkLight1'];
+const WHOOSH_HEAVY_POOL: readonly SampleKey[] = ['whooshHeavy', 'whoosh1'];
+const WHOOSH_MID_POOL: readonly SampleKey[] = ['whoosh1', 'whooshHeavy', 'whooshLight'];
+const WHOOSH_LIGHT_POOL: readonly SampleKey[] = ['whooshLight', 'whoosh1'];
+const STONE_PICK_POOL: readonly SampleKey[] = ['stonePick1', 'stonePick2'];
+const STONE_PICK_HEAVY_POOL: readonly SampleKey[] = ['stonePickHeavy', 'stonePick1'];
 
 interface DecodedSample {
     buffer: AudioBuffer;
@@ -113,6 +152,7 @@ export class CinemaAudioEngine {
     private reverbConvolver?: ConvolverNode;
     private noiseBuffer?: AudioBuffer;
     private samples = new Map<SampleKey, DecodedSample>();
+    private lastPickedByPool = new Map<string, SampleKey>();
     private loadingStarted = false;
     private ambienceSource?: AudioBufferSourceNode;
     private ambienceKind: 'none' | 'procedural' | 'sample' = 'none';
@@ -342,16 +382,44 @@ export class CinemaAudioEngine {
         return { input: filter, gain, sp };
     }
 
-    /** Tactile soft pebble-clink sound when picking up or pocketing a stone on the riverbank. */
+    /** Pick a loaded sample randomly from a candidate pool, avoiding immediate back-to-back repeats. */
+    private pickSample(poolName: string, keys: readonly SampleKey[]): DecodedSample | undefined {
+        const available = keys.filter(k => this.samples.has(k));
+        if (available.length === 0) return undefined;
+        const prev = this.lastPickedByPool.get(poolName);
+        const candidates = available.length > 1 && prev ? available.filter(k => k !== prev) : available;
+        const chosenKey = candidates[Math.floor(Math.random() * candidates.length)];
+        this.lastPickedByPool.set(poolName, chosenKey);
+        return this.samples.get(chosenKey);
+    }
+
+    /** Tactile river-stone foley when picking up or pocketing a stone (real ElevenLabs samples with procedural fallback). */
     playStoneClink(stoneMass = 0.06) {
         if (this.muted || !this.ctx || !this.sfxGain) return;
         const ctx = this.ctx;
         if (ctx.state !== 'running') return;
         const now = ctx.currentTime;
         const massRatio = THREE.MathUtils.clamp(stoneMass / 0.06, 0.35, 3.2);
-        const pitch = Math.pow(1 / massRatio, 0.26);
+        const pitch = Math.pow(1 / massRatio, 0.22);
 
-        // Dual short stony click resonances (like two dry river pebbles gently touching)
+        const sample = stoneMass >= 0.13
+            ? this.pickSample('stonePickHeavy', STONE_PICK_HEAVY_POOL)
+            : this.pickSample('stonePick', STONE_PICK_POOL);
+        if (sample) {
+            const src = ctx.createBufferSource();
+            src.buffer = sample.buffer;
+            src.playbackRate.value = (0.94 + Math.random() * 0.12) * THREE.MathUtils.clamp(pitch, 0.80, 1.18);
+            const g = ctx.createGain();
+            g.gain.setValueAtTime(0.001, now);
+            g.gain.linearRampToValueAtTime(0.34 * Math.pow(massRatio, 0.18), now + 0.005);
+            g.gain.exponentialRampToValueAtTime(0.001, now + 0.52);
+            src.connect(g);
+            g.connect(this.sfxGain);
+            src.start(now, sample.onset);
+            return;
+        }
+
+        // Fallback dual short stony click resonances while MP3s load
         for (const [offset, mult, amp] of [[0, 1.0, 0.14], [0.018, 1.38, 0.09]] as const) {
             const osc = ctx.createOscillator();
             const g = ctx.createGain();
@@ -369,7 +437,7 @@ export class CinemaAudioEngine {
         }
     }
 
-    playThrow(speed: number) {
+    playThrow(speed: number, stoneMass = 0.06) {
         if (this.muted || !this.ctx || !this.sfxGain) return;
         const ctx = this.ctx;
         if (ctx.state !== 'running') return;
@@ -377,15 +445,20 @@ export class CinemaAudioEngine {
         const intensity = THREE.MathUtils.clamp((speed - 5) / 18, 0.25, 1.0);
         const rateScale = this.currentMode === 'bullet' ? 0.42 : this.currentMode === 'slow' ? 0.68 : 1.0;
 
-        const sample = this.samples.get('whoosh');
+        const whooshPool = (speed >= 17 || stoneMass >= 0.13)
+            ? WHOOSH_HEAVY_POOL
+            : (speed <= 10.5 && stoneMass <= 0.055)
+                ? WHOOSH_LIGHT_POOL
+                : WHOOSH_MID_POOL;
+        const sample = this.pickSample('whoosh', whooshPool);
         if (sample) {
             const src = ctx.createBufferSource();
             src.buffer = sample.buffer;
-            src.playbackRate.value = (0.88 + intensity * 0.34 + (Math.random() - 0.5) * 0.08) * rateScale;
+            src.playbackRate.value = (0.90 + intensity * 0.26 + (Math.random() - 0.5) * 0.08) * rateScale;
             const g = ctx.createGain();
             g.gain.setValueAtTime(0.0005, now);
-            g.gain.linearRampToValueAtTime(0.30 * intensity, now + 0.025);
-            g.gain.exponentialRampToValueAtTime(0.001, now + 0.48 / rateScale);
+            g.gain.linearRampToValueAtTime(0.32 * intensity, now + 0.022);
+            g.gain.exponentialRampToValueAtTime(0.001, now + 0.50 / rateScale);
             src.connect(g);
             g.connect(this.sfxGain);
             src.start(now, sample.onset);
@@ -440,21 +513,20 @@ export class CinemaAudioEngine {
             softCutoff
         );
 
-        const heavy = this.samples.get('skipHeavy');
-        const skim1 = this.samples.get('skipSkim1');
-        const skim2 = this.samples.get('skipSkim2');
-        const light = this.samples.get('skipLight');
-        const softPool = [skim1, skim2, light].filter((s): s is DecodedSample => s !== undefined);
+        const heavy = this.pickSample('skipHeavy', SKIP_HEAVY_POOL);
+        const light = this.pickSample('skipLight', SKIP_LIGHT_POOL);
+        const skim = this.pickSample('skipSkim', SKIP_SKIM_POOL);
 
         // Keep pitch variation subtle & organic (~0.93..1.12) modulated by stone mass
         const jitter = (0.94 + Math.random() * 0.12) * massPitch;
         const gentleRise = 1.0 + Math.min(0.10, skipIndex * 0.006);
 
-        if (heavy && softPool.length > 0) {
+        if (heavy || light || skim) {
             if (skipIndex === 0) {
-                // First contact: full crisp realistic water slap (user loved this one!)
+                // First contact: full crisp realistic water slap (lighter stones or gentle tosses can pull light pool)
+                const primary = (stoneMass < 0.036 && energyNorm < 0.55 && light) ? light : (heavy ?? light ?? skim)!;
                 const src = ctx.createBufferSource();
-                src.buffer = heavy.buffer;
+                src.buffer = primary.buffer;
                 src.playbackRate.value = (0.94 + energyNorm * 0.12) * jitter * rateScale;
                 const g = ctx.createGain();
                 g.gain.setValueAtTime(0.001, now);
@@ -462,14 +534,15 @@ export class CinemaAudioEngine {
                 g.gain.exponentialRampToValueAtTime(0.001, now + 0.68 / rateScale);
                 src.connect(g);
                 g.connect(chain.input);
-                src.start(now, heavy.onset);
+                src.start(now, primary.onset);
             } else {
-                // Subsequent consecutive skips: silky water-skim textures with soft 6ms liquid attack
-                const chosen = softPool[skipIndex % softPool.length];
-                // Blend a whisper of heavy only on strong early skips (skip 1..2)
-                const heavyHint = skipIndex <= 2 ? Math.max(0, (vertical - 0.85) * 0.25) : 0;
+                // Subsequent consecutive skips: rotate across varied skim & light pools with soft 6ms liquid attack
+                const chosen = (skipIndex <= 2 && energyNorm > 0.45 && Math.random() < 0.55 && light)
+                    ? light
+                    : (skim ?? light ?? heavy)!;
+                const heavyHint = skipIndex <= 2 && heavy ? Math.max(0, (vertical - 0.85) * 0.25) : 0;
 
-                if (heavyHint > 0.05) {
+                if (heavyHint > 0.05 && heavy) {
                     const srcH = ctx.createBufferSource();
                     srcH.buffer = heavy.buffer;
                     srcH.playbackRate.value = 1.02 * jitter * rateScale;
@@ -486,13 +559,11 @@ export class CinemaAudioEngine {
                 srcS.buffer = chosen.buffer;
                 srcS.playbackRate.value = gentleRise * jitter * rateScale;
                 const gS = ctx.createGain();
-                // 6ms soft fade-in removes any hard knock/click artifact
                 gS.gain.setValueAtTime(0.001, now);
                 gS.gain.linearRampToValueAtTime(0.88, now + 0.006);
                 gS.gain.exponentialRampToValueAtTime(0.001, now + 0.36 / rateScale);
                 srcS.connect(gS);
                 gS.connect(chain.input);
-                // Slight micro-offset jitter inside onset prevents mechanical phase repetition
                 srcS.start(now, Math.max(0, chosen.onset + Math.random() * 0.006));
 
                 // Subtle airy fine-spray shimmer layer (pure filtered noise, zero tonal pitch-bend)
@@ -545,39 +616,59 @@ export class CinemaAudioEngine {
         if (intensity < 0.015) return;
 
         const now = ctx.currentTime;
-        const massRatio = THREE.MathUtils.clamp(stoneMass / 0.06, 0.35, 2.6);
-        const massGain = Math.pow(massRatio, 0.38);
-        const massPitch = Math.pow(1 / massRatio, 0.24);
+        const massRatio = THREE.MathUtils.clamp(stoneMass / 0.06, 0.35, 2.8);
+        const massGain = Math.pow(massRatio, 0.36);
+        const massPitch = Math.pow(1 / massRatio, 0.18);
         const rateScale = this.currentMode === 'bullet' ? 0.40 : this.currentMode === 'slow' ? 0.65 : 1.0;
-        // Shallow/post-skip sinking is much softer & warmer (muffled slip) vs crisp direct plunge
-        const sinkCutoff = skips === 0 ? 14000 : 1200 + 2600 * intensity;
-        const chain = this.createSpatialChain(point, camera, 0.88 * intensity * massGain, sinkCutoff);
 
-        const sink = this.samples.get('sink');
+        // Route physically to distinct recorded plunge/sink pools based on prior skips & stone mass!
+        let sink: DecodedSample | undefined;
+        let durationSec = 1.15;
+        if (skips >= 2) {
+            // Post-skip shallow submerge: gentle liquid slip instead of loud kerplunk
+            sink = this.pickSample('sinkSlip', SINK_SLIP_POOL) ?? this.pickSample('sinkPlop', SINK_PLOP_POOL);
+            durationSec = 0.65;
+        } else if (stoneMass >= 0.135) {
+            // Heavy boulder / cobble direct drop: deep resonant kerplunk + tall splash
+            sink = this.pickSample('sinkBoulder', SINK_BOULDER_POOL) ?? this.pickSample('sinkPlop', SINK_PLOP_POOL);
+            durationSec = 1.95;
+        } else if (stoneMass <= 0.044) {
+            // Light wafer / thin shale direct drop: quick delicate high plop
+            sink = this.pickSample('sinkLight', SINK_LIGHT_POOL) ?? this.pickSample('sinkPlop', SINK_PLOP_POOL);
+            durationSec = 0.95;
+        } else {
+            // Standard-to-medium stones: rich 4-way randomized natural plop pool
+            sink = this.pickSample('sinkPlop', SINK_PLOP_POOL);
+            durationSec = 1.35;
+        }
+
+        const sinkCutoff = skips === 0 ? 15000 : 1400 + 2800 * intensity;
+        const chain = this.createSpatialChain(point, camera, 0.90 * intensity * massGain, sinkCutoff);
+
         if (sink) {
             const src = ctx.createBufferSource();
             src.buffer = sink.buffer;
-            src.playbackRate.value = (0.94 + Math.random() * 0.10) * massPitch * rateScale;
+            // Subtle organic pitch jitter layered atop the naturally distinct recorded samples
+            src.playbackRate.value = (0.95 + Math.random() * 0.10) * THREE.MathUtils.clamp(massPitch, 0.84, 1.14) * rateScale;
             const g = ctx.createGain();
-            // Longer soft fade-in for gentle post-skip slip vs crisp onset for direct stone drop
-            const attack = skips === 0 ? 0.004 : 0.028;
+            const attack = skips === 0 ? 0.004 : 0.024;
             g.gain.setValueAtTime(0.001, now);
-            g.gain.linearRampToValueAtTime(0.95, now + attack);
-            g.gain.exponentialRampToValueAtTime(0.001, now + (skips === 0 ? 1.05 : 0.55) / rateScale);
+            g.gain.linearRampToValueAtTime(0.96, now + attack);
+            g.gain.exponentialRampToValueAtTime(0.001, now + durationSec / rateScale);
             src.connect(g);
             g.connect(chain.input);
             src.start(now, sink.onset);
         }
 
-        // Only add resonant Minnaert cavity bubble bloop on steep / direct plunges (0..1 skips)
-        if (skips <= 1 && intensity > 0.25) {
+        // Subtle Minnaert cavity bubble undertone only on steep/direct plunges when no boulder sample already carries it
+        if (skips <= 1 && intensity > 0.30 && (!sink || stoneMass < 0.135)) {
             const bubble = ctx.createOscillator();
             const bGain = ctx.createGain();
-            const startF = (180 + Math.random() * 40) * massPitch * rateScale;
+            const startF = (175 + Math.random() * 45) * massPitch * rateScale;
             bubble.type = 'sine';
             bubble.frequency.setValueAtTime(startF, now + 0.025 / rateScale);
-            bubble.frequency.exponentialRampToValueAtTime(startF * 2.1, now + 0.11 / rateScale);
-            const bAmp = (sink ? 0.12 : 0.36) * intensity;
+            bubble.frequency.exponentialRampToValueAtTime(startF * 2.05, now + 0.11 / rateScale);
+            const bAmp = (sink ? 0.09 : 0.36) * intensity;
             bGain.gain.setValueAtTime(0.0001, now);
             bGain.gain.linearRampToValueAtTime(bAmp, now + 0.032 / rateScale);
             bGain.gain.exponentialRampToValueAtTime(0.0008, now + 0.15 / rateScale);

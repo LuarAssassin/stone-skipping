@@ -357,7 +357,7 @@ export function boot() {
         rig.beginThrow(session.sim.p, session.mode === 'bullet', lastThrow.sampled.direction, camera.aspect, estimatedSimSeconds);
         audio.unlock();
         audio.updatePlaybackState(session.mode, false);
-        audio.playThrow(lastThrow.sampled.speed);
+        audio.playThrow(lastThrow.sampled.speed, activeStone.mass);
         dev.resetFrames();
         syncQuickHud();
     }
