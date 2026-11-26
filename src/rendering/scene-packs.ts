@@ -2,7 +2,18 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { shoreElevation } from './sunset-env';
 
-export type ScenePackId = 'none' | 'jiangnan' | 'tahoe' | 'kyoto' | 'nordic' | 'lagoon';
+export type ScenePackId =
+    | 'none'
+    | 'jiangnan'
+    | 'tahoe'
+    | 'kyoto'
+    | 'nordic'
+    | 'lagoon'
+    | 'fuji'
+    | 'zhangjiajie'
+    | 'venice'
+    | 'alps'
+    | 'nile';
 
 export interface ScenePropPlacement {
     asset: string;
@@ -343,6 +354,269 @@ export function buildLagoonPlacements(): ScenePropPlacement[] {
     ];
 }
 
+/** Curated postcard composition for 「河口富士 · 日本河口湖」 (Mount Fuji + Spring Sakura). */
+export function buildFujiPlacements(): ScenePropPlacement[] {
+    const placements: ScenePropPlacement[] = [
+        // Iconic symmetric snow-capped Mount Fuji centered slightly left on the horizon for "Inverted Fuji" mirror reflection
+        {
+            asset: 'mount_fuji_peak.glb',
+            position: [92.0, -0.40, -10.5],
+            rotationY: Math.PI / 2 - 0.08,
+            scale: 1.18,
+            motion: 'static',
+        },
+        // Lakeside wooden boat pier anchored on the left bank extending gracefully over the water
+        {
+            asset: 'fuji_boat_pier.glb',
+            position: [14.2, 0, -14.6],
+            rotationY: -1.16,
+            scale: 1.04,
+            motion: 'static',
+            lanternLightOffset: [5.4, 1.95, 0.0],
+            lanternColor: '#ffc884',
+        },
+        // Classic Kawaguchiko wooden rowboat gently bobbing in the right midground
+        {
+            asset: 'kawaguchi_rowboat.glb',
+            position: [25.2, 0, 8.8],
+            rotationY: 2.58,
+            scale: 1.05,
+            motion: 'boat',
+            lanternLightOffset: [1.85, 0.65, 0],
+            lanternColor: '#ffc67e',
+        },
+        // Blooming spring cherry blossom trees framing both sides of the lake
+        { asset: 'sakura_tree_leaning.glb', position: [-0.9, 0, -7.4], rotationY: -0.34, scale: 0.96, motion: 'willow', snapToShore: -0.06 },
+        { asset: 'sakura_tree_bloom.glb', position: [17.8, 0.25, -15.4], rotationY: 0.6, scale: 1.08, motion: 'willow' },
+        { asset: 'sakura_tree_bloom.glb', position: [25.6, 0.22, -16.6], rotationY: -0.9, scale: 1.02, motion: 'willow' },
+        { asset: 'sakura_tree_leaning.glb', position: [-1.4, 0, 9.4], rotationY: 0.42, scale: 0.94, motion: 'willow', snapToShore: -0.06 },
+        // Dark volcanic Fuji lava shore rocks framing the foreground coves
+        { asset: 'fuji_lava_rock.glb', position: [10.6, 0, -7.2], rotationY: 0.5, scale: 0.98, motion: 'static' },
+        { asset: 'fuji_lava_rock.glb', position: [14.6, 0, 7.2], rotationY: -1.1, scale: 1.06, motion: 'static' },
+        { asset: 'fuji_lava_rock.glb', position: [28.8, 0, 11.0], rotationY: 1.9, scale: 1.15, motion: 'static' },
+    ];
+
+    // Drifting spring pink sakura petal rafts along calm outer coves
+    const petalSpots: [number, number][] = [
+        [7.4, -6.1], [10.8, -6.8], [14.5, -7.6], [19.2, -8.8], [24.0, -9.8],
+        [9.6, 6.2], [13.2, 6.9], [17.6, 7.6], [22.4, 8.8], [27.5, 10.2],
+    ];
+    for (let i = 0; i < petalSpots.length; i++) {
+        const [x, z] = petalSpots[i];
+        placements.push({
+            asset: 'sakura_floating_petals.glb',
+            position: [x, 0, z],
+            rotationY: hash2(i * 11 + 2, 4.7) * Math.PI * 2,
+            scale: 0.92 + hash2(i * 7 + 3, 2.3) * 0.36,
+            motion: 'lotus',
+        });
+    }
+    return placements;
+}
+
+/** Curated postcard composition for 「武陵奇峰 · 中国湖南张家界宝峰湖」. */
+export function buildZhangjiajiePlacements(): ScenePropPlacement[] {
+    return [
+        // Towering vertical quartz-sandstone Wulingyuan pillar ranges across the misty horizon
+        {
+            asset: 'zjj_pillar_cluster.glb',
+            position: [92.0, -0.45, -18.0],
+            rotationY: Math.PI / 2 - 0.16,
+            scale: 1.18,
+            motion: 'static',
+        },
+        {
+            asset: 'zjj_pillar_cluster.glb',
+            position: [96.0, -0.50, 24.0],
+            rotationY: Math.PI / 2 + 0.28,
+            scale: 1.02,
+            motion: 'static',
+        },
+        // Dramatic lone sandstone karst pillars rising straight out of the emerald canyon lake
+        { asset: 'zjj_pillar_tall.glb', position: [48.0, 0, -17.8], rotationY: 0.4, scale: 1.06, motion: 'static' },
+        { asset: 'zjj_pillar_tall.glb', position: [54.0, 0, 16.5], rotationY: -1.1, scale: 1.00, motion: 'static' },
+        // Traditional Tujia stilted wooden diaojiaolou tea house on the left emerald bank
+        {
+            asset: 'tujia_diaojiaolou.glb',
+            position: [23.2, 0, -12.4],
+            rotationY: -0.68,
+            scale: 1.04,
+            motion: 'static',
+            lanternLightOffset: [0, 2.8, 2.0],
+            lanternColor: '#ff8a48',
+        },
+        // Mountain bamboo raft with cormorant lantern gliding in the right cove
+        {
+            asset: 'bamboo_raft.glb',
+            position: [25.6, 0, 8.9],
+            rotationY: 2.64,
+            scale: 1.05,
+            motion: 'boat',
+            lanternLightOffset: [1.9, 0.78, 0],
+            lanternColor: '#ffad54',
+        },
+        // Cliff-clinging gnarled pines & lush emerald bamboo framing the shore
+        { asset: 'cliff_pine_gnarled.glb', position: [-0.9, 0, -7.6], rotationY: -0.32, scale: 0.96, motion: 'willow', snapToShore: -0.06 },
+        { asset: 'cliff_pine_gnarled.glb', position: [17.4, 0.30, -15.4], rotationY: -0.55, scale: 1.08, motion: 'willow' },
+        { asset: 'mountain_bamboo_clump.glb', position: [-1.4, 0, 8.8], rotationY: 0.5, scale: 0.98, motion: 'willow', snapToShore: -0.06 },
+        { asset: 'mountain_bamboo_clump.glb', position: [28.2, 0.25, -16.2], rotationY: 1.4, scale: 1.06, motion: 'willow' },
+        // Stratified sandstone cliff shore rocks
+        { asset: 'wuling_cliff_rock.glb', position: [10.6, 0, -7.2], rotationY: 0.5, scale: 1.00, motion: 'static' },
+        { asset: 'wuling_cliff_rock.glb', position: [14.4, 0, 7.2], rotationY: -0.8, scale: 1.05, motion: 'static' },
+        { asset: 'wuling_cliff_rock.glb', position: [30.2, 0, 11.4], rotationY: 2.1, scale: 1.18, motion: 'static' },
+    ];
+}
+
+/** Curated postcard composition for 「威尼斯水巷 · 意大利威尼斯泻湖」. */
+export function buildVenicePlacements(): ScenePropPlacement[] {
+    return [
+        // Iconic San Giorgio Maggiore campanile & dome silhouette across the golden lagoon
+        {
+            asset: 'venice_campanile_island.glb',
+            position: [90.0, -0.35, -15.0],
+            rotationY: Math.PI / 2 - 0.14,
+            scale: 1.18,
+            motion: 'static',
+        },
+        // Warm terracotta Venetian palazzetto waterfront corner with glowing arched windows
+        {
+            asset: 'venice_palazzo_corner.glb',
+            position: [23.8, 0, -13.0],
+            rotationY: -0.72,
+            scale: 1.04,
+            motion: 'static',
+            lanternLightOffset: [0.4, 2.6, 2.4],
+            lanternColor: '#ffbb6a',
+        },
+        // Venetian Istrian-stone canal arch bridge with classical wrought-iron street lamp
+        {
+            asset: 'venice_stone_arch.glb',
+            position: [36.5, 0, -16.8],
+            rotationY: -0.35,
+            scale: 1.06,
+            motion: 'static',
+            lanternLightOffset: [0, 3.6, 0.8],
+            lanternColor: '#ffc274',
+        },
+        // Sleek black lacquered Venetian Gondola with brass ferro bobbing in the right lagoon
+        {
+            asset: 'venice_gondola.glb',
+            position: [25.6, 0, 8.9],
+            rotationY: 2.62,
+            scale: 1.05,
+            motion: 'boat',
+            lanternLightOffset: [2.1, 0.72, 0],
+            lanternColor: '#ffbd66',
+        },
+        // Iconic candy-striped Venetian wooden mooring poles (Pali) flanking both foreground coves
+        { asset: 'venice_pali_cluster.glb', position: [10.4, 0, -7.0], rotationY: 0.3, scale: 1.00, motion: 'static' },
+        { asset: 'venice_pali_cluster.glb', position: [17.8, 0, -9.6], rotationY: 1.8, scale: 1.04, motion: 'static' },
+        { asset: 'venice_pali_cluster.glb', position: [13.8, 0, 7.0], rotationY: -0.9, scale: 1.02, motion: 'static' },
+        { asset: 'venice_pali_cluster.glb', position: [29.4, 0, 10.6], rotationY: 2.4, scale: 1.06, motion: 'static' },
+        // Mossy Istrian limestone waterfront landing steps
+        { asset: 'venice_stone_steps.glb', position: [15.4, 0, -11.4], rotationY: -0.6, scale: 1.05, motion: 'static' },
+        { asset: 'venice_stone_steps.glb', position: [19.2, 0, 10.8], rotationY: 2.5, scale: 1.02, motion: 'static' },
+    ];
+}
+
+/** Curated postcard composition for 「瑞士琉森 · 阿尔卑斯翡翠雪湖」. */
+export function buildAlpsPlacements(): ScenePropPlacement[] {
+    return [
+        // Dramatic Matterhorn-inspired pyramidal snow peak rising over emerald glacier water
+        {
+            asset: 'matterhorn_peak.glb',
+            position: [94.0, -0.40, -13.0],
+            rotationY: Math.PI / 2 - 0.12,
+            scale: 1.22,
+            motion: 'static',
+        },
+        // Charming honey-timber Swiss chalet boathouse on the left turquoise bank
+        {
+            asset: 'swiss_boathouse.glb',
+            position: [23.6, 0, -12.6],
+            rotationY: -0.68,
+            scale: 1.04,
+            motion: 'static',
+            lanternLightOffset: [0, 2.3, 2.4],
+            lanternColor: '#ffc474',
+        },
+        // Light-timber Swiss lake pier with red-white mooring post
+        {
+            asset: 'swiss_lake_pier.glb',
+            position: [13.2, 0, -14.2],
+            rotationY: -1.16,
+            scale: 1.04,
+            motion: 'static',
+            lanternLightOffset: [5.0, 1.75, 0],
+        },
+        // Classic Swiss lake wooden sailboat gently rocking in the right midground
+        {
+            asset: 'alpine_sailboat.glb',
+            position: [26.8, 0, 9.4],
+            rotationY: 2.52,
+            scale: 1.04,
+            motion: 'boat',
+        },
+        // Golden-green Alpine larches framing the rocky shorelines
+        { asset: 'alpine_larch_tree.glb', position: [-1.5, 0, -8.0], rotationY: 0.3, scale: 0.96, motion: 'willow', snapToShore: -0.06 },
+        { asset: 'alpine_larch_tree.glb', position: [17.4, 0.25, -15.6], rotationY: 1.2, scale: 1.08, motion: 'willow' },
+        { asset: 'alpine_larch_tree.glb', position: [28.6, 0.25, -16.8], rotationY: -0.8, scale: 1.04, motion: 'willow' },
+        { asset: 'alpine_larch_tree.glb', position: [-1.8, 0, 9.6], rotationY: -0.5, scale: 0.94, motion: 'willow', snapToShore: -0.06 },
+        // Glacial slate shoreline rocks
+        { asset: 'alpine_slate_rock.glb', position: [10.4, 0, -7.2], rotationY: 0.6, scale: 0.96, motion: 'static' },
+        { asset: 'alpine_slate_rock.glb', position: [14.6, 0, 7.2], rotationY: -1.0, scale: 1.04, motion: 'static' },
+        { asset: 'alpine_slate_rock.glb', position: [30.4, 0, 11.4], rotationY: 1.8, scale: 1.15, motion: 'static' },
+    ];
+}
+
+/** Curated postcard composition for 「尼罗夕照 · 埃及阿斯旺」. */
+export function buildNilePlacements(): ScenePropPlacement[] {
+    return [
+        // Sahara golden dunes & ancient pyramid silhouettes glowing on the distant dusk horizon
+        {
+            asset: 'nile_horizon_monuments.glb',
+            position: [94.0, -0.35, -14.0],
+            rotationY: Math.PI / 2 - 0.14,
+            scale: 1.20,
+            motion: 'static',
+        },
+        // Ancient carved sandstone Egyptian temple quay with flickering bronze braziers
+        {
+            asset: 'nile_temple_quay.glb',
+            position: [23.4, 0, -12.6],
+            rotationY: -0.70,
+            scale: 1.04,
+            motion: 'static',
+            lanternLightOffset: [0, 2.2, 2.2],
+            lanternColor: '#ff9638',
+        },
+        // Iconic Nile Felucca lateen-sail wooden boat gliding on the right cove
+        {
+            asset: 'nile_felucca.glb',
+            position: [26.4, 0, 9.2],
+            rotationY: 2.58,
+            scale: 1.04,
+            motion: 'boat',
+            lanternLightOffset: [-2.0, 0.85, 0],
+            lanternColor: '#ffaa4a',
+        },
+        // Tall Nile date palms framing both banks
+        { asset: 'nile_date_palm.glb', position: [-1.2, 0, -7.8], rotationY: -0.3, scale: 0.96, motion: 'willow', snapToShore: -0.06 },
+        { asset: 'nile_date_palm.glb', position: [17.2, 0.25, -15.6], rotationY: 0.8, scale: 1.08, motion: 'willow' },
+        { asset: 'nile_date_palm.glb', position: [28.4, 0.25, -16.8], rotationY: -1.1, scale: 1.04, motion: 'willow' },
+        { asset: 'nile_date_palm.glb', position: [-1.6, 0, 9.4], rotationY: 0.5, scale: 0.95, motion: 'willow', snapToShore: -0.06 },
+        // Water-smoothed Aswan dark granite river boulders
+        { asset: 'aswan_granite_boulder.glb', position: [10.6, 0, -7.4], rotationY: 0.4, scale: 0.96, motion: 'static' },
+        { asset: 'aswan_granite_boulder.glb', position: [14.4, 0, 7.3], rotationY: -0.9, scale: 1.04, motion: 'static' },
+        { asset: 'aswan_granite_boulder.glb', position: [30.0, 0, 11.2], rotationY: 1.7, scale: 1.15, motion: 'static' },
+        // Nile papyrus reed clumps along the calm shoreline edges
+        { asset: 'nile_papyrus_clump.glb', position: [6.8, 0, -6.2], rotationY: 0.2, scale: 1.00, motion: 'lotus' },
+        { asset: 'nile_papyrus_clump.glb', position: [13.2, 0, -8.2], rotationY: 1.4, scale: 1.08, motion: 'lotus' },
+        { asset: 'nile_papyrus_clump.glb', position: [9.4, 0, 6.2], rotationY: -0.7, scale: 0.96, motion: 'lotus' },
+        { asset: 'nile_papyrus_clump.glb', position: [18.2, 0, 8.2], rotationY: 2.3, scale: 1.05, motion: 'lotus' },
+    ];
+}
+
 export function getPlacementsForPack(packId: ScenePackId): ScenePropPlacement[] {
     switch (packId) {
         case 'jiangnan': return buildJiangnanPlacements();
@@ -350,6 +624,11 @@ export function getPlacementsForPack(packId: ScenePackId): ScenePropPlacement[] 
         case 'kyoto': return buildKyotoPlacements();
         case 'nordic': return buildNordicPlacements();
         case 'lagoon': return buildLagoonPlacements();
+        case 'fuji': return buildFujiPlacements();
+        case 'zhangjiajie': return buildZhangjiajiePlacements();
+        case 'venice': return buildVenicePlacements();
+        case 'alps': return buildAlpsPlacements();
+        case 'nile': return buildNilePlacements();
         default: return [];
     }
 }
@@ -373,6 +652,18 @@ function createPackLandmarks(packId: ScenePackId): THREE.Group | undefined {
         ],
         lagoon: [
             { pos: [18.6, -0.60, -16.6], scale: [8.4, 1.05, 5.0], color: '#bca882' },
+        ],
+        fuji: [
+            { pos: [19.5, -0.55, -16.8], scale: [10.2, 1.15, 5.0], color: '#424c44' },
+        ],
+        zhangjiajie: [
+            { pos: [21.5, -0.55, -16.8], scale: [10.6, 1.22, 5.0], color: '#384b3c' },
+        ],
+        alps: [
+            { pos: [21.0, -0.55, -16.8], scale: [10.5, 1.20, 5.0], color: '#4c5c4a' },
+        ],
+        nile: [
+            { pos: [21.8, -0.55, -16.8], scale: [10.8, 1.18, 5.0], color: '#8f6c48' },
         ],
     };
 
@@ -485,8 +776,12 @@ export function createScenePackManager(scene: THREE.Scene) {
             const isDistant =
                 p.asset.includes('distant') ||
                 p.asset.includes('ridge') ||
-                p.asset.includes('cliff') ||
-                p.asset.includes('volcanic');
+                p.asset.includes('cliff_wall') ||
+                p.asset.includes('volcanic') ||
+                p.asset.includes('peak') ||
+                p.asset.includes('pillar_cluster') ||
+                p.asset.includes('campanile') ||
+                p.asset.includes('horizon');
             prepareModel(instance, !isDistant);
 
             const y = p.snapToShore !== undefined

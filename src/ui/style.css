@@ -113,6 +113,101 @@
   --primary-grad-hover: linear-gradient(135deg, #f09e58, #3b9c9e);
 }
 
+:root[data-theme="zhangjiajie_peaks"] {
+  --bg-base: #132420;
+  --glass-bg: rgba(14, 28, 24, 0.56);
+  --glass-bg-strong: rgba(10, 23, 20, 0.88);
+  --glass-border: rgba(178, 226, 208, 0.22);
+  --glass-border-strong: rgba(138, 218, 184, 0.48);
+  --text-main: #eff8f4;
+  --text-muted: rgba(206, 232, 222, 0.74);
+  --text-dim: rgba(174, 204, 194, 0.52);
+  --accent: #68c69e;
+  --accent-bright: #c8f6e0;
+  --accent-soft: rgba(104, 198, 158, 0.22);
+  --scrollbar-thumb: rgba(178, 226, 208, 0.26);
+  --scrollbar-thumb-hover: rgba(104, 198, 158, 0.58);
+  --power-grad: linear-gradient(90deg, #358a6c, #74cca4, #e4f2c8);
+  --primary-grad: linear-gradient(135deg, #429876, #286652);
+  --primary-grad-hover: linear-gradient(135deg, #52ac88, #337a64);
+}
+
+:root[data-theme="fuji_kawaguchi"] {
+  --bg-base: #1c2234;
+  --glass-bg: rgba(20, 24, 38, 0.54);
+  --glass-bg-strong: rgba(16, 20, 32, 0.86);
+  --glass-border: rgba(246, 206, 218, 0.24);
+  --glass-border-strong: rgba(248, 174, 196, 0.52);
+  --text-main: #fdf4f7;
+  --text-muted: rgba(238, 216, 226, 0.74);
+  --text-dim: rgba(208, 186, 198, 0.52);
+  --accent: #f2a0b8;
+  --accent-bright: #ffdce6;
+  --accent-soft: rgba(242, 160, 184, 0.22);
+  --scrollbar-thumb: rgba(246, 206, 218, 0.28);
+  --scrollbar-thumb-hover: rgba(242, 160, 184, 0.60);
+  --power-grad: linear-gradient(90deg, #6888c4, #e89cb6, #ffe4ec);
+  --primary-grad: linear-gradient(135deg, #d87e9b, #7d6aa4);
+  --primary-grad-hover: linear-gradient(135deg, #ea8fae, #8f7bb8);
+}
+
+:root[data-theme="venice_lagoon"] {
+  --bg-base: #221c1d;
+  --glass-bg: rgba(26, 21, 22, 0.56);
+  --glass-bg-strong: rgba(22, 18, 19, 0.86);
+  --glass-border: rgba(246, 204, 158, 0.22);
+  --glass-border-strong: rgba(240, 174, 108, 0.48);
+  --text-main: #fbf3ea;
+  --text-muted: rgba(238, 216, 196, 0.72);
+  --text-dim: rgba(210, 186, 166, 0.50);
+  --accent: #e6a45e;
+  --accent-bright: #ffd9a8;
+  --accent-soft: rgba(230, 164, 94, 0.22);
+  --scrollbar-thumb: rgba(246, 204, 158, 0.26);
+  --scrollbar-thumb-hover: rgba(230, 164, 94, 0.58);
+  --power-grad: linear-gradient(90deg, #4b8c8e, #d89a56, #ffe0a8);
+  --primary-grad: linear-gradient(135deg, #c97e48, #8c4b36);
+  --primary-grad-hover: linear-gradient(135deg, #dc8f58, #a25a42);
+}
+
+:root[data-theme="swiss_alps"] {
+  --bg-base: #132830;
+  --glass-bg: rgba(14, 30, 36, 0.54);
+  --glass-bg-strong: rgba(11, 24, 30, 0.86);
+  --glass-border: rgba(186, 236, 242, 0.24);
+  --glass-border-strong: rgba(114, 218, 214, 0.50);
+  --text-main: #f0fbfb;
+  --text-muted: rgba(210, 238, 240, 0.74);
+  --text-dim: rgba(178, 212, 216, 0.52);
+  --accent: #5cd0c8;
+  --accent-bright: #c8faf6;
+  --accent-soft: rgba(92, 208, 200, 0.22);
+  --scrollbar-thumb: rgba(186, 236, 242, 0.28);
+  --scrollbar-thumb-hover: rgba(92, 208, 200, 0.60);
+  --power-grad: linear-gradient(90deg, #248a94, #5ed4cc, #e4fcfc);
+  --primary-grad: linear-gradient(135deg, #2d9896, #24687a);
+  --primary-grad-hover: linear-gradient(135deg, #3aaaa8, #2e7c90);
+}
+
+:root[data-theme="nile_sunset"] {
+  --bg-base: #231712;
+  --glass-bg: rgba(28, 18, 14, 0.58);
+  --glass-bg-strong: rgba(23, 14, 11, 0.88);
+  --glass-border: rgba(252, 194, 126, 0.22);
+  --glass-border-strong: rgba(246, 162, 74, 0.52);
+  --text-main: #fcf2e6;
+  --text-muted: rgba(242, 214, 182, 0.72);
+  --text-dim: rgba(216, 182, 148, 0.50);
+  --accent: #f29d46;
+  --accent-bright: #ffd694;
+  --accent-soft: rgba(242, 157, 70, 0.24);
+  --scrollbar-thumb: rgba(252, 194, 126, 0.26);
+  --scrollbar-thumb-hover: rgba(242, 157, 70, 0.60);
+  --power-grad: linear-gradient(90deg, #b85624, #ef9a42, #ffe09c);
+  --primary-grad: linear-gradient(135deg, #d87a2e, #98461e);
+  --primary-grad-hover: linear-gradient(135deg, #ea8b3c, #ae5426);
+}
+
 :root[data-theme="mist_dawn"] {
   --bg-base: #1d2c31;
   --glass-bg: rgba(16, 30, 35, 0.54);
@@ -371,6 +466,26 @@ canvas {
 
 .theme-swatch-tropical_lagoon {
   background: linear-gradient(135deg, #ffd388 0%, #3ac4ba 54%, #10555e 100%);
+}
+
+.theme-swatch-zhangjiajie_peaks {
+  background: linear-gradient(135deg, #dff2d4 0%, #52a884 52%, #1d443e 100%);
+}
+
+.theme-swatch-fuji_kawaguchi {
+  background: linear-gradient(135deg, #ffe2eb 0%, #8eb4e8 52%, #2c4674 100%);
+}
+
+.theme-swatch-venice_lagoon {
+  background: linear-gradient(135deg, #ffcf8a 0%, #c86f4c 52%, #244a50 100%);
+}
+
+.theme-swatch-swiss_alps {
+  background: linear-gradient(135deg, #f4ffff 0%, #42c6be 52%, #144d5c 100%);
+}
+
+.theme-swatch-nile_sunset {
+  background: linear-gradient(135deg, #ffce78 0%, #d86e2c 54%, #3c2220 100%);
 }
 
 .theme-swatch-mist_dawn {

@@ -21,7 +21,7 @@ import {
 
 test('scene theme registry exposes sunset as default and registers all differentiated worlds', () => {
     assert.equal(DEFAULT_THEME_ID, 'sunset');
-    assert.ok(SCENE_THEMES.length >= 8, 'expected sunset, jiangnan, tahoe, kyoto, nordic, lagoon, mist_dawn, moonlight');
+    assert.ok(SCENE_THEMES.length >= 13, 'expected 10 global 3D worlds + 3 pure atmospheric themes');
 
     const ids = new Set<string>();
     for (const theme of SCENE_THEMES) {
@@ -42,6 +42,11 @@ test('scene theme registry exposes sunset as default and registers all different
     assert.equal(getSceneTheme('nordic_aurora').scenePack, 'nordic');
     assert.equal(getSceneTheme('nordic_aurora').auroraStrength, 1.0);
     assert.equal(getSceneTheme('tropical_lagoon').scenePack, 'lagoon');
+    assert.equal(getSceneTheme('zhangjiajie_peaks').scenePack, 'zhangjiajie');
+    assert.equal(getSceneTheme('fuji_kawaguchi').scenePack, 'fuji');
+    assert.equal(getSceneTheme('venice_lagoon').scenePack, 'venice');
+    assert.equal(getSceneTheme('swiss_alps').scenePack, 'alps');
+    assert.equal(getSceneTheme('nile_sunset').scenePack, 'nile');
     assert.equal(getSceneTheme('nonexistent').id, DEFAULT_THEME_ID);
 });
 
@@ -62,7 +67,10 @@ test('weather registry exposes clear, mist, rain, and fireflies with valid optic
 });
 
 test('every registered 3D scene pack keeps throwing corridor and shore foraging zone completely unobstructed', () => {
-    const packs: ScenePackId[] = ['jiangnan', 'tahoe', 'kyoto', 'nordic', 'lagoon'];
+    const packs: ScenePackId[] = [
+        'jiangnan', 'tahoe', 'kyoto', 'nordic', 'lagoon',
+        'fuji', 'zhangjiajie', 'venice', 'alps', 'nile',
+    ];
     for (const packId of packs) {
         const placements = getPlacementsForPack(packId);
         assert.ok(placements.length >= 10, `${packId} should place a rich set of scenic props`);
