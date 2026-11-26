@@ -12,8 +12,7 @@ import { createWorld } from '../rendering/world';
 import { mountUI } from '../ui/panel';
 import { createBounceMarkers } from '../ui/bounce-markers';
 import { CinemaAudioEngine } from '../audio/engine';
-import { formatStoneDimensions, StoneBox, type StoneSpec } from '../simulation/stones';
-import { createStonePreviewStage } from '../rendering/stone-mesh';
+import { StoneBox, type StoneSpec } from '../simulation/stones';
 import { createShoreForaging } from '../rendering/shore-foraging';
 import { setupDevReview } from './dev-review';
 
@@ -52,17 +51,12 @@ export function boot() {
     const audioLabel = document.querySelector<HTMLElement>('#audio-label')!;
     const wristCursorEl = document.querySelector<HTMLElement>('#wrist-cursor')!;
 
-    // Handheld 3D Stone Preview Stage (bottom-left)
-    const stageCanvas = document.querySelector<HTMLCanvasElement>('#stone-stage')!;
-    const stonePreview = createStonePreviewStage(stageCanvas);
-
     function syncHandPanel() {
         const stone = stoneBox.equipped;
         document.querySelector('#hand-stone-name')!.textContent = stone.name;
         const rarityEl = document.querySelector<HTMLElement>('#hand-stone-rarity')!;
         rarityEl.textContent = stoneBox.isUsingEphemeral ? `${stone.rarityLabel} · 试投` : stone.rarityLabel;
         rarityEl.className = `rarity-tag rarity-${stone.rarity}`;
-        document.querySelector('#hand-stone-dims')!.textContent = formatStoneDimensions(stone);
         document.querySelector('#hand-tilt')!.textContent = `${Math.round(parameters.tilt)}°`;
         document.querySelector('#hand-roll')!.textContent = `${Math.round(parameters.roll ?? 0)}°`;
         document.querySelector('#hand-elev')!.textContent = `${Math.round(parameters.elevation)}°`;
@@ -71,12 +65,11 @@ export function boot() {
     }
 
     function applyEquippedStone(stone: StoneSpec) {
-        stonePreview.setStone(stone);
         world.setStoneMesh(stone);
         syncHandPanel();
     }
 
-    const shoreForaging = createShoreForaging(world.scene, camera, renderer.domElement, stoneBox, {
+    const shoreForaging = createShoreForaging(world.scene, world.sunset.shoreMesh, camera, renderer.domElement, stoneBox, {
         onEquipAndStandUp(stone) {
             applyEquippedStone(stone);
             rig.beginThrow(SHORE_ORIGIN, false, parameters.direction, camera.aspect);
@@ -91,6 +84,14 @@ export function boot() {
         onExit() {
             syncHandPanel();
         },
+        getLaunch() {
+            return parameters;
+        },
+        onLaunchChange(patch) {
+            Object.assign(parameters, patch);
+            syncControls();
+            syncHandPanel();
+        },
     });
     world.hideFromTransmission(shoreForaging.rootGroup);
     applyEquippedStone(stoneBox.equipped);
@@ -103,42 +104,16 @@ export function boot() {
             shoreForaging.open();
         }
     };
+    document.querySelector<HTMLButtonElement>('#open-tune')!.onclick = () => {
+        cancelGesture();
+        setLabOpen(false);
+        shoreForaging.openTuneCurrent(stoneBox.equipped);
+    };
     document.querySelector<HTMLButtonElement>('#hand-spin-dir')!.onclick = () => {
         parameters.spin = parameters.spin === 0 ? 18 : -parameters.spin;
         syncControls();
         syncHandPanel();
     };
-
-    // Direct 3D drag on the handheld stone preview canvas adjusts tilt (pitch) & roll (bank)
-    let stageDrag: { pointerId: number; x: number; y: number; tilt: number; roll: number } | undefined;
-    stageCanvas.addEventListener('pointerdown', event => {
-        if (!event.isPrimary || event.button !== 0) return;
-        stageDrag = {
-            pointerId: event.pointerId,
-            x: event.clientX,
-            y: event.clientY,
-            tilt: parameters.tilt,
-            roll: parameters.roll ?? 0,
-        };
-        stageCanvas.setPointerCapture(event.pointerId);
-        event.preventDefault();
-    });
-    stageCanvas.addEventListener('pointermove', event => {
-        if (!stageDrag || stageDrag.pointerId !== event.pointerId) return;
-        const dx = event.clientX - stageDrag.x;
-        const dy = event.clientY - stageDrag.y;
-        parameters.tilt = Math.round(clamp(stageDrag.tilt - dy * 0.35, 0, 50));
-        parameters.roll = Math.round(clamp(stageDrag.roll + dx * 0.42, -35, 35));
-        syncControls();
-        syncHandPanel();
-    });
-    const endStageDrag = (event: PointerEvent) => {
-        if (!stageDrag || stageDrag.pointerId !== event.pointerId) return;
-        if (stageCanvas.hasPointerCapture(event.pointerId)) stageCanvas.releasePointerCapture(event.pointerId);
-        stageDrag = undefined;
-    };
-    stageCanvas.addEventListener('pointerup', endStageDrag);
-    stageCanvas.addEventListener('pointercancel', endStageDrag);
 
     document.querySelector('#controls')!.addEventListener('input', syncHandPanel);
     document.querySelector('#posture')!.addEventListener('input', syncHandPanel);
@@ -374,7 +349,6 @@ export function boot() {
         const activeStone = session.sim.stone;
         world.setStoneMesh(activeStone);
         world.setStoneWet(false);
-        stonePreview.setStone(activeStone);
         syncHandPanel();
         document.querySelector<HTMLTextAreaElement>('#snapshot')!.value = JSON.stringify(session.snapshot, null, 2);
         document.querySelector('#launch-summary')!.textContent = `本次 seed ${lastThrow.seed} · T=${lastThrow.temperature.toFixed(2)} · ${activeStone.name}\n目标 → 实际出手\n` + fields.map(([key, label, , , , unit]) => `${label} ${(lastThrow.target[key] ?? 0).toFixed(3)} → ${(lastThrow.sampled[key] ?? 0).toFixed(3)} ${unit}`).join('\n');
@@ -500,7 +474,6 @@ export function boot() {
 
     let previous = performance.now();
     let ambientTime = 0;
-    let previewAccum = 0;
     let wasAiming = false;
 
     function frame(now: number) {
@@ -529,13 +502,21 @@ export function boot() {
         }
 
         const visibleDrops = feedback.update(session, document.querySelector<HTMLInputElement>('#helpers')!.checked);
+        // Hide the active lakeside throwing stone & halo while crouching on the beach so nothing floats in the sky
+        const foragingNow = shoreForaging.isOpen();
+        if (foragingNow) {
+            world.stone.visible = false;
+            world.halo.visible = false;
+        } else {
+            world.stone.visible = true;
+        }
         world.setStoneWet(sim.contacts.length > 0);
         const envTime = dev.isReferenceMode ? session.presentationTime : ambientTime;
         world.waterField.setTime(envTime);
         world.sunset.update(envTime);
 
         // Camera orchestration: 3D riverbank foraging vs aiming at shore vs throwing/replay
-        if (shoreForaging.isOpen()) {
+        if (foragingNow) {
             const foragePose = shoreForaging.update(elapsed);
             rig.updateToPose(camera, foragePose, elapsed);
         } else {
@@ -552,16 +533,6 @@ export function boot() {
         }
         dev.applySideCamera(camera);
         updateTelemetry(session, visibleDrops);
-
-        // Throttle handheld 3D preview during flight; pause it completely while crouching on the 3D shore
-        if (!dev.isReferenceMode && !shoreForaging.isOpen()) {
-            previewAccum += elapsed;
-            const inFlight = !paused && !sim.ended && !stageDrag && !isAiming;
-            if (!inFlight || previewAccum >= 0.05) {
-                stonePreview.render(parameters.tilt, parameters.roll ?? 0, parameters.spin, previewAccum);
-                previewAccum = 0;
-            }
-        }
 
         const rect = canvas.getBoundingClientRect();
         bounceMarkers.update(sim.contacts, camera, rect.width, rect.height, session.visualTime);

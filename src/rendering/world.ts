@@ -85,6 +85,8 @@ export function createWorld() {
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.06;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.body.prepend(renderer.domElement);
 
     const sunset = createSunsetEnvironment(renderer, scene);
@@ -93,8 +95,20 @@ export function createWorld() {
     // Cinematic sunset lighting: cool twilight zenith sky + warm amber reflected bounce + low golden directional sun
     scene.add(new THREE.HemisphereLight(0x7084ae, 0x4b2f24, 1.35));
     const sun = new THREE.DirectionalLight(SUN_COLOR, 3.6);
-    sun.position.copy(SUN_DIRECTION).multiplyScalar(60);
+    sun.position.copy(SUN_DIRECTION).multiplyScalar(32).add(new THREE.Vector3(-1.5, 0.1, 0));
+    sun.target.position.set(-1.5, 0.1, 0);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.camera.left = -3.8;
+    sun.shadow.camera.right = 3.8;
+    sun.shadow.camera.top = 3.2;
+    sun.shadow.camera.bottom = -3.2;
+    sun.shadow.camera.near = 6;
+    sun.shadow.camera.far = 64;
+    sun.shadow.bias = -0.0004;
+    sun.shadow.normalBias = 0.0028;
     scene.add(sun);
+    scene.add(sun.target);
     // Subtle cool sky fill from opposite side so shadowed stone faces stay legible
     const fill = new THREE.DirectionalLight(0x526b94, 0.55);
     fill.position.set(-18, 14, 22);

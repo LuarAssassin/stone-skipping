@@ -519,7 +519,7 @@ function createShoreAndReeds() {
     const group = new THREE.Group();
 
     // 1. Contoured natural gravel/pebble shoreline bank with crisp procedural sand & micro-gravel PBR
-    const cols = 48, rows = 96;
+    const cols = 96, rows = 180;
     const widthX = 24, widthZ = 56;
     const shoreGeom = new THREE.PlaneGeometry(widthX, widthZ, cols, rows);
     shoreGeom.rotateX(-Math.PI / 2);
@@ -564,6 +564,7 @@ function createShoreAndReeds() {
         envMapIntensity: 0.34,
     });
     const shoreMesh = new THREE.Mesh(shoreGeom, shoreMat);
+    shoreMesh.receiveShadow = true;
     group.add(shoreMesh);
 
     // 2. River-worn pebble base geometry (gently deformed smooth icosahedron for organic silhouettes)
@@ -735,7 +736,7 @@ function createShoreAndReeds() {
     reeds.instanceMatrix.needsUpdate = true;
     group.add(reeds);
 
-    return { group, reedsMaterial };
+    return { group, shoreMesh, reedsMaterial };
 }
 
 export function createSunsetEnvironment(renderer: THREE.WebGLRenderer, scene: THREE.Scene) {
@@ -747,7 +748,7 @@ export function createSunsetEnvironment(renderer: THREE.WebGLRenderer, scene: TH
     const mountains = createMountainRings();
     scene.add(mountains);
 
-    const { group: shoreGroup, reedsMaterial } = createShoreAndReeds();
+    const { group: shoreGroup, shoreMesh, reedsMaterial } = createShoreAndReeds();
     scene.add(shoreGroup);
 
     // Bake PMREM environment map once from the procedural sunset sky for PBR reflections on stone & spray
@@ -766,6 +767,7 @@ export function createSunsetEnvironment(renderer: THREE.WebGLRenderer, scene: TH
         skyMesh,
         mountains,
         shoreGroup,
+        shoreMesh,
         update(time: number) {
             skyMaterial.uniforms.uTime.value = time;
             reedsMaterial.uniforms.uTime.value = time;

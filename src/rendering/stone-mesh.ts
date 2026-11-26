@@ -134,38 +134,40 @@ export interface StoneVisualOptions {
 interface WatershedUniforms {
     uShoreRoughMin: { value: number };
     uShoreDryLift: { value: number };
+    uShoreDarken: { value: number };
 }
 
 /** Harmonize every stone material into one cohesive low-saturation natural riverbank watershed palette
- *  and prevent grazing-angle sunset reflections from blowing out into white Bloom blobs on the shore. */
+ *  matching the warm-dark twilight wet sand bed, and prevent grazing-angle sunset reflections from
+ *  blowing out into white Bloom blobs on the shore. */
 function applyWatershedMaterialGrading(mat: THREE.MeshStandardMaterial, shoreWetness?: number) {
     const isOnShore = shoreWetness !== undefined;
     const w = isOnShore ? THREE.MathUtils.clamp(shoreWetness, 0, 1) : 0;
 
     const uniforms: WatershedUniforms = {
         // Resting shore stones stay tactile matte-to-damp; never mirror-flat sun reflectors
-        uShoreRoughMin: { value: isOnShore ? (0.64 - w * 0.18) : 0.42 },
-        uShoreDryLift: { value: isOnShore ? (0.34 - w * 0.24) : 0.10 },
+        uShoreRoughMin: { value: isOnShore ? (0.66 - w * 0.18) : 0.42 },
+        uShoreDryLift: { value: isOnShore ? (0.36 - w * 0.24) : 0.10 },
+        // Match the warm-dark exposure of the wet 2K Cycles riverbed so stones sit grounded instead of chalky-bright
+        uShoreDarken: { value: isOnShore ? (0.74 - 0.22 * w) : 0.98 },
     };
 
-    mat.envMapIntensity = isOnShore ? (0.36 + w * 0.10) : 0.68;
-    if (isOnShore) {
-        // Damp stones near the waterline darken naturally like real wet creek rocks
-        mat.color.multiplyScalar(1 - 0.34 * w);
-    }
+    mat.envMapIntensity = isOnShore ? (0.30 + w * 0.10) : 0.72;
 
     mat.userData.watershedUniforms = uniforms;
     mat.userData.shoreWetness = shoreWetness;
-    mat.customProgramCacheKey = () => 'river-stone-watershed-v1';
+    mat.customProgramCacheKey = () => 'river-stone-watershed-v2';
     mat.onBeforeCompile = shader => {
         shader.uniforms.uShoreRoughMin = uniforms.uShoreRoughMin;
         shader.uniforms.uShoreDryLift = uniforms.uShoreDryLift;
+        shader.uniforms.uShoreDarken = uniforms.uShoreDarken;
         shader.fragmentShader = shader.fragmentShader
             .replace(
                 '#include <common>',
                 `#include <common>
                 uniform float uShoreRoughMin;
-                uniform float uShoreDryLift;`
+                uniform float uShoreDryLift;
+                uniform float uShoreDarken;`
             )
             .replace(
                 '#include <map_fragment>',
@@ -173,8 +175,9 @@ function applyWatershedMaterialGrading(mat: THREE.MeshStandardMaterial, shoreWet
                 {
                     float stoneLum = dot(diffuseColor.rgb, vec3(0.299, 0.587, 0.114));
                     vec3 desat = mix(vec3(stoneLum), diffuseColor.rgb, 0.44);
-                    vec3 riverSilt = vec3(0.31, 0.30, 0.29) * (0.48 + 0.96 * stoneLum);
-                    diffuseColor.rgb = mix(desat, riverSilt, 0.28);
+                    // Warm-neutral wet twilight river silt tone matching the 2K Cycles shore bed
+                    vec3 riverSilt = vec3(0.22, 0.195, 0.18) * (0.45 + 0.94 * stoneLum);
+                    diffuseColor.rgb = mix(desat, riverSilt, 0.34) * uShoreDarken;
                 }`
             )
             .replace(
@@ -195,6 +198,8 @@ export function populateStoneGroup(
 ) {
     disposeGroupChildren(group);
     const procedural = buildProceduralStoneMesh(stone);
+    procedural.castShadow = true;
+    procedural.receiveShadow = true;
     if (procedural.material instanceof THREE.MeshStandardMaterial) {
         applyWatershedMaterialGrading(procedural.material, options?.shoreWetness);
     }
@@ -216,13 +221,17 @@ export function populateStoneGroup(
         if (stone.glbPath === '/assets/stone.glb') {
             clone.scale.set(stone.a / 0.04, stone.h / 0.0045, stone.b / 0.03);
         }
+        const inspecting = Boolean(group.userData.inspectLook);
+        const shoreWet = group.userData.shoreWetness as number | undefined;
         clone.traverse(obj => {
             if (obj instanceof THREE.Mesh) {
                 // BufferGeometry is shared with glbCache template; keep it alive across shore re-scatters
                 obj.userData.sharedGeometry = true;
+                obj.castShadow = !inspecting;
+                obj.receiveShadow = true;
                 if (obj.material instanceof THREE.MeshStandardMaterial) {
                     obj.material = obj.material.clone();
-                    applyWatershedMaterialGrading(obj.material, group.userData.shoreWetness as number | undefined);
+                    applyWatershedMaterialGrading(obj.material, inspecting ? undefined : shoreWet);
                     obj.userData.baseRoughness = obj.material.roughness;
                     obj.userData.baseColor = obj.material.color.clone();
                 }
@@ -248,18 +257,22 @@ export function populateStoneGroup(
     });
 }
 
-/** Lift specular/env clarity subtly when a stone is picked up for 360° close-up inspection. */
+/** Lift specular/exposure clarity when a stone is picked up to center-stage for close-up tuning & inspection. */
 export function setStoneInspectLook(group: THREE.Group, inspecting: boolean) {
     if (group.userData.inspectLook === inspecting) return;
     group.userData.inspectLook = inspecting;
     const shoreWet = typeof group.userData.shoreWetness === 'number' ? group.userData.shoreWetness : 0;
     group.traverse(obj => {
-        if (obj instanceof THREE.Mesh && obj.material instanceof THREE.MeshStandardMaterial) {
-            obj.material.envMapIntensity = inspecting ? 0.68 : (0.36 + shoreWet * 0.10);
-            const u = obj.material.userData.watershedUniforms as WatershedUniforms | undefined;
-            if (u) {
-                u.uShoreRoughMin.value = inspecting ? 0.42 : (0.64 - shoreWet * 0.18);
-                u.uShoreDryLift.value = inspecting ? 0.10 : (0.34 - shoreWet * 0.24);
+        if (obj instanceof THREE.Mesh) {
+            obj.castShadow = !inspecting;
+            if (obj.material instanceof THREE.MeshStandardMaterial) {
+                obj.material.envMapIntensity = inspecting ? 0.72 : (0.30 + shoreWet * 0.10);
+                const u = obj.material.userData.watershedUniforms as WatershedUniforms | undefined;
+                if (u) {
+                    u.uShoreRoughMin.value = inspecting ? 0.42 : (0.66 - shoreWet * 0.18);
+                    u.uShoreDryLift.value = inspecting ? 0.10 : (0.36 - shoreWet * 0.24);
+                    u.uShoreDarken.value = inspecting ? 1.0 : (0.74 - 0.22 * shoreWet);
+                }
             }
         }
     });

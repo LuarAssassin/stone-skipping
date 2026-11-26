@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { shoreElevation, shorelineCurveX, shoreNormal } from './sunset-env';
+import { shoreElevation, shorelineCurveX, shoreNormal, SUN_DIRECTION } from './sunset-env';
 import { populateStoneGroup, setStoneHighlight, setStoneInspectLook } from './stone-mesh';
 import {
     forageShoreStones,
@@ -10,10 +10,12 @@ import {
     type StoneBox,
     type StoneSpec,
 } from '../simulation/stones';
+import type { Launch } from '../simulation/physics';
 import type { Pose } from '../camera/rig';
 
 const SHORE_STONE_COUNT = 52;
 const FORAGE_FOV = 45;
+const HERO_LIFT_SCALE = 1.56;
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 
 interface ShoreStoneItem {
@@ -27,6 +29,7 @@ interface ShoreStoneItem {
     restQuat: THREE.Quaternion;
     hoverAmount: number;
     inspectBlend: number;
+    isTemporaryTune?: boolean;
 }
 
 export interface ShoreForagingCallbacks {
@@ -34,6 +37,8 @@ export interface ShoreForagingCallbacks {
     onEquipStay(stone: StoneSpec): void;
     onClink(mass: number): void;
     onExit(): void;
+    getLaunch(): Launch;
+    onLaunchChange(patch: Partial<Launch>): void;
 }
 
 /** Fixed crouching camera framing at z = 0 overlooking the natural fluvial gravel bar and twilight waterline. */
@@ -46,7 +51,7 @@ function computeForageCameraFrame() {
     return { waterEdge, focusX, focusY, camX, camY };
 }
 
-/** Shared radial soft ambient-occlusion contact shadow texture so every stone sits grounded into the gravel bed. */
+/** Shared radial soft ambient-occlusion contact shadow texture reinforcing real shadow maps right at the stone-sand crease. */
 function createContactShadowTexture(): THREE.DataTexture {
     const size = 64;
     const data = new Uint8Array(size * size * 4);
@@ -55,25 +60,28 @@ function createContactShadowTexture(): THREE.DataTexture {
         for (let x = 0; x < size; x++) {
             const nx = (x + 0.5) / size * 2 - 1;
             const r = Math.hypot(nx, ny);
-            const falloff = Math.pow(Math.max(0, 1 - r), 1.85);
+            const falloff = Math.pow(Math.max(0, 1 - r), 1.6);
             const o = (y * size + x) * 4;
-            data[o] = 16;
-            data[o + 1] = 14;
-            data[o + 2] = 15;
-            data[o + 3] = Math.round(falloff * 188);
+            data[o] = 10;
+            data[o + 1] = 8;
+            data[o + 2] = 9;
+            data[o + 3] = Math.round(falloff * 224);
         }
     }
     const tex = new THREE.DataTexture(data, size, size);
+    tex.magFilter = THREE.LinearFilter;
+    tex.minFilter = THREE.LinearFilter;
     tex.needsUpdate = true;
     return tex;
 }
 
-/** Live 3D twilight riverbank foraging (Direction A — natural geological gravel bar):
- *  - Mixes 52 strictly unique Blender GLB hero stones seamlessly into a 2,800-pebble real gravel bed
- *  - Natural fluvial bar clustering, half-buried embedding, stream-imbricated tilts, waterline wetness & contact AO
- *  - Pure mouse direct picking (no WASD / no panning): hover to preview, click to lift & 360° inspect */
+/** Live 3D twilight riverbank foraging & center-stage lift-and-tune posture studio:
+ *  - Seats 52 unique Blender GLB stones directly onto exact raycasted shoreMesh triangles with real sunset shadows + contact AO
+ *  - Clicking any stone lifts & enlarges it (1.56x) to center-stage with a golden waterline horizon ring
+ *  - Drag directly on the lifted stone to tune attack tilt & side roll, wheel/controls for elevation & spin, or flip 360° */
 export function createShoreForaging(
     scene: THREE.Scene,
+    shoreMesh: THREE.Mesh,
     camera: THREE.PerspectiveCamera,
     canvas: HTMLCanvasElement,
     box: StoneBox,
@@ -89,13 +97,26 @@ export function createShoreForaging(
         new THREE.MeshBasicMaterial({
             color: 0xffcf86,
             transparent: true,
-            opacity: 0.65,
+            opacity: 0.68,
             side: THREE.DoubleSide,
             depthWrite: false,
         })
     );
     hoverRing.visible = false;
     rootGroup.add(hoverRing);
+
+    // Delicate golden horizontal waterline plane ring around the lifted stone so tilt & roll read at a glance
+    const postureRingMat = new THREE.MeshBasicMaterial({
+        color: 0xffcf88,
+        transparent: true,
+        opacity: 0,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+    });
+    const postureRing = new THREE.Mesh(new THREE.RingGeometry(0.068, 0.0715, 64), postureRingMat);
+    postureRing.rotation.x = -Math.PI / 2;
+    postureRing.visible = false;
+    rootGroup.add(postureRing);
 
     const colliderMat = new THREE.MeshBasicMaterial({
         transparent: true,
@@ -105,8 +126,17 @@ export function createShoreForaging(
 
     const shadowGeom = new THREE.PlaneGeometry(1, 1);
     const shadowTex = createContactShadowTexture();
+    const downRay = new THREE.Raycaster();
+    const downOrigin = new THREE.Vector3();
+    const downDir = new THREE.Vector3(0, -1, 0);
+    // Horizontal shadow cast direction away from the low golden sunset
+    const sunShadowDirX = -SUN_DIRECTION.x;
+    const sunShadowDirZ = -SUN_DIRECTION.z;
+    const sunShadowLen = Math.hypot(sunShadowDirX, sunShadowDirZ) || 1;
+    const sunCastX = sunShadowDirX / sunShadowLen;
+    const sunCastZ = sunShadowDirZ / sunShadowLen;
 
-    // Mount minimal cinematic Forage HUD inside #app
+    // Mount minimal cinematic Forage & Posture-Tuning HUD inside #app
     const hud = document.createElement('div');
     hud.id = 'forage-hud';
     hud.className = 'forage-hud';
@@ -114,7 +144,7 @@ export function createShoreForaging(
       <div class="forage-top-bar">
         <div class="forage-banner">
           <span class="pill-dot"></span>
-          <span id="forage-banner-text">暮色浅滩寻石 · 鼠标直接点选河石 · 抬起后 360° 翻转看薄厚</span>
+          <span id="forage-banner-text">暮色浅滩寻石 · 鼠标直接点选河石 · 抬起放大调好出手角度</span>
         </div>
         <div class="forage-top-actions">
           <span class="career-pill" id="forage-career">累计 0 跳</span>
@@ -131,9 +161,30 @@ export function createShoreForaging(
         </div>
         <p id="forage-stone-feel" class="forage-feel"></p>
         <div id="forage-inspect-actions" class="forage-inspect-actions">
-          <span class="inspect-tip">按住拖动 360° 翻转看薄厚 · 右键或点空白处放回</span>
+          <div class="tune-mode-bar">
+            <div class="tune-mode-seg" role="group" aria-label="交互模式">
+              <button id="mode-tune" class="seg active" type="button">调投姿</button>
+              <button id="mode-flip" class="seg" type="button">360° 翻看</button>
+            </div>
+            <span id="inspect-tip" class="inspect-tip">拖动上下调攻角 · 左右调侧倾 · 滚轮调抛角</span>
+          </div>
+          <div class="tune-grid">
+            <label class="tune-cell">
+              <span>攻角 <b id="tune-tilt-val">6°</b></span>
+              <input id="tune-tilt" type="range" min="0" max="50" step="1" value="6">
+            </label>
+            <label class="tune-cell">
+              <span>侧倾 <b id="tune-roll-val">0°</b></span>
+              <input id="tune-roll" type="range" min="-35" max="35" step="1" value="0">
+            </label>
+            <label class="tune-cell">
+              <span>抛角 <b id="tune-elev-val">2°</b></span>
+              <input id="tune-elev" type="range" min="-12" max="20" step="1" value="2">
+            </label>
+            <button id="tune-spin" class="tune-spin-btn" type="button" title="切换顺/逆自旋方向 (Q/E)">↻ 顺旋</button>
+          </div>
           <div class="inspect-btns">
-            <button id="forage-take" class="dock-btn primary" type="button">拿去投</button>
+            <button id="forage-take" class="dock-btn primary" type="button">拿去投 <kbd>↵</kbd></button>
             <button id="forage-collect" class="dock-btn" type="button">收入石匣</button>
             <button id="forage-putback" class="dock-btn" type="button">放回岸滩</button>
           </div>
@@ -159,19 +210,27 @@ export function createShoreForaging(
     let inspected: ShoreStoneItem | undefined;
     let forageSeed = Math.floor(Math.random() * 0xffffffff);
     let lastBatchManifestIds = new Set<string>();
+    let inspectMode: 'tune' | 'flip' = 'tune';
+    let closeAfterPutBack = false;
 
     let cursorNdcX = 0;
     let cursorNdcY = 0;
 
-    // 360° in-hand inspection rotation state
-    let inspectYaw = 0.5;
-    let inspectPitch = 0.42;
+    // 360° free-flip inspection rotation state & subtle live spin preview angle
+    let inspectYaw = 0.45;
+    let inspectPitch = 0.36;
+    let spinPreviewAngle = 0;
     const inspectEuler = new THREE.Euler();
     const inspectQuat = new THREE.Quaternion();
+    const spinQuat = new THREE.Quaternion();
+    const poseRollQuat = new THREE.Quaternion();
+    const poseTiltQuat = new THREE.Quaternion();
+    const poseYawQuat = new THREE.Quaternion();
 
     const raycaster = new THREE.Raycaster();
     const ndc = new THREE.Vector2();
     const upAxis = new THREE.Vector3(0, 1, 0);
+    const xAxis = new THREE.Vector3(1, 0, 0);
     const zAxis = new THREE.Vector3(0, 0, 1);
     const camForward = new THREE.Vector3();
     const camUp = new THREE.Vector3();
@@ -183,14 +242,62 @@ export function createShoreForaging(
     const captionEl = hud.querySelector<HTMLElement>('#forage-caption')!;
     const msgEl = hud.querySelector<HTMLElement>('#forage-msg')!;
     const bannerTextEl = hud.querySelector<HTMLElement>('#forage-banner-text')!;
+    const inspectTipEl = hud.querySelector<HTMLElement>('#inspect-tip')!;
     const collectBtn = hud.querySelector<HTMLButtonElement>('#forage-collect')!;
+    const putbackBtn = hud.querySelector<HTMLButtonElement>('#forage-putback')!;
+    const modeTuneBtn = hud.querySelector<HTMLButtonElement>('#mode-tune')!;
+    const modeFlipBtn = hud.querySelector<HTMLButtonElement>('#mode-flip')!;
+    const tuneTiltInput = hud.querySelector<HTMLInputElement>('#tune-tilt')!;
+    const tuneRollInput = hud.querySelector<HTMLInputElement>('#tune-roll')!;
+    const tuneElevInput = hud.querySelector<HTMLInputElement>('#tune-elev')!;
+    const tuneSpinBtn = hud.querySelector<HTMLButtonElement>('#tune-spin')!;
 
     function setMsg(text: string) {
         msgEl.textContent = text;
     }
 
     function syncBannerCount() {
-        bannerTextEl.textContent = `暮色浅滩寻石 · 砾石滩藏有 ${items.length} 块可拾河石 · 鼠标直点 360° 端详`;
+        const shoreCount = items.filter(it => !it.isTemporaryTune).length;
+        bannerTextEl.textContent = `暮色浅滩寻石 · 眼前 ${shoreCount} 块可拾河石 · 点击拾起放大直接调投姿`;
+    }
+
+    function syncTuneReadout() {
+        const p = callbacks.getLaunch();
+        const tilt = Math.round(p.tilt);
+        const roll = Math.round(p.roll ?? 0);
+        const elev = Math.round(p.elevation);
+        tuneTiltInput.value = String(tilt);
+        tuneRollInput.value = String(roll);
+        tuneElevInput.value = String(elev);
+        hud.querySelector('#tune-tilt-val')!.textContent = `${tilt}°`;
+        hud.querySelector('#tune-roll-val')!.textContent = `${roll > 0 ? `+${roll}` : roll}°`;
+        hud.querySelector('#tune-elev-val')!.textContent = `${elev > 0 ? `+${elev}` : elev}°`;
+        tuneSpinBtn.textContent = p.spin < 0 ? '↺ 逆旋' : '↻ 顺旋';
+    }
+
+    function setInspectMode(mode: 'tune' | 'flip') {
+        inspectMode = mode;
+        modeTuneBtn.classList.toggle('active', mode === 'tune');
+        modeFlipBtn.classList.toggle('active', mode === 'flip');
+        inspectTipEl.textContent = mode === 'tune'
+            ? '按住拖动：上下调攻角 · 左右调侧倾 · 滚轮调抛角'
+            : '按住任意拖动 360° 翻转查看石子薄厚与岩纹';
+    }
+
+    /** Sample the EXACT rendered triangle height & normal on shoreMesh so stones sit with 0.0 mm gap. */
+    function sampleRenderedShore(px: number, pz: number): { y: number; normal: THREE.Vector3 } {
+        shoreMesh.updateMatrixWorld(true);
+        downOrigin.set(px, 3.0, pz);
+        downRay.set(downOrigin, downDir);
+        const hits = downRay.intersectObject(shoreMesh, false);
+        if (hits.length > 0) {
+            const hit = hits[0];
+            const normal = hit.face
+                ? hit.face.normal.clone().transformDirection(shoreMesh.matrixWorld).normalize()
+                : shoreNormal(px, pz);
+            return { y: hit.point.y, normal };
+        }
+        return { y: shoreElevation(px, pz), normal: shoreNormal(px, pz) };
     }
 
     function disposeItems() {
@@ -211,6 +318,7 @@ export function createShoreForaging(
         hovered = undefined;
         inspected = undefined;
         hoverRing.visible = false;
+        postureRing.visible = false;
     }
 
     function populateShore(seed: number, avoidPrevious = false) {
@@ -229,7 +337,6 @@ export function createShoreForaging(
 
         const placed: { x: number; z: number; r: number; h: number }[] = [];
 
-        // Deterministic PRNG for organic fluvial gravel-bar deposition
         let rngState = (seed ^ 0x51f23a9b) >>> 0;
         const rand = () => {
             rngState = (rngState + 0x6d2b79f5) >>> 0;
@@ -237,14 +344,14 @@ export function createShoreForaging(
             t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
             return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
         };
-        const randSigned = () => (rand() + rand() - 1); // triangular distribution peaked at 0
+        const randSigned = () => (rand() + rand() - 1);
 
         const safeAspect = clamp(camera.aspect || 1.6, 0.70, 1.82);
         const tanHalfFov = Math.tan(THREE.MathUtils.degToRad(FORAGE_FOV * 0.5));
         const halfZFar = 1.84 * tanHalfFov * safeAspect * 0.90;
         const halfZNear = 1.04 * tanHalfFov * safeAspect * 0.86;
 
-        // 5 natural meandering fluvial pebble-bar lobes along the curved damp shoreline (breaks artificial box silhouette!)
+        // 5 natural meandering fluvial pebble-bar lobes along the curved damp shoreline
         const lobes = Array.from({ length: 5 }, (_, idx) => {
             const frac = (idx + 0.5) / 5;
             const lobeZ = (frac * 2 - 1) * halfZFar * 0.88 + randSigned() * 0.18;
@@ -256,7 +363,6 @@ export function createShoreForaging(
             };
         });
 
-        // Place larger stones first so smaller flats & wafers naturally settle around cobble shoulders
         const order = specs.map((_, idx) => idx).sort((a, b) =>
             Math.max(specs[b].a, specs[b].b) - Math.max(specs[a].a, specs[a].b)
         );
@@ -277,23 +383,19 @@ export function createShoreForaging(
                 const mode = rand();
 
                 if (mode < 0.68 && attempt < 75) {
-                    // Fluvial gravel-bar cluster along damp shoreline (organic pockets, never a uniform grid)
                     const lobe = lobes[Math.floor(rand() * lobes.length)];
                     candidateZ = lobe.z + randSigned() * lobe.spreadZ;
                     inlandOffset = lobe.inland + randSigned() * lobe.spreadX;
                 } else if (mode < 0.86) {
-                    // Wet waterline wash band (including a few stones half-awash right at the shallow edge)
                     inlandOffset = -0.04 + Math.pow(rand(), 1.3) * 0.34;
                     candidateZ = (rand() * 2 - 1) * halfZFar * 1.04;
                 } else {
-                    // Sparse upper-bank stragglers fading softly into the dry foreground gravel
                     const t = 0.45 + rand() * 0.55;
                     inlandOffset = 0.06 + t * 0.96;
                     const maxZ = halfZFar + (halfZNear - halfZFar) * t;
                     candidateZ = (rand() * 2 - 1) * maxZ * 0.96;
                 }
 
-                // Soft viewport framing envelope (no sharp rectangular cutoff, yet every stone stays reachable)
                 inlandOffset = clamp(inlandOffset, -0.05, 1.02);
                 const tNorm = clamp((inlandOffset + 0.05) / 1.07, 0, 1);
                 const maxZ = halfZFar + (halfZNear - halfZFar) * tNorm;
@@ -301,7 +403,6 @@ export function createShoreForaging(
 
                 const candidateX = shorelineCurveX(candidateZ) - inlandOffset;
 
-                // Allow occasional realistic edge imbrication (a thin flat slightly leaning against a neighbor's rim)
                 let ok = true;
                 let bestLift = 0;
                 const desiredGap = attempt < 45 ? 0.016 : attempt < 80 ? 0.006 : -0.006;
@@ -309,10 +410,9 @@ export function createShoreForaging(
                     const d = Math.hypot(p.x - candidateX, p.z - candidateZ);
                     const minSep = p.r + radius + desiredGap;
                     if (d < minSep) {
-                        // Permit gentle shoulder overlap only for a thin stone kissing a thicker rock's outer edge
                         const canLean = isThin && p.h > spec.h * 1.35 && d >= (p.r + radius * 0.68) && bestLift === 0;
                         if (canLean) {
-                            bestLift = Math.min(0.007, p.h * 0.35);
+                            bestLift = Math.min(0.006, p.h * 0.32);
                         } else {
                             ok = false;
                             break;
@@ -341,31 +441,29 @@ export function createShoreForaging(
         for (let i = 0; i < specs.length; i++) {
             const spec = specs[i];
             const { x: px, z: pz, leanLift } = placements[i];
-            const py = shoreElevation(px, pz);
-            const normal = shoreNormal(px, pz);
+            // Exact rendered triangle height & normal eliminate the 5–12mm analytical-vs-mesh air gap!
+            const { y: py, normal } = sampleRenderedShore(px, pz);
 
-            // Real geological embedding: thick cobbles sink 40–55% into gravel; thin flats nestle 26–44%
+            // Real geological embedding: thick cobbles sink 45–62% into wet sand; thin flats nestle 38–54%
             const isBulky = spec.h > 0.011;
             const exposeRatio = isBulky
-                ? (0.44 + rand() * 0.16)
-                : (0.56 + rand() * 0.18);
+                ? (0.36 + rand() * 0.16)
+                : (0.44 + rand() * 0.16);
             const restPos = new THREE.Vector3(px, py + spec.h * exposeRatio + leanLift, pz);
 
-            // Natural fluvial imbrication: stones tilt gently 4°–16° instead of lying flat like coins on a table
+            // Natural fluvial imbrication: gentle 3°–12° cant so bottoms never lift off the sand
             const alignSlope = new THREE.Quaternion().setFromUnitVectors(upAxis, normal);
             const yawRad = rand() * Math.PI * 2;
             const randomYaw = new THREE.Quaternion().setFromAxisAngle(upAxis, yawRad);
-            const cantMax = isBulky ? 0.24 : 0.20;
-            // Subtle downstream/shoreward bias + organic random cant
+            const cantMax = isBulky ? 0.18 : 0.12;
             cantEuler.set(
                 (rand() - 0.5) * cantMax * 1.4,
                 0,
-                (rand() - 0.38) * cantMax * 1.4 + (leanLift > 0 ? 0.14 : 0)
+                (rand() - 0.4) * cantMax * 1.4 + (leanLift > 0 ? 0.12 : 0)
             );
             cantQuat.setFromEuler(cantEuler);
             const restQuat = alignSlope.multiply(randomYaw).multiply(cantQuat);
 
-            // Waterline wetness coupling: stones near/in the shallow water edge look authentically dark & damp
             const shoreWetness = 1 - THREE.MathUtils.smoothstep(py, -0.01, 0.095);
 
             const root = new THREE.Group();
@@ -380,18 +478,25 @@ export function createShoreForaging(
             const collider = new THREE.Mesh(new THREE.SphereGeometry(hitRadius, 10, 8), colliderMat);
             root.add(collider);
 
-            // Soft contact AO shadow seated right on the gravel surface beneath each stone (aligned to stone yaw)
+            // Grounded Contact AO shadow slightly shifted away from the low sunset sun to reinforce PCF soft shadows
             const shadowMat = new THREE.MeshBasicMaterial({
                 map: shadowTex,
                 transparent: true,
                 depthWrite: false,
-                opacity: isBulky ? 0.80 : 0.68,
+                polygonOffset: true,
+                polygonOffsetFactor: -1,
+                polygonOffsetUnits: -2,
+                opacity: isBulky ? 0.88 : 0.78,
             });
             const shadow = new THREE.Mesh(shadowGeom, shadowMat);
-            shadow.position.set(px, py + 0.0025, pz);
+            const castShift = Math.min(0.018, spec.h * 0.85);
+            const sxPos = px + sunCastX * castShift;
+            const szPos = pz + sunCastZ * castShift;
+            const { y: shadowY } = sampleRenderedShore(sxPos, szPos);
+            shadow.position.set(sxPos, shadowY + 0.0014, szPos);
             shadow.quaternion.setFromUnitVectors(zAxis, normal);
             shadow.rotateOnAxis(zAxis, yawRad);
-            shadow.scale.set(spec.a * 2.55, spec.b * 2.55, 1);
+            shadow.scale.set(spec.a * 2.75, spec.b * 2.65, 1);
 
             rootGroup.add(shadow);
             rootGroup.add(root);
@@ -472,9 +577,11 @@ export function createShoreForaging(
         captionEl.classList.toggle('inspecting', Boolean(inspected));
 
         if (inspected) {
+            syncTuneReadout();
             const alreadySaved = box.stones.some(saved => saved.id === s.id);
             collectBtn.disabled = alreadySaved;
             collectBtn.textContent = alreadySaved ? '已在石匣中' : '收入石匣';
+            putbackBtn.textContent = inspected.isTemporaryTune ? '返回湖面' : '放回岸滩';
         }
     }
 
@@ -507,9 +614,61 @@ export function createShoreForaging(
         syncBannerCount();
     }
 
+    function pickUpItem(item: ShoreStoneItem) {
+        inspected = item;
+        setStoneHighlight(inspected.visual, false);
+        setStoneInspectLook(inspected.visual, true);
+        hovered = undefined;
+        hoverRing.visible = false;
+        setInspectMode('tune');
+        inspectYaw = 0.45;
+        inspectPitch = 0.36;
+        setMsg('');
+        callbacks.onClink(inspected.spec.mass);
+        syncCaption();
+        canvas.style.cursor = 'grab';
+    }
+
+    function confirmTakeAndStandUp() {
+        if (!inspected) return;
+        const picked = inspected.spec;
+        setStoneInspectLook(inspected.visual, false);
+        if (inspected.isTemporaryTune) {
+            removeTakenItem(inspected);
+        } else if (box.stones.some(s => s.id === picked.id)) {
+            box.equipSaved(picked.id);
+        } else {
+            box.equipEphemeral(picked);
+            removeTakenItem(inspected);
+        }
+        inspected = undefined;
+        closeAfterPutBack = false;
+        callbacks.onClink(picked.mass);
+        close();
+        callbacks.onEquipAndStandUp(box.equipped);
+    }
+
+    function putBackInspected() {
+        if (!inspected) return;
+        const wasTemp = Boolean(inspected.isTemporaryTune);
+        setStoneInspectLook(inspected.visual, false);
+        if (wasTemp) {
+            removeTakenItem(inspected);
+        }
+        inspected = undefined;
+        setMsg('');
+        syncCaption();
+        canvas.style.cursor = 'default';
+        if (wasTemp && closeAfterPutBack) {
+            closeAfterPutBack = false;
+            close();
+            callbacks.onExit();
+        }
+    }
+
     // Pure mouse interaction (capture phase isolates foraging from lake pull-to-throw)
-    let rotateDrag:
-        | { pointerId: number; lastX: number; lastY: number; moved: number }
+    let dragState:
+        | { pointerId: number; lastX: number; lastY: number; moved: number; startTilt: number; startRoll: number }
         | undefined;
 
     canvas.addEventListener('pointerdown', event => {
@@ -517,7 +676,6 @@ export function createShoreForaging(
         event.stopImmediatePropagation();
         if (!event.isPrimary) return;
 
-        // Right-click while inspecting puts the stone back immediately
         if (event.button === 2) {
             if (inspected) putBackInspected();
             event.preventDefault();
@@ -526,11 +684,14 @@ export function createShoreForaging(
         if (event.button !== 0) return;
 
         if (inspected) {
-            rotateDrag = {
+            const p = callbacks.getLaunch();
+            dragState = {
                 pointerId: event.pointerId,
                 lastX: event.clientX,
                 lastY: event.clientY,
                 moved: 0,
+                startTilt: p.tilt,
+                startRoll: p.roll ?? 0,
             };
             canvas.setPointerCapture(event.pointerId);
             canvas.style.cursor = 'grabbing';
@@ -538,20 +699,10 @@ export function createShoreForaging(
             return;
         }
 
-        // Clicking directly on any visible stone lifts it into 360° hand inspection
         updateRaycast(event.clientX, event.clientY);
         if (hovered) {
-            inspected = hovered;
-            setStoneHighlight(inspected.visual, false);
-            setStoneInspectLook(inspected.visual, true);
-            hovered = undefined;
-            hoverRing.visible = false;
-            inspectYaw = 0.45;
-            inspectPitch = 0.38;
-            setMsg('');
-            callbacks.onClink(inspected.spec.mass);
-            syncCaption();
-            canvas.style.cursor = 'grab';
+            closeAfterPutBack = false;
+            pickUpItem(hovered);
             event.preventDefault();
         }
     }, true);
@@ -559,62 +710,121 @@ export function createShoreForaging(
     canvas.addEventListener('pointermove', event => {
         if (!active) return;
         event.stopImmediatePropagation();
-        if (rotateDrag && rotateDrag.pointerId === event.pointerId) {
-            const dx = event.clientX - rotateDrag.lastX;
-            const dy = event.clientY - rotateDrag.lastY;
-            rotateDrag.lastX = event.clientX;
-            rotateDrag.lastY = event.clientY;
-            rotateDrag.moved += Math.hypot(dx, dy);
-            inspectYaw += dx * 0.011;
-            inspectPitch = clamp(inspectPitch + dy * 0.011, -1.45, 1.45);
+        if (dragState && dragState.pointerId === event.pointerId) {
+            const dx = event.clientX - dragState.lastX;
+            const dy = event.clientY - dragState.lastY;
+            dragState.lastX = event.clientX;
+            dragState.lastY = event.clientY;
+            dragState.moved += Math.hypot(dx, dy);
+
+            if (inspectMode === 'tune') {
+                // Direct 3D posture tuning: drag up/down -> attack tilt, left/right -> side roll
+                const p = callbacks.getLaunch();
+                const nextTilt = clamp(p.tilt - dy * 0.20, 0, 50);
+                const nextRoll = clamp((p.roll ?? 0) + dx * 0.26, -35, 35);
+                callbacks.onLaunchChange({ tilt: Math.round(nextTilt), roll: Math.round(nextRoll) });
+                syncTuneReadout();
+            } else {
+                inspectYaw += dx * 0.011;
+                inspectPitch = clamp(inspectPitch + dy * 0.011, -1.45, 1.45);
+            }
             return;
         }
         updateRaycast(event.clientX, event.clientY);
     }, true);
 
-    const endRotate = (event: PointerEvent) => {
+    const endDrag = (event: PointerEvent) => {
         if (!active) return;
         event.stopImmediatePropagation();
-        if (!rotateDrag || rotateDrag.pointerId !== event.pointerId) return;
-        const wasClick = rotateDrag.moved < 7;
+        if (!dragState || dragState.pointerId !== event.pointerId) return;
+        const wasClick = dragState.moved < 7;
         if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
-        rotateDrag = undefined;
+        dragState = undefined;
 
         if (wasClick && inspected) {
             const boxRect = canvas.getBoundingClientRect();
             const cx = (event.clientX - boxRect.left) / boxRect.width - 0.5;
             const cy = (event.clientY - boxRect.top) / boxRect.height - 0.5;
-            if (Math.hypot(cx, cy) > 0.20) {
+            if (Math.hypot(cx, cy) > 0.24) {
                 putBackInspected();
                 return;
             }
         }
         canvas.style.cursor = inspected ? 'grab' : (hovered ? 'pointer' : 'default');
     };
-    canvas.addEventListener('pointerup', endRotate, true);
-    canvas.addEventListener('pointercancel', endRotate, true);
+    canvas.addEventListener('pointerup', endDrag, true);
+    canvas.addEventListener('pointercancel', endDrag, true);
 
-    // Swallow wheel while foraging so accidental scroll doesn't alter background launch tilt/roll
+    // Mouse wheel while lifted tunes launch elevation (or Shift+wheel tunes roll); swallowed otherwise
     canvas.addEventListener('wheel', event => {
         if (!active) return;
         event.stopImmediatePropagation();
         event.preventDefault();
+        if (!inspected) return;
+        const step = event.deltaY < 0 ? 1 : -1;
+        const p = callbacks.getLaunch();
+        if (event.shiftKey) {
+            callbacks.onLaunchChange({ roll: Math.round(clamp((p.roll ?? 0) + step * 2, -35, 35)) });
+        } else {
+            callbacks.onLaunchChange({ elevation: Math.round(clamp(p.elevation + step, -12, 20)) });
+        }
+        syncTuneReadout();
     }, { capture: true, passive: false });
 
     canvas.addEventListener('contextmenu', event => {
         if (active) event.preventDefault();
     });
 
-    function putBackInspected() {
-        if (!inspected) return;
-        setStoneInspectLook(inspected.visual, false);
-        inspected = undefined;
-        setMsg('');
-        syncCaption();
-        canvas.style.cursor = 'default';
-    }
+    // Keyboard shortcuts while a stone is lifted at center-stage
+    window.addEventListener('keydown', event => {
+        if (!active || !inspected) return;
+        if (event.target instanceof HTMLElement && event.target.closest('input, textarea, select')) return;
+        const p = callbacks.getLaunch();
+        if (event.code === 'Enter') {
+            event.preventDefault();
+            confirmTakeAndStandUp();
+        } else if (event.code === 'KeyW') {
+            callbacks.onLaunchChange({ elevation: Math.round(clamp(p.elevation + 1, -12, 20)) });
+            syncTuneReadout();
+        } else if (event.code === 'KeyS') {
+            callbacks.onLaunchChange({ elevation: Math.round(clamp(p.elevation - 1, -12, 20)) });
+            syncTuneReadout();
+        } else if (event.code === 'KeyA') {
+            callbacks.onLaunchChange({ roll: Math.round(clamp((p.roll ?? 0) - 2, -35, 35)) });
+            syncTuneReadout();
+        } else if (event.code === 'KeyD') {
+            callbacks.onLaunchChange({ roll: Math.round(clamp((p.roll ?? 0) + 2, -35, 35)) });
+            syncTuneReadout();
+        } else if (event.code === 'KeyQ') {
+            callbacks.onLaunchChange({ spin: -Math.max(12, Math.abs(p.spin || 18)) });
+            syncTuneReadout();
+        } else if (event.code === 'KeyE') {
+            callbacks.onLaunchChange({ spin: Math.max(12, Math.abs(p.spin || 18)) });
+            syncTuneReadout();
+        }
+    });
 
-    // Wire minimal HUD buttons
+    // Wire HUD posture-tuning controls & buttons
+    modeTuneBtn.onclick = () => setInspectMode('tune');
+    modeFlipBtn.onclick = () => setInspectMode('flip');
+    tuneTiltInput.oninput = () => {
+        callbacks.onLaunchChange({ tilt: Number(tuneTiltInput.value) });
+        syncTuneReadout();
+    };
+    tuneRollInput.oninput = () => {
+        callbacks.onLaunchChange({ roll: Number(tuneRollInput.value) });
+        syncTuneReadout();
+    };
+    tuneElevInput.oninput = () => {
+        callbacks.onLaunchChange({ elevation: Number(tuneElevInput.value) });
+        syncTuneReadout();
+    };
+    tuneSpinBtn.onclick = () => {
+        const p = callbacks.getLaunch();
+        callbacks.onLaunchChange({ spin: p.spin === 0 ? 18 : -p.spin });
+        syncTuneReadout();
+    };
+
     hud.querySelector<HTMLButtonElement>('#forage-return')!.onclick = () => {
         close();
         callbacks.onExit();
@@ -624,22 +834,8 @@ export function createShoreForaging(
         populateShore(forageSeed, true);
         setMsg('沿着砾石浅滩换了一处，露出新一批不重样的天然河石');
     };
-    hud.querySelector<HTMLButtonElement>('#forage-putback')!.onclick = putBackInspected;
-    hud.querySelector<HTMLButtonElement>('#forage-take')!.onclick = () => {
-        if (!inspected) return;
-        const picked = inspected.spec;
-        setStoneInspectLook(inspected.visual, false);
-        if (box.stones.some(s => s.id === picked.id)) {
-            box.equipSaved(picked.id);
-        } else {
-            box.equipEphemeral(picked);
-            removeTakenItem(inspected);
-        }
-        inspected = undefined;
-        callbacks.onClink(picked.mass);
-        close();
-        callbacks.onEquipAndStandUp(box.equipped);
-    };
+    putbackBtn.onclick = putBackInspected;
+    hud.querySelector<HTMLButtonElement>('#forage-take')!.onclick = confirmTakeAndStandUp;
     collectBtn.onclick = () => {
         if (!inspected) return;
         const picked = inspected.spec;
@@ -660,7 +856,7 @@ export function createShoreForaging(
             manifestLoaded = true;
             catalog = await loadStoneManifest();
         }
-        if (items.length < 12) {
+        if (items.filter(it => !it.isTemporaryTune).length < 12) {
             forageSeed = Math.floor(Math.random() * 0xffffffff);
             populateShore(forageSeed);
         } else {
@@ -672,6 +868,7 @@ export function createShoreForaging(
     function open() {
         if (active) return;
         active = true;
+        closeAfterPutBack = false;
         rootGroup.visible = true;
         document.body.classList.add('forage-open');
         canvas.style.cursor = 'default';
@@ -679,11 +876,65 @@ export function createShoreForaging(
         void ensureManifestAndPopulate();
     }
 
+    /** Open the lifted center-stage posture-tuning view directly for the currently equipped stone. */
+    function openTuneCurrent(stone: StoneSpec) {
+        if (!active) {
+            active = true;
+            rootGroup.visible = true;
+            document.body.classList.add('forage-open');
+            setMsg('');
+        }
+        closeAfterPutBack = true;
+        void ensureManifestAndPopulate().then(() => {
+            if (!active) return;
+            // Remove any previous temporary tune item
+            for (const old of items.filter(it => it.isTemporaryTune)) removeTakenItem(old);
+
+            const { focusX, focusY } = computeForageCameraFrame();
+            const restPos = new THREE.Vector3(focusX, focusY + 0.04, 0);
+            const restQuat = new THREE.Quaternion();
+
+            const root = new THREE.Group();
+            root.position.copy(restPos);
+            const visual = new THREE.Group();
+            populateStoneGroup(visual, stone);
+            root.add(visual);
+            const collider = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 6), colliderMat);
+            root.add(collider);
+
+            const shadowMat = new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, opacity: 0, depthWrite: false });
+            const shadow = new THREE.Mesh(shadowGeom, shadowMat);
+            shadow.visible = false;
+            rootGroup.add(root);
+            rootGroup.add(shadow);
+
+            const tempItem: ShoreStoneItem = {
+                spec: stone,
+                root,
+                visual,
+                collider,
+                shadow,
+                shadowMat,
+                restPos,
+                restQuat,
+                hoverAmount: 0,
+                inspectBlend: 0,
+                isTemporaryTune: true,
+            };
+            collider.userData.shoreItem = tempItem;
+            items.push(tempItem);
+            pickUpItem(tempItem);
+        });
+    }
+
     function close() {
         if (!active) return;
         active = false;
+        closeAfterPutBack = false;
         if (inspected) {
+            const wasTemp = Boolean(inspected.isTemporaryTune);
             setStoneInspectLook(inspected.visual, false);
+            if (wasTemp) removeTakenItem(inspected);
             inspected = undefined;
         }
         if (hovered) {
@@ -691,7 +942,8 @@ export function createShoreForaging(
             hovered = undefined;
         }
         hoverRing.visible = false;
-        rotateDrag = undefined;
+        postureRing.visible = false;
+        dragState = undefined;
         rootGroup.visible = false;
         document.body.classList.remove('forage-open');
         captionEl.classList.remove('visible', 'inspecting');
@@ -706,6 +958,7 @@ export function createShoreForaging(
 
     return {
         open,
+        openTuneCurrent,
         close,
         isOpen: () => active,
         isInspecting: () => Boolean(inspected),
@@ -717,24 +970,26 @@ export function createShoreForaging(
             const match = items.find(it => it.spec.id === thrownId);
             if (match) removeTakenItem(match);
         },
-        /** Compute fixed crouching riverbank camera pose & animate stone hover/levitation. */
+        /** Compute fixed crouching riverbank camera pose & animate lift-and-enlarge posture tuning. */
         update(dt: number): Pose {
             const { focusX, focusY, camX, camY } = computeForageCameraFrame();
 
-            // Subtle alive eye parallax that keeps every stone firmly within the viewport
             const parallaxZ = inspected ? 0 : cursorNdcX * 0.024;
             const parallaxY = inspected ? 0 : cursorNdcY * 0.015;
 
             const goalPose: Pose = {
                 position: new THREE.Vector3(camX, camY, 0),
                 target: new THREE.Vector3(focusX + 0.10, focusY + parallaxY, parallaxZ),
-                fov: inspected ? 36 : FORAGE_FOV,
+                fov: inspected ? 34 : FORAGE_FOV,
             };
 
-            // Animate each stone smoothly between its embedded resting pose, hover lift, and 360° levitation inspection
             camera.getWorldDirection(camForward);
             camUp.set(0, 1, 0).applyQuaternion(camera.quaternion);
-            const animAlpha = 1 - Math.exp(-Math.max(0, dt) * 11);
+            const animAlpha = 1 - Math.exp(-Math.max(0, dt) * 10);
+            const launchParams = callbacks.getLaunch();
+            spinPreviewAngle += Math.sign(launchParams.spin || 0) * Math.min(Math.abs(launchParams.spin) * 0.055, 1.35) * dt;
+
+            let activeRingBlend = 0;
 
             for (const item of items) {
                 const isInspected = item === inspected;
@@ -742,35 +997,67 @@ export function createShoreForaging(
                 item.hoverAmount += ((isHovered ? 1 : 0) - item.hoverAmount) * animAlpha;
                 item.inspectBlend += ((isInspected ? 1 : 0) - item.inspectBlend) * animAlpha;
 
-                const baseShadow = item.spec.h > 0.011 ? 0.80 : 0.68;
-                item.shadowMat.opacity = baseShadow * (1 - item.inspectBlend) * (1 - item.hoverAmount * 0.35);
+                const baseShadow = item.spec.h > 0.011 ? 0.88 : 0.78;
+                item.shadowMat.opacity = item.isTemporaryTune
+                    ? 0
+                    : baseShadow * (1 - item.inspectBlend) * (1 - item.hoverAmount * 0.45);
+
+                // Smoothly lift UP and enlarge (1.0 -> 1.56x) when picked up to center-stage!
+                const scale = 1 + (HERO_LIFT_SCALE - 1) * item.inspectBlend;
+                item.root.scale.setScalar(scale);
 
                 if (item.inspectBlend > 0.004) {
-                    const maxR = Math.max(item.spec.a, item.spec.b, item.spec.h * 2.0, 0.03);
-                    const inspectDist = clamp(maxR * 5.6, 0.21, 0.34);
+                    const maxR = Math.max(item.spec.a, item.spec.b, item.spec.h * 2.0, 0.032);
+                    const inspectDist = clamp(maxR * 6.8, 0.26, 0.42);
                     goalInspectPos
                         .copy(camera.position)
                         .addScaledVector(camForward, inspectDist)
-                        .addScaledVector(camUp, 0.016);
+                        .addScaledVector(camUp, 0.032);
 
+                    // Graceful upward arc while lifting off the shore
                     item.root.position.lerpVectors(item.restPos, goalInspectPos, item.inspectBlend);
-                    inspectEuler.set(inspectPitch, inspectYaw, 0, 'YXZ');
-                    inspectQuat.setFromEuler(inspectEuler);
-                    tempQuat.copy(camera.quaternion).multiply(inspectQuat);
-                    item.root.quaternion.slerpQuaternions(item.restQuat, tempQuat, item.inspectBlend);
+                    item.root.position.y += Math.sin(item.inspectBlend * Math.PI) * 0.045;
+
+                    if (inspectMode === 'tune') {
+                        // World-horizontal posture display so user directly sees attack tilt & side roll vs water plane!
+                        poseYawQuat.setFromAxisAngle(upAxis, -0.32); // subtle 3/4 view angle to read both tilt & roll clearly
+                        poseTiltQuat.setFromAxisAngle(zAxis, THREE.MathUtils.degToRad(launchParams.tilt));
+                        poseRollQuat.setFromAxisAngle(xAxis, THREE.MathUtils.degToRad(launchParams.roll ?? 0));
+                        spinQuat.setFromAxisAngle(upAxis, spinPreviewAngle);
+                        tempQuat.copy(poseYawQuat).multiply(poseTiltQuat).multiply(poseRollQuat).multiply(spinQuat);
+                        item.root.quaternion.slerpQuaternions(item.restQuat, tempQuat, item.inspectBlend);
+
+                        activeRingBlend = item.inspectBlend;
+                        postureRing.position.copy(item.root.position);
+                        postureRing.position.y -= item.spec.h * scale + 0.012;
+                        const ringScale = (maxR * scale) / 0.052;
+                        postureRing.scale.set(ringScale, ringScale, 1);
+                    } else {
+                        inspectEuler.set(inspectPitch, inspectYaw, 0, 'YXZ');
+                        inspectQuat.setFromEuler(inspectEuler);
+                        tempQuat.copy(camera.quaternion).multiply(inspectQuat);
+                        item.root.quaternion.slerpQuaternions(item.restQuat, tempQuat, item.inspectBlend);
+                    }
                 } else {
                     item.root.position.copy(item.restPos);
-                    item.root.position.y += item.hoverAmount * 0.013;
+                    item.root.position.y += item.hoverAmount * 0.014;
                     item.root.quaternion.copy(item.restQuat);
                 }
+            }
+
+            if (activeRingBlend > 0.05) {
+                postureRing.visible = true;
+                postureRingMat.opacity = 0.42 * activeRingBlend;
+            } else {
+                postureRing.visible = false;
             }
 
             if (hovered && !inspected) {
                 hoverRing.visible = true;
                 const rScale = Math.max(hovered.spec.a, hovered.spec.b) / 0.042;
                 hoverRing.scale.set(rScale, rScale, 1);
-                hoverRing.position.set(hovered.restPos.x, shoreElevation(hovered.restPos.x, hovered.restPos.z) + 0.007, hovered.restPos.z);
-                const normal = shoreNormal(hovered.restPos.x, hovered.restPos.z);
+                const { y: ringY, normal } = sampleRenderedShore(hovered.restPos.x, hovered.restPos.z);
+                hoverRing.position.set(hovered.restPos.x, ringY + 0.004, hovered.restPos.z);
                 hoverRing.quaternion.setFromUnitVectors(zAxis, normal);
             } else {
                 hoverRing.visible = false;

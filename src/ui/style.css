@@ -358,65 +358,77 @@ canvas {
   box-shadow: 0 0 8px rgba(255, 214, 150, 0.9);
 }
 
-/* Bottom-left handheld 3D stone posture & collection panel */
-.hand-panel {
+/* Minimal bottom-left equipped stone pill (replaces old mini 3D window; posture tuning lives center-stage) */
+.stone-pill {
   position: fixed;
   left: 24px;
   bottom: 22px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 14px 10px 10px;
-  border-radius: 18px;
+  gap: 14px;
+  padding: 9px 12px 9px 15px;
+  border-radius: 16px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   box-shadow: var(--shadow-soft);
   pointer-events: auto;
-  max-width: 370px;
 }
 
-.hand-stage-wrap {
-  position: relative;
-  width: 112px;
-  height: 92px;
-  flex-shrink: 0;
-  border-radius: 12px;
-  background: radial-gradient(circle at 60% 35%, rgba(255, 182, 110, 0.14), rgba(10, 14, 24, 0.56));
-  border: 1px solid rgba(255, 206, 158, 0.16);
-  overflow: hidden;
-}
-
-#stone-stage {
-  position: static;
-  width: 100%;
-  height: 100%;
-  display: block;
-  cursor: grab;
-  touch-action: none;
-}
-
-#stone-stage:active {
-  cursor: grabbing;
-}
-
-.stage-hint {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 3px;
-  text-align: center;
-  font-size: 9px;
-  color: rgba(245, 224, 200, 0.55);
-  pointer-events: none;
-}
-
-.hand-info {
+.stone-pill-meta {
   display: flex;
   flex-direction: column;
+  gap: 4px;
+}
+
+.stone-pill-posture {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.stone-pill-posture b {
+  color: var(--accent-bright);
+  font-weight: 600;
+}
+
+.spin-inline {
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 206, 158, 0.22);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--accent-bright);
+  font-size: 10px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.spin-inline:hover {
+  background: rgba(243, 164, 93, 0.22);
+  border-color: var(--accent);
+}
+
+.stone-pill-actions {
+  display: flex;
+  align-items: center;
   gap: 6px;
-  min-width: 0;
+  padding-left: 10px;
+  border-left: 1px solid rgba(255, 206, 158, 0.14);
+}
+
+.forage-btn.subtle {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 206, 158, 0.18);
+  color: var(--text-main);
+}
+
+.forage-btn.subtle:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 206, 158, 0.36);
 }
 
 .hand-title-row {
@@ -591,12 +603,12 @@ body.forage-open .forage-hud {
 .forage-caption {
   position: fixed;
   left: 50%;
-  bottom: 92px;
+  bottom: 86px;
   transform: translate(-50%, 10px);
-  width: min(460px, calc(100vw - 32px));
+  width: min(520px, calc(100vw - 32px));
   padding: 13px 18px;
   border-radius: 18px;
-  background: rgba(13, 17, 29, 0.72);
+  background: rgba(13, 17, 29, 0.74);
   border: 1px solid rgba(255, 206, 158, 0.26);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -646,12 +658,12 @@ body.forage-open .forage-hud {
 
 .forage-inspect-actions {
   display: none;
-  margin-top: 11px;
+  margin-top: 10px;
   padding-top: 10px;
   border-top: 1px solid rgba(255, 206, 158, 0.14);
   flex-direction: column;
-  align-items: center;
-  gap: 8px;
+  align-items: stretch;
+  gap: 9px;
   pointer-events: auto;
 }
 
@@ -659,10 +671,89 @@ body.forage-open .forage-hud {
   display: flex;
 }
 
+.tune-mode-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tune-mode-seg {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 206, 158, 0.16);
+}
+
+.tune-mode-seg .seg {
+  padding: 3px 10px;
+  font-size: 11px;
+  border-radius: 999px;
+}
+
+.tune-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.tune-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 206, 158, 0.12);
+  font-size: 10px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.tune-cell span {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tune-cell b {
+  color: var(--accent-bright);
+  font-weight: 600;
+}
+
+.tune-cell input[type="range"] {
+  width: 100%;
+  margin: 0;
+  accent-color: var(--accent);
+  height: 4px;
+  cursor: pointer;
+}
+
+.tune-spin-btn {
+  align-self: stretch;
+  padding: 0 11px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 206, 158, 0.24);
+  background: rgba(243, 164, 93, 0.14);
+  color: var(--accent-bright);
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.tune-spin-btn:hover {
+  background: rgba(243, 164, 93, 0.26);
+  border-color: var(--accent);
+}
+
 .inspect-tip {
   font-size: 11px;
   color: var(--text-dim);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
 }
 
 .inspect-btns {
@@ -670,6 +761,13 @@ body.forage-open .forage-hud {
   gap: 8px;
   flex-wrap: wrap;
   justify-content: center;
+}
+
+.inspect-btns kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  margin-left: 3px;
+  opacity: 0.75;
 }
 
 .inspect-btns button:disabled {
@@ -1251,18 +1349,11 @@ body.reference-mode #bounce-markers {
 
 /* Mobile / narrow screens */
 @media (max-width: 980px) {
-  .hand-panel {
+  .stone-pill {
     left: 12px;
     bottom: 92px;
     padding: 7px 10px;
-    gap: 8px;
-  }
-  .hand-stage-wrap {
-    width: 78px;
-    height: 68px;
-  }
-  .stage-hint {
-    display: none;
+    gap: 10px;
   }
   #gesture-hud {
     bottom: 14px;
@@ -1297,8 +1388,14 @@ body.reference-mode #bounce-markers {
   .glass-pill kbd {
     display: none;
   }
-  .hand-panel {
+  .stone-pill {
     bottom: 158px;
+  }
+  .tune-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .tune-spin-btn {
+    padding: 7px 10px;
   }
   .hud-dock {
     right: 12px;

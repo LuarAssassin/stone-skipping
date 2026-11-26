@@ -31,25 +31,23 @@ export function mountUI() {
   </button>
 </div>
 
-<section id="hand-panel" class="hand-panel" aria-label="手中石子与姿态调整">
-  <div class="hand-stage-wrap">
-    <canvas id="stone-stage" width="164" height="124" title="按住拖动旋转石子攻角与侧倾"></canvas>
-    <span class="stage-hint">拖动转姿 · 滚轮调攻角</span>
-  </div>
-  <div class="hand-info">
+<section id="hand-panel" class="stone-pill" aria-label="当前石子与快捷操作">
+  <div class="stone-pill-meta">
     <div class="hand-title-row">
       <strong id="hand-stone-name">河岸标准扁石</strong>
       <span class="rarity-tag rarity-usable" id="hand-stone-rarity">寻常</span>
     </div>
-    <div class="hand-dims" id="hand-stone-dims">80 × 60 × 9.0 mm · 60 g</div>
-    <div class="hand-posture-grid">
-      <span class="posture-chip" title="鼠标滚轮 / 拖石子上下">攻角 <b id="hand-tilt">6°</b></span>
-      <span class="posture-chip" title="A/D / 拖石子左右">侧倾 <b id="hand-roll">0°</b></span>
-      <span class="posture-chip" title="W/S 调整出手抛射仰角">抛角 <b id="hand-elev">2°</b></span>
-      <button id="hand-spin-dir" class="spin-chip" type="button" title="Q/E 切换顺逆自旋">↻ 顺旋</button>
+    <div class="stone-pill-posture" id="hand-posture-summary">
+      <span>攻角 <b id="hand-tilt">6°</b></span>
+      <span>侧倾 <b id="hand-roll">0°</b></span>
+      <span>抛角 <b id="hand-elev">2°</b></span>
+      <button id="hand-spin-dir" class="spin-inline" type="button" title="Q/E 切换顺逆自旋">↻ 顺旋</button>
     </div>
+  </div>
+  <div class="stone-pill-actions">
+    <button id="open-tune" class="forage-btn subtle" type="button" title="抬起当前石子放大调姿">调姿</button>
     <button id="open-stones" class="forage-btn" type="button" title="低头在暮色岸滩拣石头 (F)">
-      岸滩拣石 · 石匣 <kbd>F</kbd>
+      拣石 <kbd>F</kbd>
     </button>
   </div>
 </section>
