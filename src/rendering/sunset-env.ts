@@ -1,25 +1,41 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { getSceneTheme, themeSunDirection, type SceneTheme } from './themes';
+
+const defaultTheme = getSceneTheme('sunset');
 
 /** Off-axis low golden-hour sun (~9.5° elevation, ~-26.5° azimuth off +X throw axis).
  *  Keeps the main throw corridor clear of blinding glare while raking ripples & sheets in warm gold. */
-export const SUN_DIRECTION = new THREE.Vector3(0.88, 0.165, -0.44).normalize();
-export const SUN_COLOR = new THREE.Color('#ffad60');
-export const FOG_COLOR = new THREE.Color('#7f5253');
+export const SUN_DIRECTION = themeSunDirection(defaultTheme);
+export const SUN_COLOR = new THREE.Color(defaultTheme.sunColor);
+export const FOG_COLOR = new THREE.Color(defaultTheme.fogColor);
 
 function hash2(x: number, y: number): number {
     const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453123;
     return s - Math.floor(s);
 }
 
-function createSkyMaterial() {
+function createSkyMaterial(theme: SceneTheme) {
+    const sky = theme.sky;
     return new THREE.ShaderMaterial({
         side: THREE.BackSide,
         depthWrite: false,
         fog: false,
         uniforms: {
-            uSunDir: { value: SUN_DIRECTION.clone() },
+            uSunDir: { value: themeSunDirection(theme) },
             uTime: { value: 0 },
+            uZenith: { value: new THREE.Vector3(...sky.zenith) },
+            uUpperMid: { value: new THREE.Vector3(...sky.upperMid) },
+            uLowerMid: { value: new THREE.Vector3(...sky.lowerMid) },
+            uHorizon: { value: new THREE.Vector3(...sky.horizon) },
+            uGlowWide: { value: new THREE.Vector3(...sky.glowWide) },
+            uGlowTight: { value: new THREE.Vector3(...sky.glowTight) },
+            uDisk: { value: new THREE.Vector3(...sky.disk) },
+            uHalo: { value: new THREE.Vector3(...sky.halo) },
+            uCloudDark: { value: new THREE.Vector3(...sky.cloudDark) },
+            uCloudLit: { value: new THREE.Vector3(...sky.cloudLit) },
+            uCloudSilver: { value: new THREE.Vector3(...sky.cloudSilver) },
+            uBelowDark: { value: new THREE.Vector3(...sky.belowDark) },
         },
         vertexShader: /* glsl */ `
             varying vec3 vDir;
@@ -31,6 +47,9 @@ function createSkyMaterial() {
         fragmentShader: /* glsl */ `
             uniform vec3 uSunDir;
             uniform float uTime;
+            uniform vec3 uZenith, uUpperMid, uLowerMid, uHorizon;
+            uniform vec3 uGlowWide, uGlowTight, uDisk, uHalo;
+            uniform vec3 uCloudDark, uCloudLit, uCloudSilver, uBelowDark;
             varying vec3 vDir;
 
             float hash(vec2 p) {
@@ -62,29 +81,23 @@ function createSkyMaterial() {
                 float h = clamp(dir.y, -1.0, 1.0);
                 float up = max(h, 0.0);
 
-                // Twilight palette: Prussian indigo zenith -> dusty plum -> rose-coral -> golden apricot horizon
-                vec3 zenith = vec3(0.045, 0.078, 0.165);
-                vec3 upperMid = vec3(0.145, 0.135, 0.255);
-                vec3 lowerMid = vec3(0.46, 0.24, 0.27);
-                vec3 horizon = vec3(0.92, 0.52, 0.30);
+                vec3 sky = mix(uHorizon, uLowerMid, smoothstep(0.0, 0.14, up));
+                sky = mix(sky, uUpperMid, smoothstep(0.10, 0.38, up));
+                sky = mix(sky, uZenith, smoothstep(0.32, 0.85, up));
 
-                vec3 sky = mix(horizon, lowerMid, smoothstep(0.0, 0.14, up));
-                sky = mix(sky, upperMid, smoothstep(0.10, 0.38, up));
-                sky = mix(sky, zenith, smoothstep(0.32, 0.85, up));
-
-                // Directional sunset glow (azimuthal warmth toward sun)
+                // Directional sun/moon glow
                 float sunDot = dot(dir, uSunDir);
                 float sunAlign = max(0.0, sunDot);
                 float horizonBand = exp(-abs(h) * 8.5);
-                sky += vec3(0.72, 0.32, 0.12) * pow(sunAlign, 3.0) * (0.42 + 0.58 * horizonBand);
-                sky += vec3(1.15, 0.62, 0.26) * pow(sunAlign, 18.0) * 0.62;
+                sky += uGlowWide * pow(sunAlign, 3.0) * (0.42 + 0.58 * horizonBand);
+                sky += uGlowTight * pow(sunAlign, 18.0) * 0.62;
 
-                // Crisp HDR solar disk + soft Mie corona (triggers selective bloom cleanly)
+                // Crisp HDR solar/lunar disk + soft Mie corona
                 float sunDisk = smoothstep(0.9986, 0.99955, sunDot);
                 float sunHalo = pow(sunAlign, 160.0) * 1.45;
-                sky += vec3(2.8, 1.75, 0.92) * sunDisk + vec3(1.35, 0.72, 0.34) * sunHalo;
+                sky += uDisk * sunDisk + uHalo * sunHalo;
 
-                // Subtle high-altitude sunset cirrus clouds
+                // Subtle high-altitude cirrus clouds
                 if (dir.y > 0.018) {
                     vec2 cloudUV = dir.xz / (dir.y + 0.14) * vec2(0.55, 1.35);
                     cloudUV += vec2(uTime * 0.0035, -uTime * 0.0012);
@@ -93,17 +106,15 @@ function createSkyMaterial() {
                     float mask = smoothstep(0.48, 0.82, c1 * 0.62 + c2 * 0.48);
                     mask *= smoothstep(0.018, 0.11, dir.y) * smoothstep(0.72, 0.18, dir.y);
 
-                    // Lit warm underside near sun, muted plum shadow away from sun
                     float silver = pow(sunAlign, 4.0);
-                    vec3 cloudDark = vec3(0.14, 0.11, 0.19);
-                    vec3 cloudLit = mix(vec3(0.86, 0.45, 0.32), vec3(1.45, 0.88, 0.48), silver);
-                    vec3 cloudColor = mix(cloudDark, cloudLit, smoothstep(0.25, 0.78, c2 + silver * 0.45));
+                    vec3 cloudLit = mix(uCloudLit, uCloudSilver, silver);
+                    vec3 cloudColor = mix(uCloudDark, cloudLit, smoothstep(0.25, 0.78, c2 + silver * 0.45));
                     sky = mix(sky, cloudColor, mask * 0.62);
                 }
 
-                // Below horizon: dark twilight water bounce for clean PMREM/reflections
+                // Below horizon: water bounce for clean PMREM/reflections
                 if (h < 0.0) {
-                    vec3 below = mix(horizon * 0.55, vec3(0.03, 0.05, 0.08), smoothstep(0.0, -0.35, h));
+                    vec3 below = mix(uHorizon * 0.55, uBelowDark, smoothstep(0.0, -0.35, h));
                     sky = mix(sky, below, smoothstep(0.0, -0.04, h));
                 }
 
@@ -113,17 +124,20 @@ function createSkyMaterial() {
     });
 }
 
-function createMountainRings(): THREE.Group {
+function createMountainRings(theme: SceneTheme) {
     const group = new THREE.Group();
-    const layers = [
-        { radius: 148, baseHeight: 16.5, ridgeScale: 1.0, seed: 1.7, topColor: '#3a2d44', bottomColor: '#a46350' },
-        { radius: 132, baseHeight: 10.5, ridgeScale: 1.35, seed: 4.3, topColor: '#292237', bottomColor: '#7a4a4e' },
-        { radius: 116, baseHeight: 5.8, ridgeScale: 1.85, seed: 8.9, topColor: '#1b1a2c', bottomColor: '#4c3442' },
+    const specs = [
+        { radius: 148, baseHeight: 16.5, ridgeScale: 1.0, seed: 1.7 },
+        { radius: 132, baseHeight: 10.5, ridgeScale: 1.35, seed: 4.3 },
+        { radius: 116, baseHeight: 5.8, ridgeScale: 1.85, seed: 8.9 },
     ];
+    const materials: THREE.ShaderMaterial[] = [];
+    const sunDir = themeSunDirection(theme);
+    const sunAzimuth = Math.atan2(sunDir.z, sunDir.x);
 
-    const sunAzimuth = Math.atan2(SUN_DIRECTION.z, SUN_DIRECTION.x);
-
-    for (const layer of layers) {
+    for (let layerIdx = 0; layerIdx < specs.length; layerIdx++) {
+        const layer = specs[layerIdx];
+        const palette = theme.mountains[layerIdx];
         const segments = 160;
         const positions = new Float32Array((segments + 1) * 2 * 3);
         const heights = new Float32Array((segments + 1) * 2);
@@ -135,11 +149,9 @@ function createMountainRings(): THREE.Group {
             const cos = Math.cos(angle);
             const sin = Math.sin(angle);
 
-            // Gentle mountain saddle right around the sun so the golden sun shines through cleanly
             const dSun = Math.atan2(Math.sin(angle - sunAzimuth), Math.cos(angle - sunAzimuth));
             const sunGap = 1.0 - 0.68 * Math.exp(-(dSun * dSun) / 0.14);
 
-            // Multi-octave ridge profile
             const ridge =
                 0.52 * (0.5 + 0.5 * Math.sin(angle * 3.0 * layer.ridgeScale + layer.seed)) +
                 0.28 * (0.5 + 0.5 * Math.sin(angle * 7.0 * layer.ridgeScale - layer.seed * 1.4)) +
@@ -178,9 +190,10 @@ function createMountainRings(): THREE.Group {
             side: THREE.DoubleSide,
             fog: false,
             uniforms: {
-                uTop: { value: new THREE.Color(layer.topColor) },
-                uBottom: { value: new THREE.Color(layer.bottomColor) },
-                uSunDir: { value: SUN_DIRECTION.clone() },
+                uTop: { value: new THREE.Color(palette.top) },
+                uBottom: { value: new THREE.Color(palette.bottom) },
+                uGlow: { value: new THREE.Vector3(...palette.glow) },
+                uSunDir: { value: sunDir.clone() },
             },
             vertexShader: /* glsl */ `
                 attribute float aHeight;
@@ -193,24 +206,25 @@ function createMountainRings(): THREE.Group {
                 }
             `,
             fragmentShader: /* glsl */ `
-                uniform vec3 uTop, uBottom, uSunDir;
+                uniform vec3 uTop, uBottom, uGlow, uSunDir;
                 varying float vHeight;
                 varying vec3 vDir;
                 void main() {
                     float sunGlow = pow(max(0.0, dot(normalize(vDir), uSunDir)), 5.0);
                     vec3 col = mix(uBottom, uTop, smoothstep(0.0, 0.85, vHeight));
-                    col += vec3(0.42, 0.21, 0.11) * sunGlow * (1.0 - 0.55 * vHeight);
+                    col += uGlow * sunGlow * (1.0 - 0.55 * vHeight);
                     gl_FragColor = vec4(col, 1.0);
                 }
             `,
         });
 
+        materials.push(material);
         const mesh = new THREE.Mesh(geometry, material);
         mesh.frustumCulled = false;
         group.add(mesh);
     }
 
-    return group;
+    return { group, materials };
 }
 
 export function shorelineCurveX(z: number): number {
@@ -664,6 +678,10 @@ function createShoreAndReeds() {
         uniforms: {
             uTime: { value: 0 },
             uSunDir: { value: SUN_DIRECTION.clone() },
+            uBaseCol: { value: new THREE.Vector3(...defaultTheme.reeds.base) },
+            uTipCol: { value: new THREE.Vector3(...defaultTheme.reeds.tip) },
+            uRimCol: { value: new THREE.Vector3(...defaultTheme.reeds.rim) },
+            uFogCol: { value: new THREE.Color(defaultTheme.fogColor) },
         },
         vertexShader: /* glsl */ `
             uniform float uTime;
@@ -683,20 +701,17 @@ function createShoreAndReeds() {
             }
         `,
         fragmentShader: /* glsl */ `
-            uniform vec3 uSunDir;
+            uniform vec3 uSunDir, uBaseCol, uTipCol, uRimCol, uFogCol;
             varying float vHeight;
             varying vec3 vWorldPos;
             void main() {
-                vec3 baseCol = vec3(0.065, 0.068, 0.062);
-                vec3 tipCol = vec3(0.32, 0.21, 0.13);
-                vec3 col = mix(baseCol, tipCol, smoothstep(0.35, 1.0, vHeight));
-                // Warm sunset backlit rim on reed tips
+                vec3 col = mix(uBaseCol, uTipCol, smoothstep(0.35, 1.0, vHeight));
                 vec3 viewDir = normalize(cameraPosition - vWorldPos);
                 float backlit = pow(max(0.0, dot(-viewDir, uSunDir)), 3.0);
-                col += vec3(0.55, 0.30, 0.12) * backlit * smoothstep(0.45, 1.0, vHeight);
+                col += uRimCol * backlit * smoothstep(0.45, 1.0, vHeight);
                 float dist = length(cameraPosition - vWorldPos);
                 float fogFactor = smoothstep(28.0, 145.0, dist);
-                col = mix(col, vec3(0.498, 0.322, 0.325), fogFactor * 0.85);
+                col = mix(col, uFogCol, fogFactor * 0.85);
                 gl_FragColor = vec4(col, 1.0);
             }
         `,
@@ -739,41 +754,88 @@ function createShoreAndReeds() {
     return { group, shoreMesh, reedsMaterial };
 }
 
-export function createSunsetEnvironment(renderer: THREE.WebGLRenderer, scene: THREE.Scene) {
-    const skyMaterial = createSkyMaterial();
+export function createSunsetEnvironment(
+    renderer: THREE.WebGLRenderer,
+    scene: THREE.Scene,
+    initialTheme: SceneTheme = defaultTheme
+) {
+    const skyMaterial = createSkyMaterial(initialTheme);
     const skyMesh = new THREE.Mesh(new THREE.SphereGeometry(165, 48, 32), skyMaterial);
     skyMesh.frustumCulled = false;
     scene.add(skyMesh);
 
-    const mountains = createMountainRings();
+    const { group: mountains, materials: mountainMaterials } = createMountainRings(initialTheme);
     scene.add(mountains);
 
     const { group: shoreGroup, shoreMesh, reedsMaterial } = createShoreAndReeds();
     scene.add(shoreGroup);
 
-    // Bake PMREM environment map once from the procedural sunset sky for PBR reflections on stone & spray
-    const pmrem = new THREE.PMREMGenerator(renderer);
-    pmrem.compileEquirectangularShader();
-    const envScene = new THREE.Scene();
-    const envSky = new THREE.Mesh(new THREE.SphereGeometry(20, 32, 16), skyMaterial);
-    envScene.add(envSky);
-    const envTarget = pmrem.fromScene(envScene, 0.02);
-    scene.environment = envTarget.texture;
-    scene.environmentIntensity = 0.85;
-    envSky.geometry.dispose();
-    pmrem.dispose();
+    // Bake PMREM environment map from procedural sky; rebaked cleanly whenever user switches scene theme
+    let envTarget: THREE.WebGLRenderTarget | undefined;
+    function rebakeEnvironment(envIntensity: number) {
+        const pmrem = new THREE.PMREMGenerator(renderer);
+        pmrem.compileEquirectangularShader();
+        const envScene = new THREE.Scene();
+        const envSky = new THREE.Mesh(new THREE.SphereGeometry(20, 32, 16), skyMaterial);
+        envScene.add(envSky);
+        const nextTarget = pmrem.fromScene(envScene, 0.02);
+        envTarget?.dispose();
+        envTarget = nextTarget;
+        scene.environment = envTarget.texture;
+        scene.environmentIntensity = envIntensity;
+        envSky.geometry.dispose();
+        pmrem.dispose();
+    }
+
+    function applyTheme(theme: SceneTheme) {
+        const sunDir = themeSunDirection(theme);
+        const u = skyMaterial.uniforms;
+        u.uSunDir.value.copy(sunDir);
+        u.uZenith.value.set(...theme.sky.zenith);
+        u.uUpperMid.value.set(...theme.sky.upperMid);
+        u.uLowerMid.value.set(...theme.sky.lowerMid);
+        u.uHorizon.value.set(...theme.sky.horizon);
+        u.uGlowWide.value.set(...theme.sky.glowWide);
+        u.uGlowTight.value.set(...theme.sky.glowTight);
+        u.uDisk.value.set(...theme.sky.disk);
+        u.uHalo.value.set(...theme.sky.halo);
+        u.uCloudDark.value.set(...theme.sky.cloudDark);
+        u.uCloudLit.value.set(...theme.sky.cloudLit);
+        u.uCloudSilver.value.set(...theme.sky.cloudSilver);
+        u.uBelowDark.value.set(...theme.sky.belowDark);
+
+        for (let i = 0; i < mountainMaterials.length; i++) {
+            const p = theme.mountains[i];
+            const m = mountainMaterials[i].uniforms;
+            m.uTop.value.set(p.top);
+            m.uBottom.value.set(p.bottom);
+            m.uGlow.value.set(...p.glow);
+            m.uSunDir.value.copy(sunDir);
+        }
+
+        reedsMaterial.uniforms.uSunDir.value.copy(sunDir);
+        reedsMaterial.uniforms.uBaseCol.value.set(...theme.reeds.base);
+        reedsMaterial.uniforms.uTipCol.value.set(...theme.reeds.tip);
+        reedsMaterial.uniforms.uRimCol.value.set(...theme.reeds.rim);
+        reedsMaterial.uniforms.uFogCol.value.set(theme.fogColor);
+
+        rebakeEnvironment(theme.envIntensity);
+    }
+
+    rebakeEnvironment(initialTheme.envIntensity);
 
     return {
         skyMesh,
         mountains,
         shoreGroup,
         shoreMesh,
+        applyTheme,
         update(time: number) {
             skyMaterial.uniforms.uTime.value = time;
             reedsMaterial.uniforms.uTime.value = time;
         },
         dispose() {
-            envTarget.dispose();
+            envTarget?.dispose();
             skyMesh.geometry.dispose();
             skyMaterial.dispose();
         },

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { commitRecord, updateTelemetry } from '../ui/telemetry';
 import { type Launch } from '../simulation/physics';
-import { Session, type ReplayMode } from './session';
+import { Session, PLAYBACK_RATE, type ReplayMode } from './session';
 import { CameraRig, type ViewMode } from '../camera/rig';
 import { mountCameraPanel } from '../ui/camera-panel';
 import { PullThrowGesture } from '../input/pull-gesture';
@@ -15,9 +15,12 @@ import { CinemaAudioEngine } from '../audio/engine';
 import { StoneBox, type StoneSpec } from '../simulation/stones';
 import { createShoreForaging } from '../rendering/shore-foraging';
 import { setupDevReview } from './dev-review';
+import { getSceneTheme, loadSavedThemeId, saveThemeId, type SceneThemeId } from '../rendering/themes';
 
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 const SHORE_ORIGIN = new THREE.Vector3(0, 0.24, 0);
+
+type ReplayCameraMode = 'course' | 'bullet';
 
 export function boot() {
     mountUI();
@@ -42,14 +45,65 @@ export function boot() {
     const viewSelect = document.querySelector<HTMLSelectElement>('#view')!;
     const playbackSelect = document.querySelector<HTMLSelectElement>('#playback')!;
     const pauseButton = document.querySelector<HTMLButtonElement>('#pause')!;
-    const quickPauseButton = document.querySelector<HTMLButtonElement>('#quick-pause')!;
     const resultToast = document.querySelector<HTMLElement>('#result-toast')!;
+    const resultReplayCourse = document.querySelector<HTMLButtonElement>('#result-replay-course')!;
+    const resultReplayBullet = document.querySelector<HTMLButtonElement>('#result-replay-bullet')!;
+    const resultThrowAgain = document.querySelector<HTMLButtonElement>('#result-throw-again')!;
+    const resultChangeStone = document.querySelector<HTMLButtonElement>('#result-change-stone')!;
     const gestureHud = document.querySelector<HTMLElement>('#gesture-hud')!;
     const labToggle = document.querySelector<HTMLButtonElement>('#lab-toggle')!;
     const audioToggle = document.querySelector<HTMLButtonElement>('#audio-toggle')!;
     const audioIcon = document.querySelector<HTMLElement>('#audio-icon')!;
     const audioLabel = document.querySelector<HTMLElement>('#audio-label')!;
     const wristCursorEl = document.querySelector<HTMLElement>('#wrist-cursor')!;
+
+    // Theme switcher
+    const themeSwitcher = document.querySelector<HTMLElement>('#theme-switcher')!;
+    const themeToggle = document.querySelector<HTMLButtonElement>('#theme-toggle')!;
+    const themeLabel = document.querySelector<HTMLElement>('#theme-label')!;
+    const themeActiveSwatch = document.querySelector<HTMLElement>('#theme-active-swatch')!;
+    const sceneSubtitle = document.querySelector<HTMLElement>('#scene-subtitle')!;
+    const themeOptions = Array.from(document.querySelectorAll<HTMLButtonElement>('.theme-option'));
+
+    function setThemeMenuOpen(open: boolean) {
+        themeSwitcher.classList.toggle('open', open);
+        themeToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
+    function applyTheme(id: SceneThemeId, persist = true) {
+        const theme = getSceneTheme(id);
+        document.documentElement.dataset.theme = theme.id;
+        world.applyTheme(theme);
+        themeLabel.textContent = theme.name;
+        themeActiveSwatch.className = `theme-swatch theme-swatch-${theme.id}`;
+        sceneSubtitle.textContent = theme.subtitle;
+        for (const btn of themeOptions) {
+            const active = btn.dataset.themeId === theme.id;
+            btn.classList.toggle('active', active);
+            btn.setAttribute('aria-checked', active ? 'true' : 'false');
+        }
+        if (persist) saveThemeId(theme.id);
+    }
+
+    applyTheme(loadSavedThemeId(), false);
+    themeToggle.onclick = event => {
+        event.stopPropagation();
+        setThemeMenuOpen(!themeSwitcher.classList.contains('open'));
+    };
+    for (const btn of themeOptions) {
+        btn.onclick = event => {
+            event.stopPropagation();
+            const nextId = btn.dataset.themeId as SceneThemeId;
+            applyTheme(nextId);
+            setThemeMenuOpen(false);
+        };
+    }
+    window.addEventListener('pointerdown', event => {
+        if (!themeSwitcher.classList.contains('open')) return;
+        if (event.target instanceof Node && !themeSwitcher.contains(event.target)) {
+            setThemeMenuOpen(false);
+        }
+    });
 
     function syncHandPanel() {
         const stone = stoneBox.equipped;
@@ -67,6 +121,37 @@ export function boot() {
     function applyEquippedStone(stone: StoneSpec) {
         world.setStoneMesh(stone);
         syncHandPanel();
+    }
+
+    // Auto-replay orchestration (0.25x course replay by default, toggleable to 0.25x bullet follow)
+    let isAutoReplay = false;
+    let replayCameraMode: ReplayCameraMode = 'course';
+    let autoReplayTimer: number | undefined;
+    let replayLoopScheduled = false;
+    let preReplayView: ViewMode = 'overview';
+
+    function clearAutoReplayTimer() {
+        if (autoReplayTimer !== undefined) {
+            window.clearTimeout(autoReplayTimer);
+            autoReplayTimer = undefined;
+        }
+        replayLoopScheduled = false;
+    }
+
+    function syncReplayButtons() {
+        resultReplayCourse.classList.toggle('active', replayCameraMode === 'course');
+        resultReplayBullet.classList.toggle('active', replayCameraMode === 'bullet');
+    }
+
+    function stopAutoReplay(restoreView = true) {
+        clearAutoReplayTimer();
+        if (isAutoReplay) {
+            isAutoReplay = false;
+            if (restoreView) {
+                rig.view = preReplayView;
+                viewSelect.value = preReplayView;
+            }
+        }
     }
 
     const shoreForaging = createShoreForaging(world.scene, world.sunset.shoreMesh, camera, renderer.domElement, stoneBox, {
@@ -96,15 +181,23 @@ export function boot() {
     world.hideFromTransmission(shoreForaging.rootGroup);
     applyEquippedStone(stoneBox.equipped);
 
+    function openForaging() {
+        stopAutoReplay(true);
+        resultToast.classList.remove('visible', 'new-best');
+        setThemeMenuOpen(false);
+        cancelGesture();
+        setLabOpen(false);
+        shoreForaging.open();
+    }
+
     document.querySelector<HTMLButtonElement>('#open-stones')!.onclick = () => {
         if (shoreForaging.isOpen()) shoreForaging.close();
-        else {
-            cancelGesture();
-            setLabOpen(false);
-            shoreForaging.open();
-        }
+        else openForaging();
     };
     document.querySelector<HTMLButtonElement>('#open-tune')!.onclick = () => {
+        stopAutoReplay(true);
+        resultToast.classList.remove('visible', 'new-best');
+        setThemeMenuOpen(false);
         cancelGesture();
         setLabOpen(false);
         shoreForaging.openTuneCurrent(stoneBox.equipped);
@@ -133,16 +226,8 @@ export function boot() {
     window.addEventListener('pointerdown', unlockAudioOnce, { passive: true });
     window.addEventListener('keydown', unlockAudioOnce, { passive: true });
 
-    function syncQuickHud() {
-        for (const btn of document.querySelectorAll<HTMLButtonElement>('.dock-group [data-view]')) {
-            btn.classList.toggle('active', btn.dataset.view === rig.view);
-        }
-        for (const btn of document.querySelectorAll<HTMLButtonElement>('.dock-group [data-rate]')) {
-            btn.classList.toggle('active', btn.dataset.rate === session.mode);
-        }
-        const label = session.paused ? '继续' : '暂停';
-        pauseButton.textContent = label;
-        quickPauseButton.textContent = label;
+    function syncLabHud() {
+        pauseButton.textContent = session.paused ? '继续' : '暂停';
     }
 
     function setLabOpen(open: boolean) {
@@ -150,47 +235,38 @@ export function boot() {
         labToggle.classList.toggle('active', open);
     }
 
-    labToggle.onclick = () => setLabOpen(!document.body.classList.contains('lab-open'));
+    labToggle.onclick = () => {
+        setThemeMenuOpen(false);
+        setLabOpen(!document.body.classList.contains('lab-open'));
+    };
     document.querySelector<HTMLButtonElement>('#lab-close')!.onclick = () => setLabOpen(false);
 
-    // Long-throw practice uses T=0 for this throw only, without locking user's global temperature to 0
+    // Long-throw practice lives in Lab only (uses T=0 for this throw without locking global temperature)
     function triggerLongThrow() {
+        stopAutoReplay(false);
         Object.assign(parameters, longLaunch);
         syncControls();
         syncHandPanel();
         rig.view = 'course';
         viewSelect.value = 'course';
+        preReplayView = 'course';
         start(false, longLaunch, 0);
     }
 
     longButton.onclick = triggerLongThrow;
-    document.querySelector<HTMLButtonElement>('#quick-long')!.onclick = triggerLongThrow;
-    document.querySelector<HTMLButtonElement>('#quick-throw')!.onclick = () => start();
-    document.querySelector<HTMLButtonElement>('#quick-replay')!.onclick = () => start(true);
-    document.querySelector<HTMLButtonElement>('#result-replay')!.onclick = () => start(true);
-    document.querySelector<HTMLButtonElement>('#result-bullet')!.onclick = () => {
-        if (!session.snapshot) return;
-        start(true, parameters, launch.temperature, 'bullet');
-    };
 
-    for (const btn of document.querySelectorAll<HTMLButtonElement>('.dock-group [data-view]')) {
-        btn.onclick = () => {
-            const view = btn.dataset.view as ViewMode;
-            rig.view = view;
-            viewSelect.value = view;
-            syncQuickHud();
-        };
-    }
-    for (const btn of document.querySelectorAll<HTMLButtonElement>('.dock-group [data-rate]')) {
-        btn.onclick = () => {
-            const mode = btn.dataset.rate as ReplayMode;
-            session.mode = mode;
-            playbackSelect.value = mode;
-            syncQuickHud();
-        };
-    }
-    viewSelect.addEventListener('change', syncQuickHud);
-    playbackSelect.addEventListener('change', syncQuickHud);
+    // Manual Lab dropdown overrides always exit auto-replay so lab inspection stays under user control
+    viewSelect.addEventListener('change', () => {
+        clearAutoReplayTimer();
+        isAutoReplay = false;
+        preReplayView = rig.view;
+        syncLabHud();
+    });
+    playbackSelect.addEventListener('change', () => {
+        clearAutoReplayTimer();
+        isAutoReplay = false;
+        syncLabHud();
+    });
 
     const gesture = new PullThrowGesture();
     const canvas = renderer.domElement;
@@ -201,6 +277,7 @@ export function boot() {
     document.querySelector('.actions')!.after(mouseLabel);
     const mouseMode = mouseLabel.querySelector<HTMLInputElement>('input')!;
     mouseMode.onchange = () => {
+        stopAutoReplay(true);
         cancelGesture();
         session.replay();
         session.mouseMode = mouseMode.checked;
@@ -224,7 +301,7 @@ export function boot() {
         if (point) {
             session.mouse = { x: point.x, z: point.z, y: 0, radius: .22, depth: .075 };
             session.paused = false;
-            syncQuickHud();
+            syncLabHud();
             canvas.setPointerCapture(pointer.pointerId);
         }
     }, true);
@@ -255,6 +332,9 @@ export function boot() {
         }
         if (!event.isPrimary || event.button !== 0) return;
         if (gesture.begin(pointerInput(event), canvas.getBoundingClientRect(), parameters)) {
+            setThemeMenuOpen(false);
+            stopAutoReplay(true);
+            resultToast.classList.remove('visible', 'new-best');
             canvas.setPointerCapture(event.pointerId);
             event.preventDefault();
         }
@@ -314,12 +394,48 @@ export function boot() {
     let heardContacts = 0;
     let heardSink = false;
 
+    function startAutoReplay() {
+        if (
+            !session.snapshot ||
+            session.mouseMode ||
+            dev.isReferenceMode ||
+            shoreForaging.isOpen() ||
+            document.hidden ||
+            gesture.pointerId !== undefined
+        ) return;
+        clearAutoReplayTimer();
+        if (!isAutoReplay) {
+            preReplayView = rig.view;
+        }
+        isAutoReplay = true;
+        syncReplayButtons();
+        if (!session.replay()) return;
+        session.mode = 'slow';
+        playbackSelect.value = 'slow';
+        const useBullet = replayCameraMode === 'bullet';
+        rig.view = useBullet ? 'follow' : 'course';
+        viewSelect.value = rig.view;
+        heardContacts = 0;
+        heardSink = false;
+        const lastThrow = session.snapshot!;
+        const activeStone = session.sim.stone;
+        world.setStoneMesh(activeStone);
+        world.setStoneWet(false);
+        feedback.reset();
+        const simDuration = lastFinishedDuration ?? Math.max(1.4, Math.min(4.5, lastThrow.sampled.speed * 0.165));
+        rig.beginThrow(session.sim.p, useBullet, lastThrow.sampled.direction, camera.aspect, simDuration, PLAYBACK_RATE.slow);
+        audio.updatePlaybackState('slow', false);
+        audio.playThrow(lastThrow.sampled.speed, activeStone.mass);
+        syncLabHud();
+    }
+
     function start(
         replay = false,
         target: Launch = parameters,
         effectiveTemperature = launch.temperature,
         overrideMode?: ReplayMode
     ) {
+        stopAutoReplay(!replay);
         cancelGesture();
         mouseMode.checked = false;
         gestureHud.style.display = '';
@@ -354,13 +470,28 @@ export function boot() {
         document.querySelector('#launch-summary')!.textContent = `本次 seed ${lastThrow.seed} · T=${lastThrow.temperature.toFixed(2)} · ${activeStone.name}\n目标 → 实际出手\n` + fields.map(([key, label, , , , unit]) => `${label} ${(lastThrow.target[key] ?? 0).toFixed(3)} → ${(lastThrow.sampled[key] ?? 0).toFixed(3)} ${unit}`).join('\n');
         feedback.reset();
         const estimatedSimSeconds = lastFinishedDuration ?? Math.max(1.4, Math.min(4.5, lastThrow.sampled.speed * 0.165));
-        rig.beginThrow(session.sim.p, session.mode === 'bullet', lastThrow.sampled.direction, camera.aspect, estimatedSimSeconds);
+        const rate = PLAYBACK_RATE[session.mode];
+        rig.beginThrow(session.sim.p, session.mode === 'bullet', lastThrow.sampled.direction, camera.aspect, estimatedSimSeconds, rate);
         audio.unlock();
         audio.updatePlaybackState(session.mode, false);
         audio.playThrow(lastThrow.sampled.speed, activeStone.mass);
         dev.resetFrames();
-        syncQuickHud();
+        syncLabHud();
     }
+
+    // Result toast replay-mode switcher & quick actions
+    resultReplayCourse.onclick = () => {
+        replayCameraMode = 'course';
+        syncReplayButtons();
+        startAutoReplay();
+    };
+    resultReplayBullet.onclick = () => {
+        replayCameraMode = 'bullet';
+        syncReplayButtons();
+        startAutoReplay();
+    };
+    resultThrowAgain.onclick = () => start(false);
+    resultChangeStone.onclick = openForaging;
 
     document.querySelector<HTMLButtonElement>('#throw')!.onclick = () => start();
     document.querySelector<HTMLButtonElement>('#replay')!.onclick = () => start(true);
@@ -383,17 +514,20 @@ export function boot() {
     };
     function toggle() {
         session.paused = !session.paused;
-        syncQuickHud();
+        syncLabHud();
     }
     pauseButton.onclick = toggle;
-    quickPauseButton.onclick = toggle;
     document.querySelector<HTMLButtonElement>('#step')!.onclick = () => {
         session.paused = true;
         session.advance(1 / 120);
-        syncQuickHud();
+        syncLabHud();
     };
     window.addEventListener('keydown', event => {
         if (event.code === 'Escape') {
+            if (themeSwitcher.classList.contains('open')) {
+                setThemeMenuOpen(false);
+                return;
+            }
             if (shoreForaging.isOpen()) {
                 if (shoreForaging.isInspecting()) shoreForaging.putBackInspected();
                 else shoreForaging.close();
@@ -405,6 +539,7 @@ export function boot() {
         if (event.code === 'Tab') {
             if (event.target instanceof HTMLElement && event.target.closest('input, textarea, select')) return;
             event.preventDefault();
+            setThemeMenuOpen(false);
             if (shoreForaging.isOpen()) shoreForaging.close();
             setLabOpen(!document.body.classList.contains('lab-open'));
             return;
@@ -413,11 +548,7 @@ export function boot() {
         if (event.code === 'KeyF') {
             event.preventDefault();
             if (shoreForaging.isOpen()) shoreForaging.close();
-            else {
-                cancelGesture();
-                setLabOpen(false);
-                shoreForaging.open();
-            }
+            else openForaging();
             return;
         }
         if (/^Digit[1-8]$/.test(event.code)) {
@@ -463,14 +594,16 @@ export function boot() {
     });
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
+            clearAutoReplayTimer();
             cancelGesture();
             session.paused = true;
-            syncQuickHud();
+            syncLabHud();
         }
     });
 
-    syncQuickHud();
+    syncLabHud();
     syncHandPanel();
+    syncReplayButtons();
 
     let previous = performance.now();
     let ambientTime = 0;
@@ -515,6 +648,8 @@ export function boot() {
         world.waterField.setTime(envTime);
         world.sunset.update(envTime);
 
+        const useBulletCam = session.mode === 'bullet' || (isAutoReplay && replayCameraMode === 'bullet');
+
         // Camera orchestration: 3D riverbank foraging vs aiming at shore vs throwing/replay
         if (foragingNow) {
             const foragePose = shoreForaging.update(elapsed);
@@ -528,7 +663,7 @@ export function boot() {
             if (aimAtShore) {
                 rig.update(camera, SHORE_ORIGIN, session.presentationTime, false, elapsed, false, []);
             } else {
-                rig.update(camera, sim.p, session.presentationTime, session.mode === 'bullet', elapsed, paused, sim.contacts);
+                rig.update(camera, sim.p, session.presentationTime, useBulletCam, elapsed, paused, sim.contacts);
             }
         }
         dev.applySideCamera(camera);
@@ -553,10 +688,13 @@ export function boot() {
             }
         }
 
-        if (sim.ended && !resultShownForThrow && !session.mouseMode && !dev.isReferenceMode && session.snapshot) {
+        // End of a live throw -> record stats, show result card, and gently launch 0.25x course replay
+        if (sim.ended && !resultShownForThrow && !isAutoReplay && !session.mouseMode && !dev.isReferenceMode && session.snapshot) {
             resultShownForThrow = true;
             lastFinishedDuration = sim.time;
-            rig.setBulletSpanFromDuration(sim.time);
+            replayCameraMode = 'course';
+            syncReplayButtons();
+            rig.setBulletSpanFromDuration(sim.time, PLAYBACK_RATE.slow);
             const distance = Math.hypot(sim.p.x, sim.p.z);
             stoneBox.recordResult(sim.stone.id, sim.skips, distance);
             const isNewBest = commitRecord(sim.skips, distance);
@@ -564,6 +702,22 @@ export function boot() {
             document.querySelector('#result-stats')!.textContent = `${sim.skips} 跳 · ${distance.toFixed(1)} m`;
             resultToast.classList.toggle('new-best', isNewBest);
             resultToast.classList.add('visible');
+            if (!foragingNow) {
+                autoReplayTimer = window.setTimeout(() => {
+                    autoReplayTimer = undefined;
+                    startAutoReplay();
+                }, 850);
+            }
+        }
+
+        // Seamless loop at the end of an auto-replay pass
+        if (sim.ended && isAutoReplay && !replayLoopScheduled && !paused && !foragingNow && !document.hidden) {
+            replayLoopScheduled = true;
+            autoReplayTimer = window.setTimeout(() => {
+                autoReplayTimer = undefined;
+                replayLoopScheduled = false;
+                if (isAutoReplay) startAutoReplay();
+            }, 1100);
         }
 
         world.post.render(envTime);

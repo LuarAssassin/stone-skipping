@@ -1,11 +1,19 @@
+import { SCENE_THEMES } from '../rendering/themes';
+
 export function mountUI() {
     const app = document.querySelector<HTMLDivElement>('#app')!;
+    const themeItems = SCENE_THEMES.map(
+        t => `<button class="theme-option" data-theme-id="${t.id}" type="button">
+            <span class="theme-swatch theme-swatch-${t.id}"></span>
+            <span>${t.name}</span>
+          </button>`
+    ).join('');
     app.innerHTML = `
 <header class="cinema-header">
   <div class="title-row">
     <h1>掠水</h1>
     <span class="title-rule"></span>
-    <span class="subtitle">暮色湖畔 · 真实水漂</span>
+    <span class="subtitle" id="scene-subtitle">暮色湖畔 · 真实水漂</span>
   </div>
   <div class="best-badge" id="best-record">最佳 <strong>0</strong> 跳 · <span>0.0</span> m</div>
 </header>
@@ -23,6 +31,16 @@ export function mountUI() {
 </div>
 
 <div class="hud-top-right">
+  <div class="theme-switcher" id="theme-switcher">
+    <button id="theme-toggle" class="glass-pill" type="button" aria-haspopup="menu" aria-expanded="false" title="切换湖畔主题">
+      <span class="theme-swatch theme-swatch-sunset" id="theme-active-swatch"></span>
+      <span id="theme-label">落日暮色</span>
+      <span class="theme-caret" aria-hidden="true">▾</span>
+    </button>
+    <div class="theme-menu" id="theme-menu" role="menu" aria-label="选择湖畔主题">
+      ${themeItems}
+    </div>
+  </div>
   <button id="audio-toggle" class="glass-pill" type="button" title="切换声音 (M)">
     <span id="audio-icon" aria-hidden="true">🔊</span><span id="audio-label">声音</span>
   </button>
@@ -58,9 +76,13 @@ export function mountUI() {
     <span class="result-record" id="result-record">★ 新纪录</span>
   </div>
   <div class="result-stats" id="result-stats">0 跳 · 0.0 m</div>
+  <div class="result-replay-bar" role="group" aria-label="回放视角">
+    <button id="result-replay-course" class="seg active" type="button">航道回放 · 0.25×</button>
+    <button id="result-replay-bullet" class="seg" type="button">子弹跟随 · 0.25×</button>
+  </div>
   <div class="result-actions">
-    <button id="result-bullet" type="button">0.05× 子弹回看</button>
-    <button id="result-replay" type="button">重放</button>
+    <button id="result-throw-again" class="primary" type="button">再投一次</button>
+    <button id="result-change-stone" type="button">换个石头</button>
   </div>
 </section>
 
@@ -77,25 +99,6 @@ export function mountUI() {
   </div>
   <output id="aim">滚轮调攻角 · A/D 侧倾 · W/S 抛角 · Q/E 切旋 · Esc 取消</output>
 </section>
-
-<nav class="hud-dock" aria-label="快捷控制">
-  <div class="dock-group" role="group" aria-label="视角">
-    <button class="seg active" data-view="overview" type="button">岸后</button>
-    <button class="seg" data-view="course" type="button">航道</button>
-    <button class="seg" data-view="follow" type="button">跟随</button>
-  </div>
-  <div class="dock-group" role="group" aria-label="播放速度">
-    <button class="seg active" data-rate="normal" type="button">1×</button>
-    <button class="seg" data-rate="slow" type="button">0.25×</button>
-    <button class="seg" data-rate="bullet" type="button">0.05×</button>
-  </div>
-  <div class="dock-actions">
-    <button id="quick-throw" class="dock-btn primary" type="button" title="投出石子 (R)">投石</button>
-    <button id="quick-long" class="dock-btn" type="button" title="高速长投练习预设">长投</button>
-    <button id="quick-replay" class="dock-btn" type="button" title="重放上一投">重放</button>
-    <button id="quick-pause" class="dock-btn" type="button" title="暂停或继续 (Space)">暂停</button>
-  </div>
-</nav>
 
 <aside class="lab-drawer" aria-label="物理实验室面板">
   <div class="lab-head">

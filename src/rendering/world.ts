@@ -4,6 +4,7 @@ import { COURSE_GRID } from '../simulation/water-grid';
 import { createSpray } from './spray';
 import { SurfaceChurn } from './surface-churn';
 import { createSunsetEnvironment, FOG_COLOR, SUN_COLOR, SUN_DIRECTION } from './sunset-env';
+import { getSceneTheme, themeSunDirection, type SceneTheme } from './themes';
 import { createPostPipeline } from './post';
 import { STANDARD_STONE, type StoneSpec } from '../simulation/stones';
 import { populateStoneGroup, setStoneWetness } from './stone-mesh';
@@ -93,7 +94,8 @@ export function createWorld() {
     const post = createPostPipeline(renderer, scene, camera);
 
     // Cinematic sunset lighting: cool twilight zenith sky + warm amber reflected bounce + low golden directional sun
-    scene.add(new THREE.HemisphereLight(0x7084ae, 0x4b2f24, 1.35));
+    const hemi = new THREE.HemisphereLight(0x7084ae, 0x4b2f24, 1.35);
+    scene.add(hemi);
     const sun = new THREE.DirectionalLight(SUN_COLOR, 3.6);
     sun.position.copy(SUN_DIRECTION).multiplyScalar(32).add(new THREE.Vector3(-1.5, 0.1, 0));
     sun.target.position.set(-1.5, 0.1, 0);
@@ -173,8 +175,37 @@ export function createWorld() {
     trail.frustumCulled = false;
     scene.add(trail);
 
+    function applyTheme(themeOrId: SceneTheme | string) {
+        const theme = typeof themeOrId === 'string' ? getSceneTheme(themeOrId) : themeOrId;
+        const sunDir = themeSunDirection(theme);
+        const fogCol = new THREE.Color(theme.fogColor);
+        scene.background = fogCol.clone();
+        if (scene.fog instanceof THREE.Fog) scene.fog.color.copy(fogCol);
+        renderer.setClearColor(fogCol);
+        renderer.toneMappingExposure = theme.exposure;
+
+        hemi.color.set(theme.hemiSky);
+        hemi.groundColor.set(theme.hemiGround);
+        hemi.intensity = theme.hemiIntensity;
+
+        sun.color.set(theme.sunColor);
+        sun.intensity = theme.sunIntensity;
+        sun.position.copy(sunDir).multiplyScalar(32).add(new THREE.Vector3(-1.5, 0.1, 0));
+
+        fill.color.set(theme.fillColor);
+        fill.intensity = theme.fillIntensity;
+
+        sunset.applyTheme(theme);
+        waterField.applyTheme(theme);
+        post.bloomPass.strength = theme.bloomStrength;
+        post.bloomPass.threshold = theme.bloomThreshold;
+        post.gradePass.uniforms.uShadowTint.value.set(...theme.gradeShadow);
+        post.gradePass.uniforms.uHighlightTint.value.set(...theme.gradeHighlight);
+    }
+
     return {
         scene, camera, renderer, post, sunset, waterField, churn, spray, stone, halo, trail, trailGeometry, aimGuide,
+        applyTheme,
         hideFromTransmission(obj: THREE.Object3D) {
             transmissionHidden.push(obj);
         },

@@ -23,9 +23,9 @@ export const BULLET_MAX_SWEEP_RAD = 24 * Math.PI / 180;
 export function cameraPose(view: ViewMode, settings: OverviewSettings, stone: Vector3, orbit?: number, course?: CourseFraming): Pose {
     if (orbit !== undefined) {
         const dirRad = (course?.direction ?? 0) * Math.PI / 180;
-        // Scale time constant with expected throw length so both short (~40s) and long (~75s)
-        // bullet replays glide smoothly through ~18°–24° total instead of spinning continuously.
-        const tau = Math.max(18, (course?.bulletSpan ?? 40) * 0.72);
+        // Scale time constant with expected throw length so both short (~10s @ 0.25x or ~40s @ 0.05x)
+        // and long replays glide smoothly through ~18°–24° total instead of spinning continuously.
+        const tau = Math.max(4, (course?.bulletSpan ?? 40) * 0.72);
         const progress = Math.tanh(Math.max(0, orbit) / tau);
         const angle = dirRad + Math.PI * 0.80 - BULLET_MAX_SWEEP_RAD * progress;
         const radius = 0.96 + 0.14 * progress;
@@ -82,16 +82,18 @@ export class CameraRig {
     private tracking=false;
     private direction=0;
     private bulletSpan=40;
-    beginThrow(stone:Vector3,bullet=false,direction=0,aspect=1.4,estimatedSimSeconds=2.0){
+    beginThrow(stone:Vector3,bullet=false,direction=0,aspect=1.4,estimatedSimSeconds=2.0,playbackRate=0.05){
         this.direction=direction;
-        this.bulletSpan=Math.max(24,Math.min(90,estimatedSimSeconds/0.05));
+        const rate=Math.max(0.05,playbackRate);
+        this.bulletSpan=Math.max(6,Math.min(90,estimatedSimSeconds/rate));
         this.tracking=bullet||this.view!=='overview';
         this.lastStone=stone.clone();
         if(this.tracking)this.pose=cameraPose(this.view,this.settings,stone,bullet?0:undefined,{direction,aspect,bulletSpan:this.bulletSpan});
     }
-    setBulletSpanFromDuration(simSeconds:number){
+    setBulletSpanFromDuration(simSeconds:number,playbackRate=0.05){
         if(Number.isFinite(simSeconds)&&simSeconds>0.2){
-            this.bulletSpan=Math.max(20,Math.min(100,simSeconds/0.05));
+            const rate=Math.max(0.05,playbackRate);
+            this.bulletSpan=Math.max(6,Math.min(100,simSeconds/rate));
         }
     }
     reset() { this.settings = { ...DEFAULT_VIEW }; }

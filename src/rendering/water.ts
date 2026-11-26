@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { Water } from 'three/addons/objects/Water.js';
 import { CoherentWater, FINE_GRID, type WaterGrid, type WaterTick } from './coherent';
 import { SUN_DIRECTION } from './sunset-env';
+import { themeSunDirection, type SceneTheme } from './themes';
 import { MAX_RIPPLE_PACKETS, RIPPLE_LIFETIME, type RipplePacket } from '../simulation/ripples';
 
 export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=null){
@@ -52,10 +53,17 @@ export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=nu
   rippleData:{value:rippleTexture},
   rippleCount:{value:0},
   rippleTime:{value:0},
+  uWaterScatter:{value:new THREE.Vector3(0.011,0.026,0.038)},
+  uRimCatch:{value:new THREE.Vector3(0.42,0.25,0.13)},
+  uFoamDark:{value:new THREE.Vector3(0.34,0.34,0.42)},
+  uFoamLit:{value:new THREE.Vector3(1.04,0.74,0.52)},
+  uFogBase:{value:new THREE.Vector3(0.49,0.32,0.32)},
+  uFogSun:{value:new THREE.Vector3(0.84,0.49,0.32)},
  });
 
  const rippleGLSL=`uniform sampler2D heightState;uniform vec2 domainSize;
  uniform sampler2D rippleData;uniform int rippleCount;uniform float rippleTime;uniform float surfaceInspection;
+ uniform vec3 uWaterScatter,uRimCatch,uFoamDark,uFoamLit,uFogBase,uFogSun;
  float localHeight(vec2 point){vec2 coord=vec2(point.x/domainSize.x,point.y/domainSize.y+.5);if(any(lessThan(coord,vec2(0.0)))||any(greaterThan(coord,vec2(1.0))))return 0.0;return texture2D(heightState,coord).r;}
  // Cauchy-Poisson deep-water dispersive multi-ring wave packets driven by real Contact impulses.
  // Returns vec3(height, dh/dx, dh/dz) analytically with zero grid aliasing.
@@ -161,19 +169,19 @@ export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=nu
  float surfaceDistance=cameraRange.x*cameraRange.y/(cameraRange.y-gl_FragCoord.z*(cameraRange.y-cameraRange.x));
  float depth=clamp(bedDistance-surfaceDistance,0.0,8.0);
  vec3 absorption=exp(-vec3(2.9,1.7,1.45)*depth);
- vec3 waterScatter=vec3(.011,.026,.038);
+ vec3 waterScatter=uWaterScatter;
  vec3 bed=transmitted*absorption+waterScatter*(1.0-absorption);
  bed=mix(bed,waterScatter,surfaceInspection);
  vec2 wetUV=vec2(point.x/domainSize.x,point.y/domainSize.y+.5);
  float opticalDepth=0.;
  if(all(greaterThanEqual(wetUV,vec2(0.)))&&all(lessThanEqual(wetUV,vec2(1.))))opticalDepth=texture2D(churnMap,wetUV).r;
- // Crisp Fresnel reflection blending cool twilight sky & warm sunset glow
+ // Crisp Fresnel reflection blending active theme sky & directional glow
  vec3 outgoingLight=mix(bed,reflectionSample,reflectance)+specularLight;
- // Subtle golden rim catch on steep ripple crests facing the sunset
+ // Subtle directional rim catch on steep ripple crests
  float rippleSlopeMag=length(ripple.yz);
  if(rippleSlopeMag>0.008){
   float rimCatch=pow(max(0.0,dot(surfaceNormal,sunDirection)),1.2)*smoothstep(0.008,0.16,rippleSlopeMag);
-  outgoingLight+=vec3(0.42,0.25,0.13)*rimCatch*(0.25+0.75*reflectance);
+  outgoingLight+=uRimCatch*rimCatch*(0.25+0.75*reflectance);
  }
  if(opticalDepth>.002){
   float coarse=surfaceGrain(point*27.+.8*gradient);
@@ -181,13 +189,13 @@ export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=nu
   float breakup=smoothstep(.04,.95,.66*coarse+.34*detail);
   float coverage=(1.-exp(-opticalDepth*(.55+1.85*breakup)))*(.26+.74*breakup);
   float sunCatch=0.35+0.65*pow(max(0.0,dot(surfaceNormal,sunDirection)),0.7);
-  vec3 foamColor=mix(vec3(0.34,0.34,0.42),vec3(1.04,0.74,0.52),sunCatch);
+  vec3 foamColor=mix(uFoamDark,uFoamLit,sunCatch);
   outgoingLight=mix(outgoingLight,foamColor,coverage*.78);
  }
  // Soft atmospheric horizon blend over distant lake
  float viewDist=length(cameraPosition-worldPosition.xyz);
  float horizonFog=smoothstep(34.0,152.0,viewDist)*(1.0-surfaceInspection);
- vec3 fogCol=mix(vec3(0.49,0.32,0.32),vec3(0.84,0.49,0.32),pow(max(0.0,dot(-eyeDirection,sunDirection)),2.2));
+ vec3 fogCol=mix(uFogBase,uFogSun,pow(max(0.0,dot(-eyeDirection,sunDirection)),2.2));
  outgoingLight=mix(outgoingLight,fogCol,horizonFog*0.86);`);
  let transmissionHidden:THREE.Object3D[]=[];
  const reflection=mesh.onBeforeRender;
@@ -204,6 +212,17 @@ export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=nu
  return {
   mesh,solver,
   setTime(time:number){material.uniforms.uTime.value=time;},
+  applyTheme(theme:SceneTheme){
+   material.uniforms.sunDirection.value.copy(themeSunDirection(theme));
+   material.uniforms.sunColor.value.set(theme.water.sunColor);
+   material.uniforms.waterColor.value.set(theme.water.waterColor);
+   material.uniforms.uWaterScatter.value.set(...theme.water.scatter);
+   material.uniforms.uRimCatch.value.set(...theme.water.rimCatch);
+   material.uniforms.uFoamDark.value.set(...theme.water.foamDark);
+   material.uniforms.uFoamLit.value.set(...theme.water.foamLit);
+   material.uniforms.uFogBase.value.set(...theme.water.fogBase);
+   material.uniforms.uFogSun.value.set(...theme.water.fogSun);
+  },
   setTransmissionHidden(objects:THREE.Object3D[]){transmissionHidden=objects;},
   updateRipples(packets:readonly RipplePacket[],time:number){
    const n=Math.min(MAX_RIPPLE_PACKETS,packets.length);

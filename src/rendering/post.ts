@@ -10,6 +10,8 @@ const CinematicGradeShader = {
         tDiffuse: { value: null },
         uTime: { value: 0 },
         uVignette: { value: 0.34 },
+        uShadowTint: { value: new THREE.Vector3(0.95, 0.98, 1.05) },
+        uHighlightTint: { value: new THREE.Vector3(1.05, 1.00, 0.94) },
     },
     vertexShader: /* glsl */ `
         varying vec2 vUv;
@@ -22,6 +24,8 @@ const CinematicGradeShader = {
         uniform sampler2D tDiffuse;
         uniform float uTime;
         uniform float uVignette;
+        uniform vec3 uShadowTint;
+        uniform vec3 uHighlightTint;
         varying vec2 vUv;
 
         float hash(vec2 p) {
@@ -32,11 +36,9 @@ const CinematicGradeShader = {
             vec4 tex = texture2D(tDiffuse, vUv);
             vec3 col = tex.rgb;
 
-            // Gentle filmic split-toning in linear space: cool twilight shadows, warm golden highlights
+            // Gentle filmic split-toning in linear space driven by active theme
             float luma = dot(col, vec3(0.2126, 0.7152, 0.0722));
-            vec3 shadowTint = vec3(0.95, 0.98, 1.05);
-            vec3 highlightTint = vec3(1.05, 1.00, 0.94);
-            col *= mix(shadowTint, highlightTint, smoothstep(0.08, 0.72, luma));
+            col *= mix(uShadowTint, uHighlightTint, smoothstep(0.08, 0.72, luma));
 
             // Subtle cinema vignette
             vec2 centered = (vUv - 0.5) * vec2(1.18, 1.0);
@@ -44,7 +46,7 @@ const CinematicGradeShader = {
             float vig = 1.0 - smoothstep(0.18, 0.85, dist2) * uVignette;
             col *= vig;
 
-            // Ultra-fine filmic dither to prevent banding across sunset sky gradients
+            // Ultra-fine filmic dither to prevent banding across sky gradients
             float grain = (hash(vUv * 913.7 + fract(uTime) * 17.3) - 0.5) * 0.0045;
             col = max(vec3(0.0), col + grain);
 
