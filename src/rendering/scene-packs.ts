@@ -28,66 +28,68 @@ function hash2(a: number, b: number): number {
 }
 
 /**
- * Curated spatial layout for the 「曲院荷风 · 江南水榭」 scene pack.
- * Strictly keeps the throwing corridor (x ∈ [0, 64], z ∈ [-5.4, +5.4])
- * and the shore foraging patch (x ∈ [-3.5, -0.4], z ∈ [-3.4, +3.4]) 100% unobstructed.
+ * Curated postcard composition for 「曲院荷风 · 江南水榭」 calibrated to the default
+ * lakeside overview frustum (camera (-2.28, 2.10, 0.74) -> (2.8, 0, 0), FOV 42°)
+ * and course-replay sweep.
+ *
+ * Strictly keeps the throwing corridor (x ∈ [0, 64], z ∈ [-5.5, +5.5])
+ * and the shore foraging patch (x ∈ [-3.5, 0], z ∈ [-3.5, +3.5]) 100% unobstructed.
  */
 export function buildJiangnanPlacements(): ScenePropPlacement[] {
     const placements: ScenePropPlacement[] = [
-        // 1. Hexagonal lakeside water pavilion framing the near-left bank
+        // 1. Hexagonal lakeside water pavilion framing the upper-left rule-of-thirds (~-27° off center)
         {
             asset: 'pavilion.glb',
-            position: [9.8, 0, -11.4],
-            rotationY: 0.42,
-            scale: 1.0,
+            position: [22.4, 0, -12.0],
+            rotationY: 0.48,
+            scale: 1.04,
             motion: 'static',
-            lanternLightOffset: [0, 2.55, 1.35],
+            lanternLightOffset: [0, 2.85, 0],
         },
-        // 2. Moored Jiangnan Wupeng wooden boat gently bobbing in the mid-right cove
+        // 2. Moored Jiangnan Wupeng wooden boat gently bobbing on the mid-right (~+16° off center)
         {
             asset: 'wupeng_boat.glb',
-            position: [16.6, 0, 9.8],
-            rotationY: -2.42,
-            scale: 1.0,
+            position: [26.2, 0, 9.2],
+            rotationY: 2.68,
+            scale: 1.05,
             motion: 'boat',
-            lanternLightOffset: [1.85, 0.92, 0],
+            lanternLightOffset: [1.95, 0.64, 0],
         },
-        // 3. Distant 5-tier Jiangnan pagoda silhouette on the far misty horizon bank
+        // 3. Distant 5-tier octagonal Jiangnan pagoda on a misty far-bank headland (~-13° horizon)
         {
             asset: 'distant_pagoda.glb',
-            position: [84.0, -0.25, -24.5],
-            rotationY: 0.3,
-            scale: 1.05,
+            position: [86.0, 0.85, -19.5],
+            rotationY: 0.25,
+            scale: 1.08,
             motion: 'static',
         },
-        // 4. Three graceful weeping willows along outer shoreline banks
+        // 4. Graceful weeping willows: one framing near-left shore, one beside pavilion embankment, one on outer right bank
         {
             asset: 'willow_tree.glb',
-            position: [-1.7, 0, -7.8],
-            rotationY: 0.45,
-            scale: 0.96,
-            motion: 'willow',
-            snapToShore: -0.08,
-        },
-        {
-            asset: 'willow_tree.glb',
-            position: [3.2, 0, -13.6],
-            rotationY: 1.15,
-            scale: 1.08,
-            motion: 'willow',
-            snapToShore: -0.05,
-        },
-        {
-            asset: 'willow_tree.glb',
-            position: [-2.1, 0, 8.9],
-            rotationY: -0.75,
+            position: [-0.8, 0, -7.2],
+            rotationY: -0.32,
             scale: 0.92,
             motion: 'willow',
-            snapToShore: -0.08,
+            snapToShore: -0.06,
+        },
+        {
+            asset: 'willow_tree.glb',
+            position: [17.4, 0.25, -15.0],
+            rotationY: -0.58,
+            scale: 1.08,
+            motion: 'willow',
+        },
+        {
+            asset: 'willow_tree.glb',
+            position: [-1.4, 0, 9.6],
+            rotationY: 0.42,
+            scale: 0.95,
+            motion: 'willow',
+            snapToShore: -0.06,
         },
     ];
 
-    // 5. Four natural lotus coves flanking left & right sides of the water corridor
+    // 5. Four natural lotus coves framing both sides of the lake corridor (left & right foreground + pavilion & boat edges)
     interface LotusCluster {
         cx: number;
         cz: number;
@@ -98,10 +100,10 @@ export function buildJiangnanPlacements(): ScenePropPlacement[] {
         seed: number;
     }
     const clusters: LotusCluster[] = [
-        { cx: 4.8, cz: -7.1, rx: 3.0, rz: 1.5, leaves: 16, flowers: 5, seed: 11 },
-        { cx: 5.6, cz: 7.4, rx: 3.2, rz: 1.6, leaves: 16, flowers: 5, seed: 29 },
-        { cx: 14.2, cz: -9.2, rx: 3.4, rz: 1.8, leaves: 14, flowers: 4, seed: 47 },
-        { cx: 21.8, cz: 10.6, rx: 3.6, rz: 1.9, leaves: 14, flowers: 4, seed: 73 },
+        { cx: 10.2, cz: -7.0, rx: 4.2, rz: 1.5, leaves: 18, flowers: 6, seed: 11 },
+        { cx: 12.8, cz: 7.0, rx: 4.2, rz: 1.5, leaves: 18, flowers: 6, seed: 29 },
+        { cx: 20.6, cz: -9.4, rx: 4.6, rz: 1.9, leaves: 16, flowers: 5, seed: 47 },
+        { cx: 24.4, cz: 10.4, rx: 4.4, rz: 1.8, leaves: 14, flowers: 4, seed: 73 },
     ];
     const leafAssets = ['lotus_leaf_flat.glb', 'lotus_leaf_tall.glb', 'lotus_leaf_curled.glb'] as const;
 
@@ -112,35 +114,67 @@ export function buildJiangnanPlacements(): ScenePropPlacement[] {
             const x = c.cx + Math.cos(angle) * c.rx * radius;
             const rawZ = c.cz + Math.sin(angle) * c.rz * radius;
             // Hard safety clamp keeping throwing corridor z ∈ [-5.5, +5.5] crystal clear
-            const z = rawZ < 0 ? Math.min(-5.65, rawZ) : Math.max(5.65, rawZ);
+            const z = rawZ < 0 ? Math.min(-5.68, rawZ) : Math.max(5.68, rawZ);
             const pick = hash2(c.seed + i * 7, 9.1);
-            const asset = pick < 0.50 ? leafAssets[0] : pick < 0.80 ? leafAssets[1] : leafAssets[2];
+            const asset = pick < 0.48 ? leafAssets[0] : pick < 0.78 ? leafAssets[1] : leafAssets[2];
             placements.push({
                 asset,
                 position: [x, 0, z],
                 rotationY: hash2(c.seed + i * 11, 2.3) * Math.PI * 2,
-                scale: 0.82 + hash2(c.seed + i * 13, 6.7) * 0.42,
+                scale: 0.90 + hash2(c.seed + i * 13, 6.7) * 0.42,
                 motion: 'lotus',
             });
         }
         for (let j = 0; j < c.flowers; j++) {
             const angle = hash2(c.seed + j * 17, 13.1) * Math.PI * 2;
-            const radius = Math.sqrt(hash2(c.seed + j * 19, 17.9)) * 0.78;
+            const radius = Math.sqrt(hash2(c.seed + j * 19, 17.9)) * 0.80;
             const x = c.cx + Math.cos(angle) * c.rx * radius;
             const rawZ = c.cz + Math.sin(angle) * c.rz * radius;
             const z = rawZ < 0 ? Math.min(-5.85, rawZ) : Math.max(5.85, rawZ);
-            const isOpen = hash2(c.seed + j * 23, 21.7) < 0.65;
+            const isOpen = hash2(c.seed + j * 23, 21.7) < 0.66;
             placements.push({
                 asset: isOpen ? 'lotus_flower_open.glb' : 'lotus_flower_bud.glb',
                 position: [x, 0, z],
                 rotationY: hash2(c.seed + j * 29, 5.1) * Math.PI * 2,
-                scale: 0.88 + hash2(c.seed + j * 31, 8.9) * 0.28,
+                scale: 0.95 + hash2(c.seed + j * 31, 8.9) * 0.30,
                 motion: 'lotus',
             });
         }
     }
 
     return placements;
+}
+
+/** Build subtle organic mossy earthen headlands anchoring lakeside willows & distant pagoda. */
+function createJiangnanLandmarks(): THREE.Group {
+    const group = new THREE.Group();
+    const mossMat = new THREE.MeshStandardMaterial({
+        color: '#344237',
+        roughness: 0.94,
+        metalness: 0.0,
+    });
+    const farBankMat = new THREE.MeshStandardMaterial({
+        color: '#2d3f3c',
+        roughness: 0.96,
+        metalness: 0.0,
+    });
+
+    const mounds: Array<{ pos: [number, number, number]; scale: [number, number, number]; mat: THREE.Material }> = [
+        // Low mossy earthen bank behind the water pavilion & supporting the mid-left willow
+        { pos: [17.2, -0.55, -16.8], scale: [7.5, 1.15, 4.8], mat: mossMat },
+        // Misty far-bank headland ridge elevating the distant 5-tier pagoda above the lake surface
+        { pos: [86.0, -0.65, -19.5], scale: [18.0, 2.25, 10.5], mat: farBankMat },
+    ];
+
+    const sphereGeo = new THREE.SphereGeometry(1, 24, 14);
+    for (const m of mounds) {
+        const mesh = new THREE.Mesh(sphereGeo, m.mat);
+        mesh.position.set(...m.pos);
+        mesh.scale.set(...m.scale);
+        mesh.receiveShadow = true;
+        group.add(mesh);
+    }
+    return group;
 }
 
 interface AnimatedProp {
@@ -175,9 +209,13 @@ export function createScenePackManager(scene: THREE.Scene) {
                 const mats = Array.isArray(child.material) ? child.material : [child.material];
                 for (const mat of mats) {
                     if (mat instanceof THREE.MeshStandardMaterial) {
-                        // Ensure alpha cutout foliage (like willow leaves) renders cleanly from both sides
+                        // Ensure alpha-cutout willow foliage & thin petals render cleanly from both sides
                         if (mat.alphaTest > 0 || mat.transparent) {
                             mat.side = THREE.DoubleSide;
+                        }
+                        // Gently lift lantern emissive luminance so selective Bloom catches warm paper glow
+                        if (mat.emissive && (mat.emissive.r + mat.emissive.g + mat.emissive.b) > 0.05) {
+                            mat.emissiveIntensity = Math.max(mat.emissiveIntensity, 2.2);
                         }
                     }
                 }
@@ -193,11 +231,9 @@ export function createScenePackManager(scene: THREE.Scene) {
         try {
             const res = await fetch(`${baseUrl}/manifest.json`, { cache: 'no-cache' });
             if (!res.ok) {
-                // Pack assets not generated yet — stay silently clean until Blender build lands
                 packLoading.delete(packId);
                 return;
             }
-            // Validate JSON before requesting GLBs
             await res.json() as ScenePackManifest;
         } catch {
             packLoading.delete(packId);
@@ -219,8 +255,11 @@ export function createScenePackManager(scene: THREE.Scene) {
 
         const group = new THREE.Group();
         group.name = `scene-pack-${packId}`;
-        const animated: AnimatedProp[] = [];
+        if (packId === 'jiangnan') {
+            group.add(createJiangnanLandmarks());
+        }
 
+        const animated: AnimatedProp[] = [];
         for (let i = 0; i < placements.length; i++) {
             const p = placements[i];
             const proto = prototypes.get(p.asset);
@@ -239,7 +278,7 @@ export function createScenePackManager(scene: THREE.Scene) {
             group.add(instance);
 
             if (p.lanternLightOffset) {
-                const light = new THREE.PointLight('#ffbd69', 3.4, 13.5, 1.6);
+                const light = new THREE.PointLight('#ffbd69', 3.6, 14.5, 1.55);
                 light.position.set(
                     p.lanternLightOffset[0],
                     p.lanternLightOffset[1],
@@ -283,20 +322,20 @@ export function createScenePackManager(scene: THREE.Scene) {
 
         for (const item of animated) {
             if (item.motion === 'boat') {
-                const t = time * 0.95 + item.phase;
-                item.object.position.y = item.basePos.y + Math.sin(t) * 0.028;
-                item.object.rotation.z = Math.sin(t * 0.82 + 0.7) * 0.026 * breezeScale;
-                item.object.rotation.x = Math.cos(t * 0.65) * 0.015 * breezeScale;
-                item.object.rotation.y = item.baseRotY + Math.sin(t * 0.35) * 0.02;
+                const t = time * 0.92 + item.phase;
+                item.object.position.y = item.basePos.y + Math.sin(t) * 0.026;
+                item.object.rotation.z = Math.sin(t * 0.80 + 0.7) * 0.024 * breezeScale;
+                item.object.rotation.x = Math.cos(t * 0.62) * 0.014 * breezeScale;
+                item.object.rotation.y = item.baseRotY + Math.sin(t * 0.34) * 0.018;
             } else if (item.motion === 'lotus') {
-                const t = time * 1.15 + item.phase;
-                item.object.position.y = item.basePos.y + Math.sin(t) * 0.011;
-                item.object.rotation.z = Math.sin(t * 0.9 + 1.1) * 0.042 * breezeScale;
-                item.object.rotation.x = Math.cos(t * 0.75) * 0.032 * breezeScale;
+                const t = time * 1.12 + item.phase;
+                item.object.position.y = item.basePos.y + Math.sin(t) * 0.010;
+                item.object.rotation.z = Math.sin(t * 0.88 + 1.1) * 0.038 * breezeScale;
+                item.object.rotation.x = Math.cos(t * 0.74) * 0.028 * breezeScale;
             } else if (item.motion === 'willow') {
-                const t = time * 0.78 + item.phase;
-                item.object.rotation.z = Math.sin(t) * 0.018 * breezeScale;
-                item.object.rotation.x = Math.cos(t * 0.65) * 0.012 * breezeScale;
+                const t = time * 0.76 + item.phase;
+                item.object.rotation.z = Math.sin(t) * 0.016 * breezeScale;
+                item.object.rotation.x = Math.cos(t * 0.64) * 0.011 * breezeScale;
             }
         }
     }

@@ -1,0 +1,517 @@
+{
+  "version": 1,
+  "packId": "jiangnan",
+  "units": "metres",
+  "gltfAxes": [
+    "X",
+    "Y up",
+    "Z"
+  ],
+  "seed": 20261126,
+  "assets": [
+    {
+      "file": "pavilion.glb",
+      "name": "pavilion",
+      "title": "江南六角水榭",
+      "use": "水中近岸主建筑，原点对齐静水面",
+      "bboxMeters": [
+        4.821540355682373,
+        6.799999952316284,
+        4.178522109985352
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.4107701778411865,
+          -1.2000000476837158,
+          -2.089261054992676
+        ],
+        "max": [
+          2.4107701778411865,
+          5.599999904632568,
+          2.089261054992676
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 13286,
+      "fileBytes": 1017644,
+      "textureMaps": [
+        {
+          "name": "pavilion_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "pavilion_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "pavilion_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "ade94c2d0fdedabff94a5957c362d2432a643427aa4a9aaad71d08e1e25e90c3"
+    },
+    {
+      "file": "wupeng_boat.glb",
+      "name": "wupeng_boat",
+      "title": "乌篷木船",
+      "use": "近中景漂浮船，船头朝 +X，原点对齐吃水线",
+      "bboxMeters": [
+        4.436886787414551,
+        1.151999980211258,
+        1.2519999742507935
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.2184433937072754,
+          -0.46000000834465027,
+          -0.6259999871253967
+        ],
+        "max": [
+          2.2184433937072754,
+          0.6919999718666077,
+          0.6259999871253967
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 7428,
+      "fileBytes": 444288,
+      "textureMaps": [
+        {
+          "name": "wupeng_boat_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "wupeng_boat_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "wupeng_boat_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "36d2e9393650498f6d0dff2f1eba0b07f71b2f504d09b4c42868905159ea284c"
+    },
+    {
+      "file": "distant_pagoda.glb",
+      "name": "distant_pagoda",
+      "title": "五层八角古塔",
+      "use": "距视点 75–95 m 的远岸轮廓，原点为基座接地面",
+      "bboxMeters": [
+        5.751014232635498,
+        18.0,
+        5.751014232635498
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.875507116317749,
+          0.0,
+          -2.875507116317749
+        ],
+        "max": [
+          2.875507116317749,
+          18.0,
+          2.875507116317749
+        ]
+      },
+      "origin": "groundContact",
+      "triangles": 2878,
+      "fileBytes": 434560,
+      "textureMaps": [
+        {
+          "name": "distant_pagoda_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "distant_pagoda_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "distant_pagoda_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "af43d76e6569b5c90aaea51e303d10839e41e9e73aa5d38495e853cecbdd0177"
+    },
+    {
+      "file": "willow_tree.glb",
+      "name": "willow_tree",
+      "title": "岸边垂柳",
+      "use": "近中景岸边树冠与柳丝，原点为根颈接地面",
+      "bboxMeters": [
+        8.037447214126587,
+        7.650891214609146,
+        7.465677261352539
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.9480512142181396,
+          -0.15000000596046448,
+          -3.3218917846679688
+        ],
+        "max": [
+          5.089395999908447,
+          7.500891208648682,
+          4.14378547668457
+        ]
+      },
+      "origin": "groundContact",
+      "triangles": 8488,
+      "fileBytes": 564136,
+      "textureMaps": [
+        {
+          "name": "willow_tree_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "willow_tree_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "willow_tree_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": false,
+      "alphaMask": true,
+      "sha256": "49a918989ebb68f7223dd06ac5bc64c0c9e4f642c337074d7c9181df24623ee5"
+    },
+    {
+      "file": "lotus_leaf_flat.glb",
+      "name": "lotus_leaf_flat",
+      "title": "贴水荷叶",
+      "use": "水面大片荷叶，适合沿塘岸成簇放置",
+      "bboxMeters": [
+        0.49264152348041534,
+        0.5245183892548084,
+        0.4825484901666641
+      ],
+      "boundsMeters": {
+        "min": [
+          -0.24126176536083221,
+          -0.4724181890487671,
+          -0.24749313294887543
+        ],
+        "max": [
+          0.25137975811958313,
+          0.052100200206041336,
+          0.2350553572177887
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 434,
+      "fileBytes": 39020,
+      "textureMaps": [
+        {
+          "name": "lotus_leaf_flat_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "lotus_leaf_flat_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "lotus_leaf_flat_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "ebd482a8fceb0bcb1d3881b924ea616d06cd02f44842114a77e336c09e32fe38"
+    },
+    {
+      "file": "lotus_leaf_tall.glb",
+      "name": "lotus_leaf_tall",
+      "title": "挺水荷叶",
+      "use": "挺水高茎荷叶，放在贴水荷叶与花之间",
+      "bboxMeters": [
+        0.4291796088218689,
+        0.9409877955913544,
+        0.42154549062252045
+      ],
+      "boundsMeters": {
+        "min": [
+          -0.1831350028514862,
+          -0.45043861865997314,
+          -0.19754846394062042
+        ],
+        "max": [
+          0.2460446059703827,
+          0.4905491769313812,
+          0.22399702668190002
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 564,
+      "fileBytes": 42564,
+      "textureMaps": [
+        {
+          "name": "lotus_leaf_tall_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "lotus_leaf_tall_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "lotus_leaf_tall_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "2a71c913240d26e8e2962f870e63a30b456e1d6fdbe2a5e06b3726cbdcbe288d"
+    },
+    {
+      "file": "lotus_leaf_curled.glb",
+      "name": "lotus_leaf_curled",
+      "title": "半卷嫩荷",
+      "use": "半卷嫩叶，用于荷叶群边缘与高低过渡",
+      "bboxMeters": [
+        0.27971822023391724,
+        0.6632633805274963,
+        0.2732153683900833
+      ],
+      "boundsMeters": {
+        "min": [
+          -0.11349807679653168,
+          -0.41337165236473083,
+          -0.12499602138996124
+        ],
+        "max": [
+          0.16622014343738556,
+          0.2498917281627655,
+          0.14821934700012207
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 476,
+      "fileBytes": 39940,
+      "textureMaps": [
+        {
+          "name": "lotus_leaf_curled_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "lotus_leaf_curled_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "lotus_leaf_curled_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "85b690f8b6c0a9a7e949ad3cc54fda945e551cbcfd90b712312ec66252786545"
+    },
+    {
+      "file": "lotus_flower_open.glb",
+      "name": "lotus_flower_open",
+      "title": "粉白盛荷",
+      "use": "近景花冠及中央莲蓬，原点对齐静水面",
+      "bboxMeters": [
+        0.23467671126127243,
+        0.964144229888916,
+        0.23334945738315582
+      ],
+      "boundsMeters": {
+        "min": [
+          -0.08713508397340775,
+          -0.4683186709880829,
+          -0.10259182751178741
+        ],
+        "max": [
+          0.14754162728786469,
+          0.49582555890083313,
+          0.1307576298713684
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 1394,
+      "fileBytes": 109420,
+      "textureMaps": [
+        {
+          "name": "lotus_flower_open_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "lotus_flower_open_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "lotus_flower_open_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "9c7487f9ca05fde553a2a4d2155c39ea11656f5592dfaacaa7ec1d012a439b3c"
+    },
+    {
+      "file": "lotus_flower_bud.glb",
+      "name": "lotus_flower_bud",
+      "title": "胭脂荷苞",
+      "use": "荷塘含苞点缀，原点对齐静水面",
+      "bboxMeters": [
+        0.10525108128786087,
+        0.8647913336753845,
+        0.10011011175811291
+      ],
+      "boundsMeters": {
+        "min": [
+          -0.03252909332513809,
+          -0.48131462931632996,
+          -0.026805056259036064
+        ],
+        "max": [
+          0.07272198796272278,
+          0.38347670435905457,
+          0.07330505549907684
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 576,
+      "fileBytes": 51640,
+      "textureMaps": [
+        {
+          "name": "lotus_flower_bud_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "lotus_flower_bud_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "lotus_flower_bud_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "1898336d0814ff82b20af2dfaec0e7e172d7a61d10d4959b3cf0a0041fc1cb74"
+    }
+  ]
+}

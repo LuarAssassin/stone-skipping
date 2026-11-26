@@ -1,5 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync, statSync } from 'node:fs';
+import { resolve } from 'node:path';
 import {
     DEFAULT_THEME_ID,
     SCENE_THEMES,
@@ -84,5 +86,21 @@ test('Jiangnan scene pack keeps throwing corridor and shore foraging zone comple
                 `prop ${p.asset} at (${x.toFixed(1)}, ${z.toFixed(1)}) intrudes into shore foraging patch`
             );
         }
+    }
+});
+
+test('Jiangnan Blender manifest and all 9 PBR GLB assets exist and are non-empty on disk', () => {
+    const dir = resolve('public/assets/scenes/jiangnan');
+    const manifest = JSON.parse(readFileSync(resolve(dir, 'manifest.json'), 'utf8')) as {
+        packId: string;
+        assets: Array<{ file: string; triangles: number; fileBytes: number }>;
+    };
+    assert.equal(manifest.packId, 'jiangnan');
+    assert.equal(manifest.assets.length, 9);
+    for (const entry of manifest.assets) {
+        const st = statSync(resolve(dir, entry.file));
+        assert.ok(st.size > 10_000, `${entry.file} unexpectedly small (${st.size} bytes)`);
+        assert.equal(st.size, entry.fileBytes, `${entry.file} size mismatch with manifest`);
+        assert.ok(entry.triangles > 100);
     }
 });
