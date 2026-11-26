@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 /** Off-axis low golden-hour sun (~9.5° elevation, ~-26.5° azimuth off +X throw axis).
  *  Keeps the main throw corridor clear of blinding glare while raking ripples & sheets in warm gold. */
@@ -360,8 +361,12 @@ function createShoreGravelTextures() {
         const tex = new THREE.DataTexture(data, size, size);
         tex.wrapS = THREE.RepeatWrapping;
         tex.wrapT = THREE.RepeatWrapping;
+        // Three.js DataTexture defaults to NearestFilter (blocky pixels); enable linear filtering + mipmaps!
+        tex.magFilter = THREE.LinearFilter;
+        tex.minFilter = THREE.LinearMipmapLinearFilter;
+        tex.generateMipmaps = true;
         tex.repeat.set(22, 52);
-        tex.anisotropy = 4;
+        tex.anisotropy = 8;
         if (isSrgb) tex.colorSpace = THREE.SRGBColorSpace;
         tex.needsUpdate = true;
         return tex;
@@ -372,6 +377,144 @@ function createShoreGravelTextures() {
         normalMap: setupTex(normalData, false),
         roughnessMap: setupTex(roughData, false),
     };
+}
+
+interface ShoreBedManifest {
+    tileSizeMeters?: number;
+    textures?: {
+        albedo?: string;
+        normal?: string;
+        roughness?: string;
+        ao?: string;
+    };
+    pebbles?: Array<{
+        id: string;
+        glbPath: string;
+    }>;
+}
+
+/** Hot-upgrade the procedural shore bed with Codex's Blender Cycles 2K seamless PBR gravel textures
+ *  and low-poly baked-PBR river pebble InstancedMeshes when `/assets/shore/manifest.json` is present. */
+function hydrateBlenderShoreBed(
+    shoreMat: THREE.MeshStandardMaterial,
+    widthX: number,
+    widthZ: number,
+    group: THREE.Group,
+    fallbackGravel: THREE.InstancedMesh,
+    gravelMatrices: THREE.Matrix4[],
+    gravelColors: THREE.Color[]
+) {
+    if (typeof fetch === 'undefined') return;
+    void fetch('/assets/shore/manifest.json')
+        .then(res => (res.ok ? (res.json() as Promise<ShoreBedManifest>) : null))
+        .then(manifest => {
+            if (!manifest) return;
+            const tileMeters = Math.max(0.4, manifest.tileSizeMeters ?? 1.2);
+            const repX = widthX / tileMeters;
+            const repZ = widthZ / tileMeters;
+            const texLoader = new THREE.TextureLoader();
+
+            const loadTile = (url: string | undefined, isSrgb: boolean, apply: (t: THREE.Texture) => void) => {
+                if (!url) return;
+                texLoader.load(url, tex => {
+                    tex.wrapS = THREE.RepeatWrapping;
+                    tex.wrapT = THREE.RepeatWrapping;
+                    tex.repeat.set(repX, repZ);
+                    tex.magFilter = THREE.LinearFilter;
+                    tex.minFilter = THREE.LinearMipmapLinearFilter;
+                    tex.anisotropy = 8;
+                    if (isSrgb) tex.colorSpace = THREE.SRGBColorSpace;
+                    tex.needsUpdate = true;
+                    apply(tex);
+                    shoreMat.needsUpdate = true;
+                });
+            };
+
+            if (manifest.textures) {
+                loadTile(manifest.textures.albedo, true, t => {
+                    shoreMat.map?.dispose();
+                    shoreMat.map = t;
+                });
+                loadTile(manifest.textures.normal, false, t => {
+                    shoreMat.normalMap?.dispose();
+                    shoreMat.normalMap = t;
+                    shoreMat.normalScale.set(1.25, 1.25);
+                });
+                loadTile(manifest.textures.roughness, false, t => {
+                    shoreMat.roughnessMap?.dispose();
+                    shoreMat.roughnessMap = t;
+                    shoreMat.roughness = 0.96;
+                });
+                loadTile(manifest.textures.ao, false, t => {
+                    shoreMat.aoMap?.dispose();
+                    shoreMat.aoMap = t;
+                    shoreMat.aoMapIntensity = 0.85;
+                });
+            }
+
+            // Upgrade 2,800 background gravel instances from icosahedra to real Blender baked-PBR pebble meshes
+            if (Array.isArray(manifest.pebbles) && manifest.pebbles.length > 0) {
+                const gltfLoader = new GLTFLoader();
+                const pebbleList = manifest.pebbles;
+                Promise.all(
+                    pebbleList.map(
+                        p =>
+                            new Promise<{ geom: THREE.BufferGeometry; mat: THREE.MeshStandardMaterial } | null>(resolve => {
+                                gltfLoader.load(
+                                    p.glbPath,
+                                    gltf => {
+                                        let found: { geom: THREE.BufferGeometry; mat: THREE.MeshStandardMaterial } | null = null;
+                                        gltf.scene.traverse(obj => {
+                                            if (!found && obj instanceof THREE.Mesh && obj.material instanceof THREE.MeshStandardMaterial) {
+                                                const mat = obj.material.clone();
+                                                mat.color.setHex(0xffffff);
+                                                mat.envMapIntensity = 0.36;
+                                                mat.roughness = Math.max(0.76, mat.roughness);
+                                                found = { geom: obj.geometry, mat };
+                                            }
+                                        });
+                                        resolve(found);
+                                    },
+                                    undefined,
+                                    () => resolve(null)
+                                );
+                            })
+                    )
+                ).then(loaded => {
+                    const valid = loaded.filter((v): v is { geom: THREE.BufferGeometry; mat: THREE.MeshStandardMaterial } => v !== null);
+                    if (valid.length === 0) return;
+
+                    const buckets: number[][] = valid.map(() => []);
+                    for (let i = 0; i < gravelMatrices.length; i++) {
+                        buckets[i % valid.length].push(i);
+                    }
+
+                    const tint = new THREE.Color();
+                    for (let b = 0; b < valid.length; b++) {
+                        const indices = buckets[b];
+                        if (indices.length === 0) continue;
+                        const inst = new THREE.InstancedMesh(valid[b].geom, valid[b].mat, indices.length);
+                        for (let k = 0; k < indices.length; k++) {
+                            const srcIdx = indices[k];
+                            inst.setMatrixAt(k, gravelMatrices[srcIdx]);
+                            // Convert palette color into subtle luminance/wetness modulation over baked rock albedo
+                            const c = gravelColors[srcIdx];
+                            const lum = c.r * 0.299 + c.g * 0.587 + c.b * 0.114;
+                            const factor = THREE.MathUtils.clamp(lum * 2.1, 0.42, 1.08);
+                            tint.setRGB(factor, factor * 0.99, factor * 0.98);
+                            inst.setColorAt(k, tint);
+                        }
+                        inst.instanceMatrix.needsUpdate = true;
+                        if (inst.instanceColor) inst.instanceColor.needsUpdate = true;
+                        group.add(inst);
+                    }
+                    fallbackGravel.visible = false;
+                });
+            }
+        })
+        .catch(() => {
+            // Optional Blender shore pack not generated yet; smooth procedural shore remains active
+        });
 }
 
 function createShoreAndReeds() {
@@ -407,6 +550,8 @@ function createShoreAndReeds() {
         colors[i * 3 + 2] = tmp.b;
     }
     shoreGeom.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    // Mirror uv to uv1 so Blender Cycles aoMap works cleanly on MeshStandardMaterial
+    shoreGeom.setAttribute('uv1', shoreGeom.attributes.uv);
     shoreGeom.computeVertexNormals();
 
     const shoreTex = createShoreGravelTextures();
@@ -505,6 +650,8 @@ function createShoreAndReeds() {
     });
     const gravelCount = 2800;
     const gravel = new THREE.InstancedMesh(pebbleGeom, gravelMat, gravelCount);
+    const gravelMatrices: THREE.Matrix4[] = new Array(gravelCount);
+    const gravelColors: THREE.Color[] = new Array(gravelCount);
     for (let i = 0; i < gravelCount; i++) {
         const r1 = hash2(i * 1.91 + 7.1, 19.3);
         const r2 = hash2(i * 3.17 + 2.4, 41.7);
@@ -513,13 +660,13 @@ function createShoreAndReeds() {
         const r5 = hash2(i * 7.43 + 1.8, 113.9);
         const r6 = hash2(i * 8.81 + 3.9, 137.3);
 
-        // 75% densely carpeting the visible foraging foreground & edges; 25% blending smoothly along the wider shore
+        // 78% densely carpeting the visible foraging foreground & edges; 22% blending smoothly along the wider shore
         const inCore = i < Math.floor(gravelCount * 0.78);
         const z = inCore
             ? (r1 - 0.5) * 4.8
             : (r1 - 0.5) * 11.0;
         const edge = shorelineCurveX(z);
-        // Extend naturally from shallow wet water (-0.25m) across the wet bar up into the dry bank (+2.35m)
+        // Extend naturally from shallow wet water (-0.22m) across the wet bar up into the dry bank (+2.35m)
         const inland = inCore
             ? -0.22 + Math.pow(r2, 1.18) * 2.25
             : -0.18 + Math.pow(r2, 1.25) * 2.85;
@@ -543,16 +690,20 @@ function createShoreAndReeds() {
         dummy.scale.set(sx, sy, sz);
         dummy.updateMatrix();
         gravel.setMatrixAt(i, dummy.matrix);
+        gravelMatrices[i] = dummy.matrix.clone();
 
         const baseCol = pebblePalette[Math.floor(r4 * pebblePalette.length) % pebblePalette.length];
         const shade = 0.66 + 0.44 * hash2(i * 2.3, 151.7);
         const wetness = 1 - THREE.MathUtils.smoothstep(y, -0.02, 0.095);
         colorAttr.copy(baseCol).multiplyScalar(shade * (1 - 0.44 * wetness));
         gravel.setColorAt(i, colorAttr);
+        gravelColors[i] = colorAttr.clone();
     }
     gravel.instanceMatrix.needsUpdate = true;
     if (gravel.instanceColor) gravel.instanceColor.needsUpdate = true;
     group.add(gravel);
+
+    hydrateBlenderShoreBed(shoreMat, widthX, widthZ, group, gravel, gravelMatrices, gravelColors);
 
     // 3. Swaying lakeside reeds along left & right shore margins (safely clear of throw corridor & camera)
     const bladeGeom = new THREE.PlaneGeometry(0.024, 1.0, 1, 6);
