@@ -1,11 +1,18 @@
 import { SCENE_THEMES } from '../rendering/themes';
+import { WEATHER_PRESETS } from '../rendering/weather';
 
 export function mountUI() {
     const app = document.querySelector<HTMLDivElement>('#app')!;
     const themeItems = SCENE_THEMES.map(
-        t => `<button class="theme-option" data-theme-id="${t.id}" type="button">
+        t => `<button class="theme-option" data-theme-id="${t.id}" type="button" role="menuitemradio">
             <span class="theme-swatch theme-swatch-${t.id}"></span>
             <span>${t.name}</span>
+          </button>`
+    ).join('');
+    const weatherItems = WEATHER_PRESETS.map(
+        w => `<button class="weather-option" data-weather-id="${w.id}" type="button" role="menuitemradio">
+            <span class="weather-icon" aria-hidden="true">${w.icon}</span>
+            <span>${w.name}</span>
           </button>`
     ).join('');
     app.innerHTML = `
@@ -32,13 +39,23 @@ export function mountUI() {
 
 <div class="hud-top-right">
   <div class="theme-switcher" id="theme-switcher">
-    <button id="theme-toggle" class="glass-pill" type="button" aria-haspopup="menu" aria-expanded="false" title="切换湖畔主题">
+    <button id="theme-toggle" class="glass-pill" type="button" aria-haspopup="menu" aria-expanded="false" title="切换湖畔场景主题">
       <span class="theme-swatch theme-swatch-sunset" id="theme-active-swatch"></span>
       <span id="theme-label">落日暮色</span>
       <span class="theme-caret" aria-hidden="true">▾</span>
     </button>
     <div class="theme-menu" id="theme-menu" role="menu" aria-label="选择湖畔主题">
       ${themeItems}
+    </div>
+  </div>
+  <div class="weather-switcher" id="weather-switcher">
+    <button id="weather-toggle" class="glass-pill" type="button" aria-haspopup="menu" aria-expanded="false" title="切换湖面天气">
+      <span class="weather-icon" id="weather-active-icon" aria-hidden="true">☀</span>
+      <span id="weather-label">晴朗</span>
+      <span class="theme-caret" aria-hidden="true">▾</span>
+    </button>
+    <div class="weather-menu" id="weather-menu" role="menu" aria-label="选择天气">
+      ${weatherItems}
     </div>
   </div>
   <button id="audio-toggle" class="glass-pill" type="button" title="切换声音 (M)">

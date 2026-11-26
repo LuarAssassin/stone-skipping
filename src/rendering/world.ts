@@ -5,6 +5,8 @@ import { createSpray } from './spray';
 import { SurfaceChurn } from './surface-churn';
 import { createSunsetEnvironment, FOG_COLOR, SUN_COLOR, SUN_DIRECTION } from './sunset-env';
 import { getSceneTheme, themeSunDirection, type SceneTheme } from './themes';
+import { createWeatherSystem, getWeatherPreset, type WeatherPreset } from './weather';
+import { createScenePackManager } from './scene-packs';
 import { createPostPipeline } from './post';
 import { STANDARD_STONE, type StoneSpec } from '../simulation/stones';
 import { populateStoneGroup, setStoneWetness } from './stone-mesh';
@@ -91,6 +93,8 @@ export function createWorld() {
     document.body.prepend(renderer.domElement);
 
     const sunset = createSunsetEnvironment(renderer, scene);
+    const weather = createWeatherSystem(scene);
+    const scenePacks = createScenePackManager(scene);
     const post = createPostPipeline(renderer, scene, camera);
 
     // Cinematic sunset lighting: cool twilight zenith sky + warm amber reflected bounce + low golden directional sun
@@ -119,8 +123,8 @@ export function createWorld() {
     scene.add(waterField.mesh);
     const spray = createSpray(waterField.mesh.material.uniforms.heightState, COURSE_GRID);
     scene.add(spray.mesh);
-    // Underwater refraction pass only needs submerged riverbed & stone; skip sky, distant mountains & airborne spray
-    const transmissionHidden: THREE.Object3D[] = [sunset.skyMesh, sunset.mountains, spray.mesh];
+    // Underwater refraction pass only needs submerged riverbed & stone; skip sky, mountains, spray, weather & above-water scenery
+    const transmissionHidden: THREE.Object3D[] = [sunset.skyMesh, sunset.mountains, spray.mesh, weather.rootGroup, scenePacks.rootGroup];
     waterField.setTransmissionHidden(transmissionHidden);
 
     // Natural gently-sloping riverbed (shallow warm pebble bank near shore -> deeper twilight basin)
@@ -175,12 +179,24 @@ export function createWorld() {
     trail.frustumCulled = false;
     scene.add(trail);
 
+    let activeTheme: SceneTheme = getSceneTheme('sunset');
+    let activeWeather: WeatherPreset = getWeatherPreset('clear');
+
+    function syncFogAndSun() {
+        if (scene.fog instanceof THREE.Fog) {
+            scene.fog.color.set(activeTheme.fogColor);
+            scene.fog.near = 34 * activeWeather.fogNearScale;
+            scene.fog.far = 148 * activeWeather.fogFarScale;
+        }
+        sun.intensity = activeTheme.sunIntensity * activeWeather.sunDim;
+    }
+
     function applyTheme(themeOrId: SceneTheme | string) {
         const theme = typeof themeOrId === 'string' ? getSceneTheme(themeOrId) : themeOrId;
+        activeTheme = theme;
         const sunDir = themeSunDirection(theme);
         const fogCol = new THREE.Color(theme.fogColor);
         scene.background = fogCol.clone();
-        if (scene.fog instanceof THREE.Fog) scene.fog.color.copy(fogCol);
         renderer.setClearColor(fogCol);
         renderer.toneMappingExposure = theme.exposure;
 
@@ -189,23 +205,45 @@ export function createWorld() {
         hemi.intensity = theme.hemiIntensity;
 
         sun.color.set(theme.sunColor);
-        sun.intensity = theme.sunIntensity;
         sun.position.copy(sunDir).multiplyScalar(32).add(new THREE.Vector3(-1.5, 0.1, 0));
 
         fill.color.set(theme.fillColor);
         fill.intensity = theme.fillIntensity;
 
         sunset.applyTheme(theme);
+        sunset.applyWeather(activeWeather);
         waterField.applyTheme(theme);
+        waterField.applyWeather(activeWeather);
+        weather.applyWeather(activeWeather, theme);
+        scenePacks.setPack(theme.scenePack);
+        syncFogAndSun();
         post.bloomPass.strength = theme.bloomStrength;
         post.bloomPass.threshold = theme.bloomThreshold;
         post.gradePass.uniforms.uShadowTint.value.set(...theme.gradeShadow);
         post.gradePass.uniforms.uHighlightTint.value.set(...theme.gradeHighlight);
     }
 
+    function applyWeather(weatherOrId: WeatherPreset | string) {
+        const preset = typeof weatherOrId === 'string' ? getWeatherPreset(weatherOrId) : weatherOrId;
+        activeWeather = preset;
+        sunset.applyWeather(preset);
+        waterField.applyWeather(preset);
+        weather.applyWeather(preset, activeTheme);
+        syncFogAndSun();
+    }
+
+    function updateEnvironment(time: number) {
+        waterField.setTime(time);
+        sunset.update(time);
+        weather.update(time, camera);
+        scenePacks.update(time, activeWeather.breezeScale);
+    }
+
     return {
-        scene, camera, renderer, post, sunset, waterField, churn, spray, stone, halo, trail, trailGeometry, aimGuide,
+        scene, camera, renderer, post, sunset, weather, scenePacks, waterField, churn, spray, stone, halo, trail, trailGeometry, aimGuide,
         applyTheme,
+        applyWeather,
+        updateEnvironment,
         hideFromTransmission(obj: THREE.Object3D) {
             transmissionHidden.push(obj);
         },

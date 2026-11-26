@@ -1,6 +1,7 @@
 import * as THREE from 'three';
+import type { ScenePackId } from './scene-packs';
 
-export type SceneThemeId = 'sunset' | 'mist_dawn' | 'moonlight';
+export type SceneThemeId = 'sunset' | 'jiangnan_lotus' | 'mist_dawn' | 'moonlight';
 
 export interface MountainLayerPalette {
     top: string;
@@ -13,6 +14,8 @@ export interface SceneTheme {
     name: string;
     shortLabel: string;
     subtitle: string;
+    /** Optional 3D Blender scenery pack mounted alongside this theme */
+    scenePack: ScenePackId;
     /** Normalized sun/moon directional vector */
     sunDirection: [number, number, number];
     sunColor: string;
@@ -71,6 +74,7 @@ export const SCENE_THEMES: readonly SceneTheme[] = [
         name: '落日暮色',
         shortLabel: '暮色',
         subtitle: '暮色湖畔 · 真实水漂',
+        scenePack: 'none',
         sunDirection: [0.88, 0.165, -0.44],
         sunColor: '#ffad60',
         sunIntensity: 3.6,
@@ -122,10 +126,67 @@ export const SCENE_THEMES: readonly SceneTheme[] = [
         },
     },
     {
+        id: 'jiangnan_lotus',
+        name: '曲院荷风',
+        shortLabel: '江南',
+        subtitle: '江南水榭 · 荷塘掠水',
+        scenePack: 'jiangnan',
+        sunDirection: [0.85, 0.21, -0.47],
+        sunColor: '#ffd7a3',
+        sunIntensity: 3.35,
+        hemiSky: '#9ec4be',
+        hemiGround: '#3d4c3e',
+        hemiIntensity: 1.45,
+        fillColor: '#6f9b98',
+        fillIntensity: 0.62,
+        fogColor: '#8ba49b',
+        exposure: 1.05,
+        envIntensity: 0.88,
+        bloomStrength: 0.28,
+        bloomThreshold: 0.94,
+        gradeShadow: [0.94, 1.01, 1.00],
+        gradeHighlight: [1.04, 1.01, 0.95],
+        sky: {
+            zenith: [0.13, 0.25, 0.33],
+            upperMid: [0.27, 0.40, 0.45],
+            lowerMid: [0.54, 0.57, 0.53],
+            horizon: [0.90, 0.77, 0.62],
+            glowWide: [0.56, 0.38, 0.22],
+            glowTight: [0.96, 0.72, 0.42],
+            disk: [2.65, 2.20, 1.55],
+            halo: [1.18, 0.88, 0.56],
+            cloudDark: [0.30, 0.38, 0.42],
+            cloudLit: [0.84, 0.74, 0.62],
+            cloudSilver: [1.30, 1.08, 0.82],
+            belowDark: [0.05, 0.09, 0.09],
+        },
+        mountains: [
+            { top: '#435e63', bottom: '#96a89e', glow: [0.30, 0.24, 0.16] },
+            { top: '#2f494f', bottom: '#6d8680', glow: [0.26, 0.21, 0.14] },
+            { top: '#1e3338', bottom: '#465f5c', glow: [0.20, 0.17, 0.12] },
+        ],
+        water: {
+            sunColor: '#ffd9a6',
+            waterColor: '#13322c',
+            scatter: [0.012, 0.036, 0.030],
+            rimCatch: [0.36, 0.32, 0.22],
+            foamDark: [0.38, 0.48, 0.44],
+            foamLit: [0.98, 0.90, 0.76],
+            fogBase: [0.52, 0.60, 0.57],
+            fogSun: [0.84, 0.72, 0.58],
+        },
+        reeds: {
+            base: [0.05, 0.10, 0.06],
+            tip: [0.16, 0.25, 0.14],
+            rim: [0.48, 0.42, 0.22],
+        },
+    },
+    {
         id: 'mist_dawn',
         name: '青岚晨雾',
         shortLabel: '晨雾',
         subtitle: '青岚晓湖 · 真实水漂',
+        scenePack: 'none',
         sunDirection: [0.86, 0.24, -0.44],
         sunColor: '#ffe8ca',
         sunIntensity: 3.25,
@@ -181,6 +242,7 @@ export const SCENE_THEMES: readonly SceneTheme[] = [
         name: '月下静湖',
         shortLabel: '月夜',
         subtitle: '清辉月湖 · 真实水漂',
+        scenePack: 'none',
         sunDirection: [0.84, 0.28, -0.46],
         sunColor: '#c4dcff',
         sunIntensity: 2.55,

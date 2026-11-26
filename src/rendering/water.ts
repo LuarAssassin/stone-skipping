@@ -3,6 +3,7 @@ import { Water } from 'three/addons/objects/Water.js';
 import { CoherentWater, FINE_GRID, type WaterGrid, type WaterTick } from './coherent';
 import { SUN_DIRECTION } from './sunset-env';
 import { themeSunDirection, type SceneTheme } from './themes';
+import type { WeatherPreset } from './weather';
 import { MAX_RIPPLE_PACKETS, RIPPLE_LIFETIME, type RipplePacket } from '../simulation/ripples';
 
 export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=null){
@@ -59,11 +60,15 @@ export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=nu
   uFoamLit:{value:new THREE.Vector3(1.04,0.74,0.52)},
   uFogBase:{value:new THREE.Vector3(0.49,0.32,0.32)},
   uFogSun:{value:new THREE.Vector3(0.84,0.49,0.32)},
+  uRainIntensity:{value:0},
+  uBreezeScale:{value:1},
+  uFogRange:{value:new THREE.Vector2(34.0,152.0)},
  });
 
  const rippleGLSL=`uniform sampler2D heightState;uniform vec2 domainSize;
  uniform sampler2D rippleData;uniform int rippleCount;uniform float rippleTime;uniform float surfaceInspection;
  uniform vec3 uWaterScatter,uRimCatch,uFoamDark,uFoamLit,uFogBase,uFogSun;
+ uniform float uRainIntensity,uBreezeScale;uniform vec2 uFogRange;
  float localHeight(vec2 point){vec2 coord=vec2(point.x/domainSize.x,point.y/domainSize.y+.5);if(any(lessThan(coord,vec2(0.0)))||any(greaterThan(coord,vec2(1.0))))return 0.0;return texture2D(heightState,coord).r;}
  // Cauchy-Poisson deep-water dispersive multi-ring wave packets driven by real Contact impulses.
  // Returns vec3(height, dh/dx, dh/dz) analytically with zero grid aliasing.
@@ -134,15 +139,56 @@ export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=nu
   float w2 = sin(p.x*6.3 - p.y*4.8 - t*1.85) * 0.5 + cos(p.x*4.9 + p.y*6.1 + t*1.45) * 0.5;
   float g1 = cos(p.x*2.4 + p.y*1.7 + t*1.15) * 1.2 - sin(p.x*1.5 - p.y*2.9 + t*0.85) * 0.75;
   float g2 = cos(p.x*2.4 + p.y*1.7 + t*1.15) * 0.85 + sin(p.x*1.5 - p.y*2.9 + t*0.85) * 1.45;
-  return vec2(g1 + w2*0.6, g2 - w1*0.55) * 0.0015;
+  return vec2(g1 + w2*0.6, g2 - w1*0.55) * (0.0015 * uBreezeScale);
+ }
+ vec2 rainLayerSlope(vec2 p, float t, float scale, float speed){
+  vec2 sp = p * scale;
+  vec2 cell = floor(sp);
+  vec2 f = fract(sp);
+  vec2 acc = vec2(0.0);
+  for(int oy=-1;oy<=1;oy++){
+   for(int ox=-1;ox<=1;ox++){
+    vec2 c = cell + vec2(float(ox), float(oy));
+    float h1 = fract(sin(dot(c, vec2(127.1, 311.7))) * 43758.5453);
+    float h2 = fract(sin(dot(c, vec2(269.5, 183.3))) * 43758.5453);
+    float cycle = t * speed + h1 * 6.2831;
+    float age = fract(cycle);
+    float id = floor(cycle);
+    vec2 jitter = vec2(
+     fract(sin(dot(c + id * 1.37, vec2(41.2, 89.7))) * 43758.5453),
+     fract(sin(dot(c + id * 2.19, vec2(73.4, 29.1))) * 43758.5453)
+    );
+    vec2 center = vec2(float(ox), float(oy)) + 0.16 + jitter * 0.68;
+    vec2 rel = f - center;
+    float dist = length(rel);
+    float radius = age * 0.58;
+    float band = dist - radius;
+    float env = exp(-band * band * 260.0) * (1.0 - age) * smoothstep(0.0, 0.08, age);
+    if(env > 0.002 && dist > 0.004){
+     float wave = sin(band * 46.0) * env;
+     acc += (rel / dist) * wave * (0.45 + 0.55 * h2);
+    }
+   }
+  }
+  return acc;
+ }
+ vec2 rainRippleSlope(vec2 p, float t, float distToCam){
+  if(uRainIntensity <= 0.01) return vec2(0.0);
+  float lod = 1.0 - smoothstep(14.0, 48.0, distToCam);
+  if(lod <= 0.005) return vec2(0.0);
+  vec2 r1 = rainLayerSlope(p, t, 1.45, 0.95);
+  vec2 r2 = rainLayerSlope(p + vec2(17.3, 9.1), t + 0.43, 2.35, 1.30);
+  return (r1 * 0.65 + r2 * 0.45) * (0.048 * uRainIntensity * lod);
  }
  `+'uniform mat4 textureMatrix; uniform sampler2D churnMap; uniform sampler2D transmission; uniform sampler2D transmissionDepth; uniform vec2 cameraRange; uniform float uTime; varying vec4 transmissionCoord;\nvoid main() {')
   .replace('vec3 surfaceNormal = normalize( noise.xzy * vec3( 1.5, 1.0, 1.5 ) );',`vec2 spacing=vec2(${grid.dx},${grid.dz});
  vec2 point=worldPosition.xz;
+ float camDistNow=length(cameraPosition-worldPosition.xyz);
  vec2 gradient=vec2(localHeight(point+vec2(spacing.x,0.0))-localHeight(point-vec2(spacing.x,0.0)),localHeight(point+vec2(0.0,spacing.y))-localHeight(point-vec2(0.0,spacing.y)))/(2.0*spacing);
  vec3 ripple=dispersiveRipples(point);
  vec2 calmWind=breezeSlope(point,uTime)*(1.0-surfaceInspection);
- vec2 totalSlope=gradient+ripple.yz+calmWind;
+ vec2 rainSlope=rainRippleSlope(point,uTime,camDistNow)*(1.0-surfaceInspection);
+ vec2 totalSlope=gradient+ripple.yz+calmWind+rainSlope;
  vec3 surfaceNormal=normalize(vec3(-totalSlope.x,1.0,-totalSlope.y));`)
   .replace('mirrorCoord.xy / mirrorCoord.w + distortion','reflectionUV')
   .replace('vec3 reflectionSample =',`vec4 ray=textureMatrix*vec4(reflect(-eyeDirection,surfaceNormal),0.0);
@@ -194,7 +240,7 @@ export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=nu
  }
  // Soft atmospheric horizon blend over distant lake
  float viewDist=length(cameraPosition-worldPosition.xyz);
- float horizonFog=smoothstep(34.0,152.0,viewDist)*(1.0-surfaceInspection);
+ float horizonFog=smoothstep(uFogRange.x,uFogRange.y,viewDist)*(1.0-surfaceInspection);
  vec3 fogCol=mix(uFogBase,uFogSun,pow(max(0.0,dot(-eyeDirection,sunDirection)),2.2));
  outgoingLight=mix(outgoingLight,fogCol,horizonFog*0.86);`);
  let transmissionHidden:THREE.Object3D[]=[];
@@ -222,6 +268,11 @@ export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=nu
    material.uniforms.uFoamLit.value.set(...theme.water.foamLit);
    material.uniforms.uFogBase.value.set(...theme.water.fogBase);
    material.uniforms.uFogSun.value.set(...theme.water.fogSun);
+  },
+  applyWeather(weather:WeatherPreset){
+   material.uniforms.uRainIntensity.value=weather.rainIntensity;
+   material.uniforms.uBreezeScale.value=weather.breezeScale;
+   material.uniforms.uFogRange.value.set(34.0*weather.fogNearScale,152.0*weather.fogFarScale);
   },
   setTransmissionHidden(objects:THREE.Object3D[]){transmissionHidden=objects;},
   updateRipples(packets:readonly RipplePacket[],time:number){

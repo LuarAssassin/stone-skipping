@@ -16,6 +16,7 @@ import { StoneBox, type StoneSpec } from '../simulation/stones';
 import { createShoreForaging } from '../rendering/shore-foraging';
 import { setupDevReview } from './dev-review';
 import { getSceneTheme, loadSavedThemeId, saveThemeId, type SceneThemeId } from '../rendering/themes';
+import { getWeatherPreset, loadSavedWeatherId, saveWeatherId, type WeatherId } from '../rendering/weather';
 
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 const SHORE_ORIGIN = new THREE.Vector3(0, 0.24, 0);
@@ -57,7 +58,7 @@ export function boot() {
     const audioLabel = document.querySelector<HTMLElement>('#audio-label')!;
     const wristCursorEl = document.querySelector<HTMLElement>('#wrist-cursor')!;
 
-    // Theme switcher
+    // Theme & Weather switchers
     const themeSwitcher = document.querySelector<HTMLElement>('#theme-switcher')!;
     const themeToggle = document.querySelector<HTMLButtonElement>('#theme-toggle')!;
     const themeLabel = document.querySelector<HTMLElement>('#theme-label')!;
@@ -65,9 +66,30 @@ export function boot() {
     const sceneSubtitle = document.querySelector<HTMLElement>('#scene-subtitle')!;
     const themeOptions = Array.from(document.querySelectorAll<HTMLButtonElement>('.theme-option'));
 
+    const weatherSwitcher = document.querySelector<HTMLElement>('#weather-switcher')!;
+    const weatherToggle = document.querySelector<HTMLButtonElement>('#weather-toggle')!;
+    const weatherLabel = document.querySelector<HTMLElement>('#weather-label')!;
+    const weatherActiveIcon = document.querySelector<HTMLElement>('#weather-active-icon')!;
+    const weatherOptions = Array.from(document.querySelectorAll<HTMLButtonElement>('.weather-option'));
+
     function setThemeMenuOpen(open: boolean) {
         themeSwitcher.classList.toggle('open', open);
         themeToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) setWeatherMenuOpen(false);
+    }
+
+    function setWeatherMenuOpen(open: boolean) {
+        weatherSwitcher.classList.toggle('open', open);
+        weatherToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) {
+            themeSwitcher.classList.remove('open');
+            themeToggle.setAttribute('aria-expanded', 'false');
+        }
+    }
+
+    function closeHeaderMenus() {
+        setThemeMenuOpen(false);
+        setWeatherMenuOpen(false);
     }
 
     function applyTheme(id: SceneThemeId, persist = true) {
@@ -85,7 +107,22 @@ export function boot() {
         if (persist) saveThemeId(theme.id);
     }
 
+    function applyWeather(id: WeatherId, persist = true) {
+        const preset = getWeatherPreset(id);
+        world.applyWeather(preset);
+        weatherLabel.textContent = preset.name;
+        weatherActiveIcon.textContent = preset.icon;
+        for (const btn of weatherOptions) {
+            const active = btn.dataset.weatherId === preset.id;
+            btn.classList.toggle('active', active);
+            btn.setAttribute('aria-checked', active ? 'true' : 'false');
+        }
+        if (persist) saveWeatherId(preset.id);
+    }
+
     applyTheme(loadSavedThemeId(), false);
+    applyWeather(loadSavedWeatherId(), false);
+
     themeToggle.onclick = event => {
         event.stopPropagation();
         setThemeMenuOpen(!themeSwitcher.classList.contains('open'));
@@ -93,15 +130,30 @@ export function boot() {
     for (const btn of themeOptions) {
         btn.onclick = event => {
             event.stopPropagation();
-            const nextId = btn.dataset.themeId as SceneThemeId;
-            applyTheme(nextId);
+            applyTheme(btn.dataset.themeId as SceneThemeId);
             setThemeMenuOpen(false);
         };
     }
+
+    weatherToggle.onclick = event => {
+        event.stopPropagation();
+        setWeatherMenuOpen(!weatherSwitcher.classList.contains('open'));
+    };
+    for (const btn of weatherOptions) {
+        btn.onclick = event => {
+            event.stopPropagation();
+            applyWeather(btn.dataset.weatherId as WeatherId);
+            setWeatherMenuOpen(false);
+        };
+    }
+
     window.addEventListener('pointerdown', event => {
-        if (!themeSwitcher.classList.contains('open')) return;
-        if (event.target instanceof Node && !themeSwitcher.contains(event.target)) {
+        if (!(event.target instanceof Node)) return;
+        if (themeSwitcher.classList.contains('open') && !themeSwitcher.contains(event.target)) {
             setThemeMenuOpen(false);
+        }
+        if (weatherSwitcher.classList.contains('open') && !weatherSwitcher.contains(event.target)) {
+            setWeatherMenuOpen(false);
         }
     });
 
@@ -184,7 +236,7 @@ export function boot() {
     function openForaging() {
         stopAutoReplay(true);
         resultToast.classList.remove('visible', 'new-best');
-        setThemeMenuOpen(false);
+        closeHeaderMenus();
         cancelGesture();
         setLabOpen(false);
         shoreForaging.open();
@@ -197,7 +249,7 @@ export function boot() {
     document.querySelector<HTMLButtonElement>('#open-tune')!.onclick = () => {
         stopAutoReplay(true);
         resultToast.classList.remove('visible', 'new-best');
-        setThemeMenuOpen(false);
+        closeHeaderMenus();
         cancelGesture();
         setLabOpen(false);
         shoreForaging.openTuneCurrent(stoneBox.equipped);
@@ -236,7 +288,7 @@ export function boot() {
     }
 
     labToggle.onclick = () => {
-        setThemeMenuOpen(false);
+        closeHeaderMenus();
         setLabOpen(!document.body.classList.contains('lab-open'));
     };
     document.querySelector<HTMLButtonElement>('#lab-close')!.onclick = () => setLabOpen(false);
@@ -332,7 +384,7 @@ export function boot() {
         }
         if (!event.isPrimary || event.button !== 0) return;
         if (gesture.begin(pointerInput(event), canvas.getBoundingClientRect(), parameters)) {
-            setThemeMenuOpen(false);
+            closeHeaderMenus();
             stopAutoReplay(true);
             resultToast.classList.remove('visible', 'new-best');
             canvas.setPointerCapture(event.pointerId);
@@ -552,8 +604,8 @@ export function boot() {
     };
     window.addEventListener('keydown', event => {
         if (event.code === 'Escape') {
-            if (themeSwitcher.classList.contains('open')) {
-                setThemeMenuOpen(false);
+            if (themeSwitcher.classList.contains('open') || weatherSwitcher.classList.contains('open')) {
+                closeHeaderMenus();
                 return;
             }
             if (shoreForaging.isOpen()) {
@@ -567,7 +619,7 @@ export function boot() {
         if (event.code === 'Tab') {
             if (event.target instanceof HTMLElement && event.target.closest('input, textarea, select')) return;
             event.preventDefault();
-            setThemeMenuOpen(false);
+            closeHeaderMenus();
             if (shoreForaging.isOpen()) shoreForaging.close();
             setLabOpen(!document.body.classList.contains('lab-open'));
             return;
@@ -673,8 +725,7 @@ export function boot() {
         }
         world.setStoneWet(sim.contacts.length > 0);
         const envTime = dev.isReferenceMode ? session.presentationTime : ambientTime;
-        world.waterField.setTime(envTime);
-        world.sunset.update(envTime);
+        world.updateEnvironment(envTime);
 
         const useBulletCam = session.mode === 'bullet' || (isAutoReplay && replayCameraMode === 'bullet');
 

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { getSceneTheme, themeSunDirection, type SceneTheme } from './themes';
+import { getWeatherPreset, type WeatherPreset } from './weather';
 
 const defaultTheme = getSceneTheme('sunset');
 
@@ -36,6 +37,8 @@ function createSkyMaterial(theme: SceneTheme) {
             uCloudLit: { value: new THREE.Vector3(...sky.cloudLit) },
             uCloudSilver: { value: new THREE.Vector3(...sky.cloudSilver) },
             uBelowDark: { value: new THREE.Vector3(...sky.belowDark) },
+            uCloudBoost: { value: 0 },
+            uOvercast: { value: 0 },
         },
         vertexShader: /* glsl */ `
             varying vec3 vDir;
@@ -50,6 +53,7 @@ function createSkyMaterial(theme: SceneTheme) {
             uniform vec3 uZenith, uUpperMid, uLowerMid, uHorizon;
             uniform vec3 uGlowWide, uGlowTight, uDisk, uHalo;
             uniform vec3 uCloudDark, uCloudLit, uCloudSilver, uBelowDark;
+            uniform float uCloudBoost, uOvercast;
             varying vec3 vDir;
 
             float hash(vec2 p) {
@@ -92,24 +96,32 @@ function createSkyMaterial(theme: SceneTheme) {
                 sky += uGlowWide * pow(sunAlign, 3.0) * (0.42 + 0.58 * horizonBand);
                 sky += uGlowTight * pow(sunAlign, 18.0) * 0.62;
 
-                // Crisp HDR solar/lunar disk + soft Mie corona
-                float sunDisk = smoothstep(0.9986, 0.99955, sunDot);
-                float sunHalo = pow(sunAlign, 160.0) * 1.45;
+                // Crisp HDR solar/lunar disk + soft Mie corona (softened under mist/rain overcast)
+                float sunVis = 1.0 - uOvercast * 0.78;
+                float sunDisk = smoothstep(0.9986, 0.99955, sunDot) * sunVis;
+                float sunHalo = pow(sunAlign, 160.0) * 1.45 * (1.0 - uOvercast * 0.55);
                 sky += uDisk * sunDisk + uHalo * sunHalo;
 
-                // Subtle high-altitude cirrus clouds
+                // Subtle high-altitude cirrus clouds (thickens smoothly under mist / rain)
                 if (dir.y > 0.018) {
                     vec2 cloudUV = dir.xz / (dir.y + 0.14) * vec2(0.55, 1.35);
                     cloudUV += vec2(uTime * 0.0035, -uTime * 0.0012);
                     float c1 = fbm(cloudUV * 1.45);
                     float c2 = fbm(cloudUV * 3.1 + vec2(c1 * 1.35, 4.2));
-                    float mask = smoothstep(0.48, 0.82, c1 * 0.62 + c2 * 0.48);
-                    mask *= smoothstep(0.018, 0.11, dir.y) * smoothstep(0.72, 0.18, dir.y);
+                    float mask = smoothstep(max(0.18, 0.48 - uCloudBoost * 0.42), 0.82, c1 * 0.62 + c2 * 0.48);
+                    mask *= smoothstep(0.018, 0.11, dir.y) * smoothstep(0.76, 0.18, dir.y);
 
-                    float silver = pow(sunAlign, 4.0);
+                    float silver = pow(sunAlign, 4.0) * (1.0 - uOvercast * 0.65);
                     vec3 cloudLit = mix(uCloudLit, uCloudSilver, silver);
                     vec3 cloudColor = mix(uCloudDark, cloudLit, smoothstep(0.25, 0.78, c2 + silver * 0.45));
-                    sky = mix(sky, cloudColor, mask * 0.62);
+                    float cover = clamp(0.62 + uCloudBoost * 0.34, 0.0, 0.94);
+                    sky = mix(sky, cloudColor, mask * cover);
+                }
+
+                // Soft overcast atmospheric veil for mist & rain moods
+                if (uOvercast > 0.001) {
+                    vec3 veil = mix(uHorizon, uCloudDark * 1.25 + uLowerMid * 0.45, smoothstep(0.0, 0.45, up));
+                    sky = mix(sky, veil, uOvercast * 0.42);
                 }
 
                 // Below horizon: water bounce for clean PMREM/reflections
@@ -787,6 +799,8 @@ export function createSunsetEnvironment(
         pmrem.dispose();
     }
 
+    let currentEnvIntensity = initialTheme.envIntensity;
+
     function applyTheme(theme: SceneTheme) {
         const sunDir = themeSunDirection(theme);
         const u = skyMaterial.uniforms;
@@ -819,7 +833,14 @@ export function createSunsetEnvironment(
         reedsMaterial.uniforms.uRimCol.value.set(...theme.reeds.rim);
         reedsMaterial.uniforms.uFogCol.value.set(theme.fogColor);
 
-        rebakeEnvironment(theme.envIntensity);
+        currentEnvIntensity = theme.envIntensity;
+        rebakeEnvironment(currentEnvIntensity);
+    }
+
+    function applyWeather(weather: WeatherPreset = getWeatherPreset()) {
+        skyMaterial.uniforms.uCloudBoost.value = weather.cloudBoost;
+        skyMaterial.uniforms.uOvercast.value = weather.overcast;
+        rebakeEnvironment(currentEnvIntensity * (1.0 - weather.overcast * 0.14));
     }
 
     rebakeEnvironment(initialTheme.envIntensity);
@@ -830,6 +851,7 @@ export function createSunsetEnvironment(
         shoreGroup,
         shoreMesh,
         applyTheme,
+        applyWeather,
         update(time: number) {
             skyMaterial.uniforms.uTime.value = time;
             reedsMaterial.uniforms.uTime.value = time;

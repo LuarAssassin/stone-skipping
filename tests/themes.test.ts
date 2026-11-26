@@ -6,10 +6,16 @@ import {
     getSceneTheme,
     themeSunDirection,
 } from '../src/rendering/themes';
+import {
+    DEFAULT_WEATHER_ID,
+    WEATHER_PRESETS,
+    getWeatherPreset,
+} from '../src/rendering/weather';
+import { buildJiangnanPlacements } from '../src/rendering/scene-packs';
 
 test('scene theme registry exposes sunset as default and provides valid switchable themes', () => {
     assert.equal(DEFAULT_THEME_ID, 'sunset');
-    assert.ok(SCENE_THEMES.length >= 2, 'at least two themes should be registered for switching');
+    assert.ok(SCENE_THEMES.length >= 4, 'expected sunset, jiangnan_lotus, mist_dawn, and moonlight');
 
     const ids = new Set<string>();
     for (const theme of SCENE_THEMES) {
@@ -24,5 +30,59 @@ test('scene theme registry exposes sunset as default and provides valid switchab
     }
 
     assert.equal(getSceneTheme('sunset').id, 'sunset');
+    assert.equal(getSceneTheme('jiangnan_lotus').scenePack, 'jiangnan');
     assert.equal(getSceneTheme('nonexistent').id, DEFAULT_THEME_ID);
+});
+
+test('weather registry exposes clear, mist, rain, and fireflies with valid optical bounds', () => {
+    assert.equal(DEFAULT_WEATHER_ID, 'clear');
+    const ids = new Set(WEATHER_PRESETS.map(w => w.id));
+    for (const expected of ['clear', 'mist', 'rain', 'fireflies'] as const) {
+        assert.ok(ids.has(expected), `missing weather preset ${expected}`);
+    }
+    for (const preset of WEATHER_PRESETS) {
+        assert.ok(preset.fogNearScale > 0 && preset.fogNearScale <= 1);
+        assert.ok(preset.fogFarScale > 0 && preset.fogFarScale <= 1);
+        assert.ok(preset.rainIntensity >= 0 && preset.rainIntensity <= 1);
+        assert.ok(preset.sunDim > 0 && preset.sunDim <= 1);
+    }
+    assert.ok(getWeatherPreset('rain').rainIntensity > 0.5);
+    assert.equal(getWeatherPreset('unknown').id, DEFAULT_WEATHER_ID);
+});
+
+test('Jiangnan scene pack keeps throwing corridor and shore foraging zone completely unobstructed', () => {
+    const placements = buildJiangnanPlacements();
+    const assets = new Set(placements.map(p => p.asset));
+    const expectedAssets = [
+        'pavilion.glb',
+        'wupeng_boat.glb',
+        'lotus_leaf_flat.glb',
+        'lotus_leaf_tall.glb',
+        'lotus_leaf_curled.glb',
+        'lotus_flower_open.glb',
+        'lotus_flower_bud.glb',
+        'willow_tree.glb',
+        'distant_pagoda.glb',
+    ];
+    for (const file of expectedAssets) {
+        assert.ok(assets.has(file), `Jiangnan layout missing asset ${file}`);
+    }
+
+    for (const p of placements) {
+        const [x, , z] = p.position;
+        // Throwing corridor: x in [0, 64], |z| < 5.5 must stay completely clear
+        if (x >= 0 && x <= 64) {
+            assert.ok(
+                Math.abs(z) >= 5.5,
+                `prop ${p.asset} at (${x.toFixed(1)}, ${z.toFixed(1)}) intrudes into throwing corridor`
+            );
+        }
+        // Shore foraging zone: x in [-3.5, 0], |z| < 3.5 must stay clear
+        if (x >= -3.5 && x <= 0) {
+            assert.ok(
+                Math.abs(z) >= 3.5,
+                `prop ${p.asset} at (${x.toFixed(1)}, ${z.toFixed(1)}) intrudes into shore foraging patch`
+            );
+        }
+    }
 });
