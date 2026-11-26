@@ -1,0 +1,405 @@
+{
+  "version": 1,
+  "packId": "lagoon",
+  "units": "metres",
+  "gltfAxes": [
+    "X",
+    "Y up",
+    "Z"
+  ],
+  "seed": 20261130,
+  "assets": [
+    {
+      "file": "overwater_bungalow.glb",
+      "name": "overwater_bungalow",
+      "title": "茅草水上草亭",
+      "use": "礁湖水上主景，檐下暖灯与竹木露台",
+      "bboxMeters": [
+        5.400000095367432,
+        6.200000047683716,
+        4.800000190734863
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.700000047683716,
+          -1.2000000476837158,
+          -2.4000000953674316
+        ],
+        "max": [
+          2.700000047683716,
+          5.0,
+          2.4000000953674316
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 11620,
+      "fileBytes": 930148,
+      "textureMaps": [
+        {
+          "name": "overwater_bungalow_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "overwater_bungalow_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "overwater_bungalow_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "f5aad8cf9aefb953c46fcfe62bd6c5745620287f4131ac77224e3b995d66537a"
+    },
+    {
+      "file": "outrigger_canoe.glb",
+      "name": "outrigger_canoe",
+      "title": "舷外支架独木舟",
+      "use": "近中景漂浮 canoe，主船身首端朝 +X",
+      "bboxMeters": [
+        4.800000190734863,
+        0.8499999940395355,
+        2.1500000953674316
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.4000000953674316,
+          -0.2800000011920929,
+          -1.0750000476837158
+        ],
+        "max": [
+          2.4000000953674316,
+          0.5699999928474426,
+          1.0750000476837158
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 5624,
+      "fileBytes": 390152,
+      "textureMaps": [
+        {
+          "name": "outrigger_canoe_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "outrigger_canoe_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "outrigger_canoe_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "01a701b71064abaebc265aeee5c3c0a0c9cf7f00f7a94bbb66482dbfebd8671f"
+    },
+    {
+      "file": "coconut_palm_curved.glb",
+      "name": "coconut_palm_curved",
+      "title": "弯干迎风椰子树",
+      "use": "岸边横探水面，弯干朝 +X",
+      "bboxMeters": [
+        6.800000190734863,
+        7.800000175833702,
+        4.599999904632568
+      ],
+      "boundsMeters": {
+        "min": [
+          -3.4000000953674316,
+          -0.23000000417232513,
+          -2.299999952316284
+        ],
+        "max": [
+          3.4000000953674316,
+          7.570000171661377,
+          2.299999952316284
+        ]
+      },
+      "origin": "groundContact",
+      "triangles": 7214,
+      "fileBytes": 448716,
+      "textureMaps": [
+        {
+          "name": "coconut_palm_curved_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "coconut_palm_curved_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "coconut_palm_curved_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": false,
+      "alphaMask": true,
+      "sha256": "11ce0ae8ae1a1bc781c91666e005b3ef61c38fac4ca059c5edf5e6b1f27372b0"
+    },
+    {
+      "file": "coconut_palm_tall.glb",
+      "name": "coconut_palm_tall",
+      "title": "高挺海岸椰子树",
+      "use": "近远岸挺立的羽状叶冠与椰果",
+      "bboxMeters": [
+        5.199999809265137,
+        9.599999889731407,
+        5.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.5999999046325684,
+          -0.23000000417232513,
+          -2.5
+        ],
+        "max": [
+          2.5999999046325684,
+          9.369999885559082,
+          2.5
+        ]
+      },
+      "origin": "groundContact",
+      "triangles": 7214,
+      "fileBytes": 448212,
+      "textureMaps": [
+        {
+          "name": "coconut_palm_tall_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "coconut_palm_tall_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "coconut_palm_tall_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": false,
+      "alphaMask": true,
+      "sha256": "3a7371511bdf20f182d48b7d162129bb9df49b0233367e9a4796863fd3149df4"
+    },
+    {
+      "file": "coral_reef_rock.glb",
+      "name": "coral_reef_rock",
+      "title": "蜂窝珊瑚礁石",
+      "use": "潮间带青浅色石灰岩，半浸水线",
+      "bboxMeters": [
+        2.799999952316284,
+        1.25,
+        2.299999952316284
+      ],
+      "boundsMeters": {
+        "min": [
+          -1.399999976158142,
+          -0.5,
+          -1.149999976158142
+        ],
+        "max": [
+          1.399999976158142,
+          0.75,
+          1.149999976158142
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 2042,
+      "fileBytes": 100168,
+      "textureMaps": [
+        {
+          "name": "coral_reef_rock_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "coral_reef_rock_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "coral_reef_rock_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "a02642dc60dba36e611057c8a956505f223a9ecb3e1e430983e87d379a384a58"
+    },
+    {
+      "file": "tropical_hibiscus_bush.glb",
+      "name": "tropical_hibiscus_bush",
+      "title": "海岸扶桑灌木",
+      "use": "岸边低灌木层，少量暖色扶桑花",
+      "bboxMeters": [
+        2.200000047683716,
+        1.4499999582767487,
+        2.0999999046325684
+      ],
+      "boundsMeters": {
+        "min": [
+          -1.100000023841858,
+          -0.15000000596046448,
+          -1.0499999523162842
+        ],
+        "max": [
+          1.100000023841858,
+          1.2999999523162842,
+          1.0499999523162842
+        ]
+      },
+      "origin": "groundContact",
+      "triangles": 3860,
+      "fileBytes": 233316,
+      "textureMaps": [
+        {
+          "name": "tropical_hibiscus_bush_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "tropical_hibiscus_bush_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "tropical_hibiscus_bush_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": false,
+      "alphaMask": true,
+      "sha256": "056fb5201448d79997a1341ccd7bbe7d22f957cdcc85c9fc96b51937af9bc4a3"
+    },
+    {
+      "file": "volcanic_island_peak.glb",
+      "name": "volcanic_island_peak",
+      "title": "热带火山岛剪影",
+      "use": "远端尖耸海岛，雨林色与裸露岩脊",
+      "bboxMeters": [
+        46.0,
+        24.0,
+        18.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -23.0,
+          -0.5,
+          -9.0
+        ],
+        "max": [
+          23.0,
+          23.5,
+          9.0
+        ]
+      },
+      "origin": "groundContact",
+      "triangles": 3726,
+      "fileBytes": 313216,
+      "textureMaps": [
+        {
+          "name": "volcanic_island_peak_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "volcanic_island_peak_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "volcanic_island_peak_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "d8906c3a5318fef38a26e21b1a35ad83e1eaf1b6b40fe29b7eb5facabb6477b7"
+    }
+  ]
+}

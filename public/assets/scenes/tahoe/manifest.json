@@ -1,0 +1,405 @@
+{
+  "version": 1,
+  "packId": "tahoe",
+  "units": "metres",
+  "gltfAxes": [
+    "X",
+    "Y up",
+    "Z"
+  ],
+  "seed": 20261127,
+  "assets": [
+    {
+      "file": "wooden_dock.glb",
+      "name": "wooden_dock",
+      "title": "雪松木栈桥",
+      "use": "近岸码头，桥面约 +0.55 m，沿 +X 伸入水面",
+      "bboxMeters": [
+        6.400000095367432,
+        3.4000000953674316,
+        2.200000047683716
+      ],
+      "boundsMeters": {
+        "min": [
+          0.0,
+          -1.2000000476837158,
+          -1.100000023841858
+        ],
+        "max": [
+          6.400000095367432,
+          2.200000047683716,
+          1.100000023841858
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 7656,
+      "fileBytes": 776388,
+      "textureMaps": [
+        {
+          "name": "wooden_dock_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "wooden_dock_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "wooden_dock_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "4ca7fd0a6f170075c4f2339fcabf017958565485cd4063e352b6e48aed292e93"
+    },
+    {
+      "file": "cedar_canoe.glb",
+      "name": "cedar_canoe",
+      "title": "红雪松独木舟",
+      "use": "湖面独木舟，船头朝 +X，编织藤座与木桨",
+      "bboxMeters": [
+        4.599999904632568,
+        0.8499999940395355,
+        0.9200000166893005
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.299999952316284,
+          -0.2800000011920929,
+          -0.46000000834465027
+        ],
+        "max": [
+          2.299999952316284,
+          0.5699999928474426,
+          0.46000000834465027
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 4784,
+      "fileBytes": 315140,
+      "textureMaps": [
+        {
+          "name": "cedar_canoe_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "cedar_canoe_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "cedar_canoe_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "3506ecc2104917bc763d1b68eb3a676d71fc02addca727ff85f6a3b3914455da"
+    },
+    {
+      "file": "alpine_pine_tall.glb",
+      "name": "alpine_pine_tall",
+      "title": "高耸冷杉",
+      "use": "近远岸高层针叶树，根颈接地",
+      "bboxMeters": [
+        4.800000190734863,
+        11.200000315904617,
+        4.800000190734863
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.4000000953674316,
+          -0.27000001072883606,
+          -2.4000000953674316
+        ],
+        "max": [
+          2.4000000953674316,
+          10.930000305175781,
+          2.4000000953674316
+        ]
+      },
+      "origin": "groundContact",
+      "triangles": 7782,
+      "fileBytes": 539984,
+      "textureMaps": [
+        {
+          "name": "alpine_pine_tall_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "alpine_pine_tall_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "alpine_pine_tall_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": false,
+      "alphaMask": true,
+      "sha256": "258d3693bb5c48968450014deb0aac0f551b5b6effbe38f91ffd83a665033a49"
+    },
+    {
+      "file": "alpine_pine_mid.glb",
+      "name": "alpine_pine_mid",
+      "title": "疏枝海岸松",
+      "use": "近岸疏枝松，镜头侧缘形成遮挡层次",
+      "bboxMeters": [
+        4.599999904632568,
+        7.599999934434891,
+        4.199999809265137
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.299999952316284,
+          -0.28999999165534973,
+          -2.0999999046325684
+        ],
+        "max": [
+          2.299999952316284,
+          7.309999942779541,
+          2.0999999046325684
+        ]
+      },
+      "origin": "groundContact",
+      "triangles": 6494,
+      "fileBytes": 457604,
+      "textureMaps": [
+        {
+          "name": "alpine_pine_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "alpine_pine_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "alpine_pine_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": false,
+      "alphaMask": true,
+      "sha256": "70837434953be83832008ae11a983e1aab726a032286a0dae1d8b85db449dcc2"
+    },
+    {
+      "file": "granite_boulder_large.glb",
+      "name": "granite_boulder_large",
+      "title": "冰川花岗岩巨石",
+      "use": "水线半浸主礁石，上干下湿",
+      "bboxMeters": [
+        3.4000000953674316,
+        2.100000023841858,
+        2.799999952316284
+      ],
+      "boundsMeters": {
+        "min": [
+          -1.7000000476837158,
+          -0.6499999761581421,
+          -1.399999976158142
+        ],
+        "max": [
+          1.7000000476837158,
+          1.4500000476837158,
+          1.399999976158142
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 1928,
+      "fileBytes": 88540,
+      "textureMaps": [
+        {
+          "name": "granite_boulder_large_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "granite_boulder_large_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "granite_boulder_large_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "431b820b77dfbc01146a87585881cf381b9dc0d3d5603ce34e6677a4d81014b4"
+    },
+    {
+      "file": "granite_boulder_cluster.glb",
+      "name": "granite_boulder_cluster",
+      "title": "浅滩花岗岩礁簇",
+      "use": "四块高低错落的浅礁，可与滩边垫层混搭",
+      "bboxMeters": [
+        2.5999999046325684,
+        1.0999999642372131,
+        2.200000047683716
+      ],
+      "boundsMeters": {
+        "min": [
+          -1.2999999523162842,
+          -0.44999998807907104,
+          -1.100000023841858
+        ],
+        "max": [
+          1.2999999523162842,
+          0.6499999761581421,
+          1.100000023841858
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 2064,
+      "fileBytes": 104368,
+      "textureMaps": [
+        {
+          "name": "granite_boulder_cluster_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "granite_boulder_cluster_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "granite_boulder_cluster_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "96fe535c87a7498839765f0b257c2c197aa24c736d19ff4f96e151a0fe4cc2e2"
+    },
+    {
+      "file": "snow_peak_ridge.glb",
+      "name": "snow_peak_ridge",
+      "title": "冰川花岗岩雪脊",
+      "use": "远岸高山主背景，锯齿脊线与积雪冲沟",
+      "bboxMeters": [
+        44.0,
+        26.0,
+        18.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -22.0,
+          -0.5,
+          -9.0
+        ],
+        "max": [
+          22.0,
+          25.5,
+          9.0
+        ]
+      },
+      "origin": "groundContact",
+      "triangles": 3924,
+      "fileBytes": 431444,
+      "textureMaps": [
+        {
+          "name": "snow_peak_ridge_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "snow_peak_ridge_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "snow_peak_ridge_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "b7fe5861246333399916b37cc99d373f9bbdb008f86e08b0a7f9a7ca22e7bc5a"
+    }
+  ]
+}

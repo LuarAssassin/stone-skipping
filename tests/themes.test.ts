@@ -99,18 +99,29 @@ test('every registered 3D scene pack keeps throwing corridor and shore foraging 
     }
 });
 
-test('Jiangnan Blender manifest and all 9 PBR GLB assets exist and are non-empty on disk', () => {
-    const dir = resolve('public/assets/scenes/jiangnan');
-    const manifest = JSON.parse(readFileSync(resolve(dir, 'manifest.json'), 'utf8')) as {
-        packId: string;
-        assets: Array<{ file: string; triangles: number; fileBytes: number }>;
-    };
-    assert.equal(manifest.packId, 'jiangnan');
-    assert.equal(manifest.assets.length, 9);
-    for (const entry of manifest.assets) {
-        const st = statSync(resolve(dir, entry.file));
-        assert.ok(st.size > 10_000, `${entry.file} unexpectedly small (${st.size} bytes)`);
-        assert.equal(st.size, entry.fileBytes, `${entry.file} size mismatch with manifest`);
-        assert.ok(entry.triangles > 100);
+test('all 5 Blender scene packs (37 PBR GLBs) and manifests exist and match exact byte sizes on disk', () => {
+    const expectedPacks: Array<{ id: ScenePackId; count: number }> = [
+        { id: 'jiangnan', count: 9 },
+        { id: 'tahoe', count: 7 },
+        { id: 'kyoto', count: 7 },
+        { id: 'nordic', count: 7 },
+        { id: 'lagoon', count: 7 },
+    ];
+    for (const { id, count } of expectedPacks) {
+        const dir = resolve('public/assets/scenes', id);
+        const manifest = JSON.parse(readFileSync(resolve(dir, 'manifest.json'), 'utf8')) as {
+            packId: string;
+            assets: Array<{ file: string; triangles: number; fileBytes: number }>;
+        };
+        assert.equal(manifest.packId, id);
+        assert.equal(manifest.assets.length, count, `${id} expected ${count} assets`);
+        const layoutFiles = new Set(getPlacementsForPack(id).map(p => p.asset));
+        for (const entry of manifest.assets) {
+            const st = statSync(resolve(dir, entry.file));
+            assert.ok(st.size > 10_000, `[${id}] ${entry.file} unexpectedly small (${st.size} bytes)`);
+            assert.equal(st.size, entry.fileBytes, `[${id}] ${entry.file} size mismatch with manifest`);
+            assert.ok(entry.triangles > 100);
+            assert.ok(layoutFiles.has(entry.file), `[${id}] ${entry.file} not placed in scene-packs.ts`);
+        }
     }
 });

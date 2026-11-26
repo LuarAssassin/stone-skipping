@@ -15,7 +15,7 @@ Web-first 物理打水漂模拟与风格化小游戏（TypeScript / Three.js / V
 ### 2. 64×32 m 连续 GPU 高度场与水幕闭环
 - **固定全域 GPU 水波求解 + Cauchy–Poisson 色散多环涟漪**（[src/rendering/coherent.ts](src/rendering/coherent.ts)、[src/simulation/water-grid.ts](src/simulation/water-grid.ts)、[src/simulation/ripples.ts](src/simulation/ripples.ts)）：`4096×1024 RGBA32F` 双缓冲负责近场压坑、滑移尾迹、落滴次级波、鼠标拨水与焦散；叠加真实接触冲量驱动的深水色散多环波包（波速 `0.46–0.74 m/s`，360° 全向扩散带前向动量加强，持续 6–9 秒无网格锯齿）。
 - **连续水幕 → 细滴 → 回落次级波**（[src/simulation/spray.ts](src/simulation/spray.ts)、[src/rendering/spray.ts](src/rendering/spray.ts)）：按接触做功预算生成短寿命连续 `WaterRibbon`，沿同一速度场无缝脱滴并在水滴解析穿水时回注至多 4 簇次级动量源；辅以沿湿迹沉积的微气泡尾迹层（[src/rendering/surface-churn.ts](src/rendering/surface-churn.ts)）。
-- **可扩展湖畔主题系统**（[src/rendering/themes.ts](src/rendering/themes.ts)、[src/rendering/sunset-env.ts](src/rendering/sunset-env.ts)、[src/rendering/water.ts](src/rendering/water.ts)、[src/rendering/post.ts](src/rendering/post.ts)）：将当前画面收敛为可切换主题体系，内置「落日暮色」（默认）、「青岚晨雾」与「月下静湖」三套全场景光影、大气穹顶、PMREM、远山剪影、水体光学、Bloom/调色与玻璃 HUD 配色方案，可在右上角一键切换并自动记忆；新增主题只需在 `SCENE_THEMES` 注册即可扩展。
+- **可扩展湖畔主题、天气与 3D 场景包系统**（[src/rendering/themes.ts](src/rendering/themes.ts)、[src/rendering/weather.ts](src/rendering/weather.ts)、[src/rendering/scene-packs.ts](src/rendering/scene-packs.ts)、[docs/SCENE_PACKS_BLENDER_SPEC.md](docs/SCENE_PACKS_BLENDER_SPEC.md)）：内置 **8 套可一键切换的湖畔主题**（落日暮色、**曲院荷风**、**太浩松涛**、**岚山枫渡**、**极光峡湾**、**珊瑚暮湾**、青岚晨雾、月下静湖），其中 5 套配备独立 Blender PBR 3D 场景包（共 37 件米制 GLB 资产：水榭/荷塘/乌篷船/古塔、木栈桥/红雪松独木舟/雪峰、水中鸟居/红枫/雪见灯笼、法鲁红渔屋/浮冰/实时极光天幕、茅草草亭/椰林/舷外独木舟/火山岛），并可自由叠加 **晴朗 / 薄雾 / 烟雨（带实时雨滴水面微涟漪）/ 萤火** 4 种动态天气。
 
 ### 3. 混合电影声景（ElevenLabs 采样 + Web Audio 物理混音）
 - **零延迟物理声学引擎**（[src/audio/engine.ts](src/audio/engine.ts)）：解码时自动检测采样瞬态起音点，结合 3D 距离衰减、空气高频低通吸收、开阔湖面混响与耳机左右声像。

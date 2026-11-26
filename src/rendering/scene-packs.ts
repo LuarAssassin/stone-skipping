@@ -139,14 +139,14 @@ export function buildJiangnanPlacements(): ScenePropPlacement[] {
 /** Curated postcard composition for 「太浩松涛 · 北美高山冰川湖」. */
 export function buildTahoePlacements(): ScenePropPlacement[] {
     return [
-        // Extending weathered cedar wooden dock on the left cove
+        // Extending weathered cedar wooden dock anchored to the left rocky bank (extends 6.4m along local +X)
         {
             asset: 'wooden_dock.glb',
-            position: [15.5, 0, -10.8],
-            rotationY: -0.68,
+            position: [13.5, 0, -14.8],
+            rotationY: -1.18,
             scale: 1.04,
             motion: 'static',
-            lanternLightOffset: [2.6, 1.85, 0.7],
+            lanternLightOffset: [5.6, 1.95, 0.0],
         },
         // Classic red-cedar canoe moored gently in the right midground cove
         {
@@ -167,20 +167,20 @@ export function buildTahoePlacements(): ScenePropPlacement[] {
         { asset: 'alpine_pine_tall.glb', position: [17.8, 0.30, -16.8], rotationY: 1.2, scale: 1.08, motion: 'willow' },
         { asset: 'alpine_pine_mid.glb', position: [-2.0, 0, 10.2], rotationY: -0.8, scale: 0.95, motion: 'willow', snapToShore: -0.06 },
         { asset: 'alpine_pine_tall.glb', position: [16.8, 0.20, 15.6], rotationY: 2.3, scale: 1.02, motion: 'willow' },
-        // Majestic snow-capped alpine granite massifs framing the distant horizon
-        { asset: 'snow_peak_ridge.glb', position: [94.0, -0.35, -15.0], rotationY: 0.14, scale: 1.12, motion: 'static' },
-        { asset: 'snow_peak_ridge.glb', position: [98.0, -0.45, 22.0], rotationY: -0.32, scale: 0.96, motion: 'static' },
+        // Majestic snow-capped alpine granite massifs rotated broadside across the distant horizon
+        { asset: 'snow_peak_ridge.glb', position: [96.0, -0.35, -16.0], rotationY: Math.PI / 2 - 0.18, scale: 1.24, motion: 'static' },
+        { asset: 'snow_peak_ridge.glb', position: [98.0, -0.45, 24.0], rotationY: Math.PI / 2 + 0.24, scale: 1.06, motion: 'static' },
     ];
 }
 
 /** Curated postcard composition for 「岚山枫渡 · 京都红叶溪湖」. */
 export function buildKyotoPlacements(): ScenePropPlacement[] {
     const placements: ScenePropPlacement[] = [
-        // Iconic vermilion lakeside Myojin Torii rising out of the mirror water
+        // Iconic vermilion lakeside Myojin Torii rising out of the mirror water (angled 3/4 toward player)
         {
             asset: 'water_torii.glb',
             position: [23.6, 0, -11.0],
-            rotationY: -1.18,
+            rotationY: -0.95,
             scale: 1.04,
             motion: 'static',
         },
@@ -191,30 +191,30 @@ export function buildKyotoPlacements(): ScenePropPlacement[] {
             rotationY: 2.66,
             scale: 1.05,
             motion: 'boat',
-            lanternLightOffset: [1.95, 0.82, 0],
+            lanternLightOffset: [1.95, 0.68, 0],
         },
-        // Mossy yukimi stone lanterns casting warm amber reflections on both foreground flanks
+        // Mossy yukimi stone lanterns seated atop lakeside basalt boulders with warm amber glow
         {
             asset: 'stone_toro.glb',
-            position: [12.0, 0.32, -7.5],
+            position: [12.0, 0.46, -7.5],
             rotationY: 0.52,
             scale: 1.02,
             motion: 'static',
-            lanternLightOffset: [0, 1.12, 0],
+            lanternLightOffset: [0, 1.05, 0],
             lanternColor: '#ffa952',
         },
         {
             asset: 'stone_toro.glb',
-            position: [14.8, 0.28, 7.1],
+            position: [14.8, 0.44, 7.1],
             rotationY: -0.85,
             scale: 0.98,
             motion: 'static',
-            lanternLightOffset: [0, 1.12, 0],
+            lanternLightOffset: [0, 1.05, 0],
             lanternColor: '#ffa952',
         },
         // Moss-draped basalt river stones supporting lanterns and shoreline depth
-        { asset: 'mossy_river_rock.glb', position: [12.0, 0, -7.5], rotationY: 0.4, scale: 1.15, motion: 'static' },
-        { asset: 'mossy_river_rock.glb', position: [14.8, 0, 7.1], rotationY: 1.9, scale: 1.10, motion: 'static' },
+        { asset: 'mossy_river_rock.glb', position: [12.0, 0, -7.5], rotationY: 0.4, scale: 1.18, motion: 'static' },
+        { asset: 'mossy_river_rock.glb', position: [14.8, 0, 7.1], rotationY: 1.9, scale: 1.14, motion: 'static' },
         { asset: 'mossy_river_rock.glb', position: [19.4, 0, -11.6], rotationY: -0.7, scale: 1.25, motion: 'static' },
         { asset: 'mossy_river_rock.glb', position: [29.2, 0, 10.8], rotationY: 2.4, scale: 1.18, motion: 'static' },
         // Crimson & amber Japanese maples framing left shore, torii headland, and right shore
@@ -245,14 +245,14 @@ export function buildKyotoPlacements(): ScenePropPlacement[] {
 /** Curated postcard composition for 「极光峡湾 · 罗弗敦冰海」. */
 export function buildNordicPlacements(): ScenePropPlacement[] {
     const placements: ScenePropPlacement[] = [
-        // Falu-red Norwegian rorbu stilt fisherman's cabin with warm amber windows
+        // Falu-red Norwegian rorbu stilt fisherman's cabin with warm amber windows facing the lake
         {
             asset: 'rorbu_cabin.glb',
             position: [23.8, 0, -12.6],
-            rotationY: 0.52,
+            rotationY: -0.68,
             scale: 1.04,
             motion: 'static',
-            lanternLightOffset: [0.4, 2.2, 2.3],
+            lanternLightOffset: [0, 2.1, 2.2],
             lanternColor: '#ffaa55',
         },
         // Clinker-built Nordic wooden fishing skiff bobbing gently in the dark fjord
@@ -262,7 +262,7 @@ export function buildNordicPlacements(): ScenePropPlacement[] {
             rotationY: 2.58,
             scale: 1.04,
             motion: 'boat',
-            lanternLightOffset: [-1.75, 0.95, 0],
+            lanternLightOffset: [-1.85, 0.62, 0],
             lanternColor: '#ffba66',
         },
         // Snow-dusted Nordic spruces along the embankment & shores
@@ -273,9 +273,9 @@ export function buildNordicPlacements(): ScenePropPlacement[] {
         // Steep basalt fjord sea stacks rising from outer mid-distance water
         { asset: 'fjord_seastack.glb', position: [44.0, 0, 15.8], rotationY: 0.7, scale: 1.08, motion: 'static' },
         { asset: 'fjord_seastack.glb', position: [56.0, 0, -19.2], rotationY: -1.2, scale: 1.18, motion: 'static' },
-        // Dramatic sheer Lofoten fjord snow walls framing the aurora sky
-        { asset: 'fjord_cliff_wall.glb', position: [96.0, -0.45, -21.0], rotationY: 0.16, scale: 1.12, motion: 'static' },
-        { asset: 'fjord_cliff_wall.glb', position: [100.0, -0.50, 20.0], rotationY: -0.26, scale: 1.04, motion: 'static' },
+        // Dramatic sheer Lofoten fjord snow walls rotated broadside, leaving a center aurora V-channel
+        { asset: 'fjord_cliff_wall.glb', position: [96.0, -0.45, -26.0], rotationY: Math.PI / 2 - 0.22, scale: 1.20, motion: 'static' },
+        { asset: 'fjord_cliff_wall.glb', position: [98.0, -0.50, 24.0], rotationY: Math.PI / 2 + 0.26, scale: 1.10, motion: 'static' },
     ];
 
     // Drifting arctic sea-ice floes flanking left & right coves (clear of z ∈ [-5.5, +5.5])
@@ -311,10 +311,10 @@ export function buildLagoonPlacements(): ScenePropPlacement[] {
         {
             asset: 'overwater_bungalow.glb',
             position: [24.0, 0, -12.4],
-            rotationY: 0.48,
+            rotationY: -0.72,
             scale: 1.04,
             motion: 'static',
-            lanternLightOffset: [0.3, 2.35, 1.8],
+            lanternLightOffset: [0, 2.55, 0.8],
             lanternColor: '#ffc266',
         },
         // Traditional wooden outrigger canoe floating on the right midground lagoon
@@ -338,8 +338,8 @@ export function buildLagoonPlacements(): ScenePropPlacement[] {
         { asset: 'coral_reef_rock.glb', position: [10.8, 0, -7.2], rotationY: 0.5, scale: 0.96, motion: 'static' },
         { asset: 'coral_reef_rock.glb', position: [14.4, 0, 7.1], rotationY: -0.9, scale: 1.02, motion: 'static' },
         { asset: 'coral_reef_rock.glb', position: [29.4, 0, 11.2], rotationY: 1.8, scale: 1.15, motion: 'static' },
-        // Iconic Moorea-style jagged volcanic island peak rising across the distant lagoon
-        { asset: 'volcanic_island_peak.glb', position: [96.0, -0.35, -15.5], rotationY: 0.22, scale: 1.12, motion: 'static' },
+        // Iconic Moorea-style jagged volcanic island peak rotated broadside across the distant lagoon
+        { asset: 'volcanic_island_peak.glb', position: [96.0, -0.35, -14.5], rotationY: Math.PI / 2 - 0.15, scale: 1.22, motion: 'static' },
     ];
 }
 

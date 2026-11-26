@@ -1,0 +1,405 @@
+{
+  "version": 1,
+  "packId": "kyoto",
+  "units": "metres",
+  "gltfAxes": [
+    "X",
+    "Y up",
+    "Z"
+  ],
+  "seed": 20261128,
+  "assets": [
+    {
+      "file": "water_torii.glb",
+      "name": "water_torii",
+      "title": "明神水鸟居",
+      "use": "湖中神社门景，朱漆门柱面朝 +Z",
+      "bboxMeters": [
+        5.800000190734863,
+        7.3999998569488525,
+        1.5
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.9000000953674316,
+          -1.2000000476837158,
+          -0.75
+        ],
+        "max": [
+          2.9000000953674316,
+          6.199999809265137,
+          0.75
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 6820,
+      "fileBytes": 831012,
+      "textureMaps": [
+        {
+          "name": "water_torii_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "water_torii_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "water_torii_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "5018fde2e28e6a68e70be3e6d9b4c8f40c82e023e0a43e9d5f335d6db0c972d9"
+    },
+    {
+      "file": "yakatabune_skiff.glb",
+      "name": "yakatabune_skiff",
+      "title": "素木和船",
+      "use": "近景漂浮和船，船头朝 +X，竹竿挂灯",
+      "bboxMeters": [
+        4.5,
+        1.0499999821186066,
+        1.1799999475479126
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.25,
+          -0.3499999940395355,
+          -0.5899999737739563
+        ],
+        "max": [
+          2.25,
+          0.699999988079071,
+          0.5899999737739563
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 5290,
+      "fileBytes": 367748,
+      "textureMaps": [
+        {
+          "name": "yakatabune_skiff_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "yakatabune_skiff_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "yakatabune_skiff_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "b9cb8a0ec3524de280438358e925d4e4f564f69b1e98f198b1f47f26b21b6ce5"
+    },
+    {
+      "file": "stone_toro.glb",
+      "name": "stone_toro",
+      "title": "雪见石灯笼",
+      "use": "岸边雪见灯笼，三曲足接地",
+      "bboxMeters": [
+        1.0499999523162842,
+        1.75,
+        1.0499999523162842
+      ],
+      "boundsMeters": {
+        "min": [
+          -0.5249999761581421,
+          0.0,
+          -0.5249999761581421
+        ],
+        "max": [
+          0.5249999761581421,
+          1.75,
+          0.5249999761581421
+        ]
+      },
+      "origin": "groundContact",
+      "triangles": 4404,
+      "fileBytes": 227656,
+      "textureMaps": [
+        {
+          "name": "stone_toro_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "stone_toro_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "stone_toro_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "ff03cb72558bec6da1100525d5fb05d8120b4d35525ebac8b26e855853516086"
+    },
+    {
+      "file": "japanese_maple_red.glb",
+      "name": "japanese_maple_red",
+      "title": "绯红鸡爪槭",
+      "use": "主体红枫，横展树枝和层叠掌状叶",
+      "bboxMeters": [
+        6.800000190734863,
+        6.200000032782555,
+        6.400000095367432
+      ],
+      "boundsMeters": {
+        "min": [
+          -3.4000000953674316,
+          -0.23999999463558197,
+          -3.200000047683716
+        ],
+        "max": [
+          3.4000000953674316,
+          5.960000038146973,
+          3.200000047683716
+        ]
+      },
+      "origin": "groundContact",
+      "triangles": 7916,
+      "fileBytes": 466484,
+      "textureMaps": [
+        {
+          "name": "japanese_maple_red_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "japanese_maple_red_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "japanese_maple_red_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": false,
+      "alphaMask": true,
+      "sha256": "77ad5771bc6aa3f55871705cf20db71b837acebe281a42a038b123d1d703ae4b"
+    },
+    {
+      "file": "japanese_maple_gold.glb",
+      "name": "japanese_maple_gold",
+      "title": "琥珀金枫",
+      "use": "金枫作为秋景中的暖色树冠层",
+      "bboxMeters": [
+        6.199999809265137,
+        5.600000128149986,
+        5.800000190734863
+      ],
+      "boundsMeters": {
+        "min": [
+          -3.0999999046325684,
+          -0.23999999463558197,
+          -2.9000000953674316
+        ],
+        "max": [
+          3.0999999046325684,
+          5.360000133514404,
+          2.9000000953674316
+        ]
+      },
+      "origin": "groundContact",
+      "triangles": 7916,
+      "fileBytes": 466304,
+      "textureMaps": [
+        {
+          "name": "japanese_maple_gold_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "japanese_maple_gold_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "japanese_maple_gold_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": false,
+      "alphaMask": true,
+      "sha256": "657693f096603c16e843f2733bc98dc0dfc24c825dee1a32a107e7083ba6a87a"
+    },
+    {
+      "file": "mossy_river_rock.glb",
+      "name": "mossy_river_rock",
+      "title": "覆苔玄武湖石",
+      "use": "近岸半浸玄武岩，石顶覆苔，下缘潮湿",
+      "bboxMeters": [
+        2.0999999046325684,
+        1.0999999642372131,
+        1.7000000476837158
+      ],
+      "boundsMeters": {
+        "min": [
+          -1.0499999523162842,
+          -0.44999998807907104,
+          -0.8500000238418579
+        ],
+        "max": [
+          1.0499999523162842,
+          0.6499999761581421,
+          0.8500000238418579
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 1560,
+      "fileBytes": 248340,
+      "textureMaps": [
+        {
+          "name": "mossy_river_rock_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "mossy_river_rock_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "mossy_river_rock_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "ac675c2cb95f56b1d9c8a882336fb519b840688ef8fcc0d21c796f590334b097"
+    },
+    {
+      "file": "autumn_floating_leaves.glb",
+      "name": "autumn_floating_leaves",
+      "title": "水面秋枫落叶",
+      "use": "十六片水面落叶，混合朱红与琥珀金",
+      "bboxMeters": [
+        1.899999976158142,
+        0.03999999910593033,
+        1.7999999523162842
+      ],
+      "boundsMeters": {
+        "min": [
+          -0.949999988079071,
+          0.0,
+          -0.8999999761581421
+        ],
+        "max": [
+          0.949999988079071,
+          0.03999999910593033,
+          0.8999999761581421
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 416,
+      "fileBytes": 54464,
+      "textureMaps": [
+        {
+          "name": "autumn_floating_leaves_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "autumn_floating_leaves_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "autumn_floating_leaves_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": false,
+      "alphaMask": true,
+      "sha256": "809152a9fcaacf7636ad4769ef9dae6548ddb324d9aee3821bdd7630307cb262"
+    }
+  ]
+}

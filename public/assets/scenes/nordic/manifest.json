@@ -1,0 +1,405 @@
+{
+  "version": 1,
+  "packId": "nordic",
+  "units": "metres",
+  "gltfAxes": [
+    "X",
+    "Y up",
+    "Z"
+  ],
+  "seed": 20261129,
+  "assets": [
+    {
+      "file": "rorbu_cabin.glb",
+      "name": "rorbu_cabin",
+      "title": "覆雪法鲁红渔屋",
+      "use": "近景水上渔屋与栈台，窗光和门灯独立发光",
+      "bboxMeters": [
+        5.800000190734863,
+        6.3999998569488525,
+        4.599999904632568
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.9000000953674316,
+          -1.2000000476837158,
+          -2.299999952316284
+        ],
+        "max": [
+          2.9000000953674316,
+          5.199999809265137,
+          2.299999952316284
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 11610,
+      "fileBytes": 1196892,
+      "textureMaps": [
+        {
+          "name": "rorbu_cabin_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "rorbu_cabin_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "rorbu_cabin_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "17dc0eccd5a413d5d88cde01774ad62886f8f1ad61b90cbdf890520decf96848"
+    },
+    {
+      "file": "nordic_fishing_skiff.glb",
+      "name": "nordic_fishing_skiff",
+      "title": "搭接木渔船",
+      "use": "峡湾近景船，搭接木板沿 +X 船体展开",
+      "bboxMeters": [
+        4.300000190734863,
+        1.0499999821186066,
+        1.3200000524520874
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.1500000953674316,
+          -0.41999998688697815,
+          -0.6600000262260437
+        ],
+        "max": [
+          2.1500000953674316,
+          0.6299999952316284,
+          0.6600000262260437
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 5678,
+      "fileBytes": 404248,
+      "textureMaps": [
+        {
+          "name": "nordic_fishing_skiff_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nordic_fishing_skiff_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nordic_fishing_skiff_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "083e1acf510a3cb5ac27ba0d3cb3c184a1fabe26d939c24c6a34135aa884cf8f"
+    },
+    {
+      "file": "ice_floe_large.glb",
+      "name": "ice_floe_large",
+      "title": "覆雪大浮冰",
+      "use": "低矮主浮冰，断边露出水线冰蓝带",
+      "bboxMeters": [
+        3.0999999046325684,
+        0.5499999970197678,
+        2.5
+      ],
+      "boundsMeters": {
+        "min": [
+          -1.5499999523162842,
+          -0.3499999940395355,
+          -1.25
+        ],
+        "max": [
+          1.5499999523162842,
+          0.20000000298023224,
+          1.25
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 1244,
+      "fileBytes": 213616,
+      "textureMaps": [
+        {
+          "name": "ice_floe_large_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "ice_floe_large_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "ice_floe_large_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "5c3bd2d8e3f25ec73d0407b51c9b3640cdfc54b877c88b219bd1077e03468b66"
+    },
+    {
+      "file": "ice_floe_small.glb",
+      "name": "ice_floe_small",
+      "title": "碎浮冰簇",
+      "use": "五片漂浮碎冰，散布在边岸冰缘",
+      "bboxMeters": [
+        1.7000000476837158,
+        0.35999999940395355,
+        1.5
+      ],
+      "boundsMeters": {
+        "min": [
+          -0.8500000238418579,
+          -0.2199999988079071,
+          -0.75
+        ],
+        "max": [
+          0.8500000238418579,
+          0.14000000059604645,
+          0.75
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 1180,
+      "fileBytes": 199672,
+      "textureMaps": [
+        {
+          "name": "ice_floe_small_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "ice_floe_small_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "ice_floe_small_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "16daff0e59fcfd37a70f9dd62a8b1cd8b5bebaee631ca95a05a7867d7a7e9196"
+    },
+    {
+      "file": "snow_spruce.glb",
+      "name": "snow_spruce",
+      "title": "挂雪峡湾云杉",
+      "use": "堆雪针叶树，树冠背光与岸边轮廓",
+      "bboxMeters": [
+        3.799999952316284,
+        8.599999696016312,
+        3.799999952316284
+      ],
+      "boundsMeters": {
+        "min": [
+          -1.899999976158142,
+          -0.2800000011920929,
+          -1.899999976158142
+        ],
+        "max": [
+          1.899999976158142,
+          8.319999694824219,
+          1.899999976158142
+        ]
+      },
+      "origin": "groundContact",
+      "triangles": 7138,
+      "fileBytes": 501052,
+      "textureMaps": [
+        {
+          "name": "snow_spruce_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "snow_spruce_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "snow_spruce_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": false,
+      "alphaMask": true,
+      "sha256": "125a0ab2c2359e600f0d0b77065e95aeb9a01809d1ea6768bc564a9ef1154e5c"
+    },
+    {
+      "file": "fjord_seastack.glb",
+      "name": "fjord_seastack",
+      "title": "玄武岩海蚀柱",
+      "use": "半浸黑岩海柱，顶端积雪保留陡壁轮廓",
+      "bboxMeters": [
+        4.400000095367432,
+        7.600000202655792,
+        3.799999952316284
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.200000047683716,
+          -0.800000011920929,
+          -1.899999976158142
+        ],
+        "max": [
+          2.200000047683716,
+          6.800000190734863,
+          1.899999976158142
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 2424,
+      "fileBytes": 184124,
+      "textureMaps": [
+        {
+          "name": "fjord_seastack_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "fjord_seastack_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "fjord_seastack_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "766e78b36dfca510d12afc5b99ca8f5c21df30ee21e6015a628ff8e46831a8d8"
+    },
+    {
+      "file": "fjord_cliff_wall.glb",
+      "name": "fjord_cliff_wall",
+      "title": "峡湾雪山绝壁",
+      "use": "远岸冰川切削岩壁，为极光天幕留出天际线",
+      "bboxMeters": [
+        48.0,
+        27.99999964237213,
+        18.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -24.0,
+          -0.6000000238418579,
+          -9.0
+        ],
+        "max": [
+          24.0,
+          27.399999618530273,
+          9.0
+        ]
+      },
+      "origin": "groundContact",
+      "triangles": 4422,
+      "fileBytes": 470856,
+      "textureMaps": [
+        {
+          "name": "fjord_cliff_wall_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "fjord_cliff_wall_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "fjord_cliff_wall_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "9bea66a706a388fcf2053fa08387549c585e8ae07202b5d8da3ede4c8a2f32e2"
+    }
+  ]
+}
