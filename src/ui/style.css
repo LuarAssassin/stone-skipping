@@ -37,6 +37,82 @@
   --primary-grad-hover: linear-gradient(135deg, #dc9072, #a56452);
 }
 
+:root[data-theme="tahoe_alpine"] {
+  --bg-base: #152536;
+  --glass-bg: rgba(14, 28, 44, 0.54);
+  --glass-bg-strong: rgba(11, 22, 36, 0.86);
+  --glass-border: rgba(182, 220, 248, 0.24);
+  --glass-border-strong: rgba(126, 204, 244, 0.50);
+  --text-main: #eef7ff;
+  --text-muted: rgba(208, 230, 248, 0.74);
+  --text-dim: rgba(176, 204, 228, 0.52);
+  --accent: #68bee8;
+  --accent-bright: #c8eeff;
+  --accent-soft: rgba(104, 190, 232, 0.22);
+  --scrollbar-thumb: rgba(182, 220, 248, 0.28);
+  --scrollbar-thumb-hover: rgba(104, 190, 232, 0.60);
+  --power-grad: linear-gradient(90deg, #2d7fb8, #6cc6ee, #d6f4ff);
+  --primary-grad: linear-gradient(135deg, #3b8cc4, #26608c);
+  --primary-grad-hover: linear-gradient(135deg, #4b9ed8, #3072a6);
+}
+
+:root[data-theme="kyoto_autumn"] {
+  --bg-base: #231618;
+  --glass-bg: rgba(30, 16, 18, 0.56);
+  --glass-bg-strong: rgba(24, 13, 15, 0.86);
+  --glass-border: rgba(255, 188, 146, 0.22);
+  --glass-border-strong: rgba(242, 128, 86, 0.50);
+  --text-main: #fcf2ec;
+  --text-muted: rgba(244, 214, 198, 0.72);
+  --text-dim: rgba(220, 184, 166, 0.50);
+  --accent: #eb7a4e;
+  --accent-bright: #ffc8a4;
+  --accent-soft: rgba(235, 122, 78, 0.24);
+  --scrollbar-thumb: rgba(255, 188, 146, 0.26);
+  --scrollbar-thumb-hover: rgba(235, 122, 78, 0.60);
+  --power-grad: linear-gradient(90deg, #c64734, #eb8648, #ffd69c);
+  --primary-grad: linear-gradient(135deg, #cf563c, #9a3228);
+  --primary-grad-hover: linear-gradient(135deg, #e2664a, #b23e32);
+}
+
+:root[data-theme="nordic_aurora"] {
+  --bg-base: #091720;
+  --glass-bg: rgba(9, 22, 32, 0.60);
+  --glass-bg-strong: rgba(7, 18, 28, 0.88);
+  --glass-border: rgba(114, 240, 206, 0.22);
+  --glass-border-strong: rgba(94, 232, 188, 0.50);
+  --text-main: #e8fbf8;
+  --text-muted: rgba(188, 232, 226, 0.72);
+  --text-dim: rgba(150, 202, 198, 0.48);
+  --accent: #52e2b4;
+  --accent-bright: #b8ffea;
+  --accent-soft: rgba(82, 226, 180, 0.20);
+  --scrollbar-thumb: rgba(114, 240, 206, 0.26);
+  --scrollbar-thumb-hover: rgba(82, 226, 180, 0.58);
+  --power-grad: linear-gradient(90deg, #2cb696, #5ee8bc, #b9a4ff);
+  --primary-grad: linear-gradient(135deg, #2ea886, #246a72);
+  --primary-grad-hover: linear-gradient(135deg, #3bbf9a, #2d7f88);
+}
+
+:root[data-theme="tropical_lagoon"] {
+  --bg-base: #132c30;
+  --glass-bg: rgba(14, 34, 38, 0.54);
+  --glass-bg-strong: rgba(11, 28, 32, 0.86);
+  --glass-border: rgba(176, 238, 226, 0.24);
+  --glass-border-strong: rgba(252, 196, 122, 0.50);
+  --text-main: #f4fbf8;
+  --text-muted: rgba(214, 240, 234, 0.74);
+  --text-dim: rgba(182, 218, 212, 0.52);
+  --accent: #f4b264;
+  --accent-bright: #ffe1aa;
+  --accent-soft: rgba(244, 178, 100, 0.22);
+  --scrollbar-thumb: rgba(176, 238, 226, 0.28);
+  --scrollbar-thumb-hover: rgba(244, 178, 100, 0.58);
+  --power-grad: linear-gradient(90deg, #2ea8a2, #78d8c4, #ffd088);
+  --primary-grad: linear-gradient(135deg, #e08e48, #30888a);
+  --primary-grad-hover: linear-gradient(135deg, #f09e58, #3b9c9e);
+}
+
 :root[data-theme="mist_dawn"] {
   --bg-base: #1d2c31;
   --glass-bg: rgba(16, 30, 35, 0.54);
@@ -281,6 +357,22 @@ canvas {
   background: linear-gradient(135deg, #f8d6c4 0%, #76b29a 52%, #294c44 100%);
 }
 
+.theme-swatch-tahoe_alpine {
+  background: linear-gradient(135deg, #eaf6ff 0%, #48a6dc 52%, #134168 100%);
+}
+
+.theme-swatch-kyoto_autumn {
+  background: linear-gradient(135deg, #ffce88 0%, #d94c34 54%, #4f1d22 100%);
+}
+
+.theme-swatch-nordic_aurora {
+  background: linear-gradient(135deg, #62f6be 0%, #3d72c8 56%, #0b182a 100%);
+}
+
+.theme-swatch-tropical_lagoon {
+  background: linear-gradient(135deg, #ffd388 0%, #3ac4ba 54%, #10555e 100%);
+}
+
 .theme-swatch-mist_dawn {
   background: linear-gradient(135deg, #e5f7f3 0%, #78c8c0 54%, #2d5c66 100%);
 }
@@ -313,7 +405,9 @@ canvas {
   position: absolute;
   right: 0;
   top: calc(100% + 8px);
-  min-width: 146px;
+  min-width: 152px;
+  max-height: min(72vh, 380px);
+  overflow-y: auto;
   padding: 6px;
   border-radius: 14px;
   background: var(--glass-bg-strong);

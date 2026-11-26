@@ -39,6 +39,7 @@ function createSkyMaterial(theme: SceneTheme) {
             uBelowDark: { value: new THREE.Vector3(...sky.belowDark) },
             uCloudBoost: { value: 0 },
             uOvercast: { value: 0 },
+            uAuroraStrength: { value: theme.auroraStrength ?? 0 },
         },
         vertexShader: /* glsl */ `
             varying vec3 vDir;
@@ -53,7 +54,7 @@ function createSkyMaterial(theme: SceneTheme) {
             uniform vec3 uZenith, uUpperMid, uLowerMid, uHorizon;
             uniform vec3 uGlowWide, uGlowTight, uDisk, uHalo;
             uniform vec3 uCloudDark, uCloudLit, uCloudSilver, uBelowDark;
-            uniform float uCloudBoost, uOvercast;
+            uniform float uCloudBoost, uOvercast, uAuroraStrength;
             varying vec3 vDir;
 
             float hash(vec2 p) {
@@ -122,6 +123,22 @@ function createSkyMaterial(theme: SceneTheme) {
                 if (uOvercast > 0.001) {
                     vec3 veil = mix(uHorizon, uCloudDark * 1.25 + uLowerMid * 0.45, smoothstep(0.0, 0.45, up));
                     sky = mix(sky, veil, uOvercast * 0.42);
+                }
+
+                // Live animated Aurora Borealis curtains (emerald-cyan -> arctic violet) for Nordic Fjord
+                if (uAuroraStrength > 0.001 && dir.y > 0.04) {
+                    float az = atan(dir.z, dir.x);
+                    float wave1 = sin(az * 3.2 + uTime * 0.18) * 0.12 + sin(az * 7.5 - uTime * 0.27) * 0.045;
+                    float band1 = exp(-pow((dir.y - (0.26 + wave1)) * 7.5, 2.0));
+                    float ray1 = 0.55 + 0.45 * fbm(vec2(az * 9.5 + uTime * 0.11, dir.y * 2.2 - uTime * 0.06));
+                    float wave2 = cos(az * 4.4 - uTime * 0.14 + 1.3) * 0.10;
+                    float band2 = exp(-pow((dir.y - (0.38 + wave2)) * 6.0, 2.0));
+                    float ray2 = 0.50 + 0.50 * fbm(vec2(az * 13.0 - uTime * 0.09, dir.y * 2.6 + 4.1));
+                    float curtain = (band1 * ray1 + band2 * ray2 * 0.72) * smoothstep(0.04, 0.16, dir.y) * smoothstep(0.76, 0.34, dir.y);
+                    // Focus aurora across the forward lake sky dome (+X hemisphere)
+                    float frontArc = smoothstep(-0.25, 0.55, dir.x);
+                    vec3 auroraCol = mix(vec3(0.10, 0.96, 0.62), vec3(0.46, 0.24, 0.92), smoothstep(0.20, 0.48, dir.y));
+                    sky += auroraCol * curtain * frontArc * uAuroraStrength * (1.0 - uOvercast * 0.55) * 0.92;
                 }
 
                 // Below horizon: water bounce for clean PMREM/reflections
@@ -817,6 +834,7 @@ export function createSunsetEnvironment(
         u.uCloudLit.value.set(...theme.sky.cloudLit);
         u.uCloudSilver.value.set(...theme.sky.cloudSilver);
         u.uBelowDark.value.set(...theme.sky.belowDark);
+        u.uAuroraStrength.value = theme.auroraStrength ?? 0;
 
         for (let i = 0; i < mountainMaterials.length; i++) {
             const p = theme.mountains[i];
