@@ -166,3 +166,20 @@ test('子弹回放镜头缓慢微转，全程总转角控制在 15°–30° 内�
         assert.ok(degrees >= 15 && degrees <= 30, `expected 15°–30° total sweep, got ${degrees.toFixed(2)}°`);
     }
 });
+
+test('resetToReady 回到岸边静水待投状态并清空水花与计数', () => {
+    const session = new Session(() => 7);
+    session.start(DEFAULT);
+    while (!session.sim.ended) session.tick(0.1);
+    const prevGen = session.waterGeneration;
+    session.mode = 'slow';
+    session.resetToReady(DEFAULT);
+    assert.equal(session.paused, true);
+    assert.equal(session.mode, 'normal');
+    assert.equal(session.sim.ended, false);
+    assert.equal(session.sim.skips, 0);
+    assert.equal(session.sim.contacts.length, 0);
+    assert.equal(session.spray.drops.length, 0);
+    assert.equal(session.waterTicks.length, 0);
+    assert.equal(session.waterGeneration, prevGen + 1);
+});

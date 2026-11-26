@@ -157,7 +157,7 @@ export function boot() {
     const shoreForaging = createShoreForaging(world.scene, world.sunset.shoreMesh, camera, renderer.domElement, stoneBox, {
         onEquipAndStandUp(stone) {
             applyEquippedStone(stone);
-            rig.beginThrow(SHORE_ORIGIN, false, parameters.direction, camera.aspect);
+            resetToShore();
         },
         onEquipStay(stone) {
             applyEquippedStone(stone);
@@ -479,6 +479,34 @@ export function boot() {
         syncLabHud();
     }
 
+    function resetToShore() {
+        stopAutoReplay(false);
+        cancelGesture();
+        mouseMode.checked = false;
+        gestureHud.style.display = '';
+        bounceMarkers.setEnabled(true);
+        resultToast.classList.remove('visible', 'new-best');
+        resultShownForThrow = false;
+        heardContacts = 0;
+        heardSink = false;
+        session.mouseMode = false;
+        session.mouse = undefined;
+        dev.review.side = false;
+        session.diagnosticContact = undefined;
+        session.resetToReady(parameters, stoneBox.equipped);
+        playbackSelect.value = 'normal';
+        rig.view = 'overview';
+        viewSelect.value = 'overview';
+        preReplayView = 'overview';
+        world.setStoneMesh(stoneBox.equipped);
+        world.setStoneWet(false);
+        feedback.reset();
+        rig.beginThrow(session.sim.p, false, parameters.direction, camera.aspect);
+        audio.updatePlaybackState('normal', false);
+        syncHandPanel();
+        syncLabHud();
+    }
+
     // Result toast replay-mode switcher & quick actions
     resultReplayCourse.onclick = () => {
         replayCameraMode = 'course';
@@ -490,7 +518,7 @@ export function boot() {
         syncReplayButtons();
         startAutoReplay();
     };
-    resultThrowAgain.onclick = () => start(false);
+    resultThrowAgain.onclick = resetToShore;
     resultChangeStone.onclick = openForaging;
 
     document.querySelector<HTMLButtonElement>('#throw')!.onclick = () => start();
