@@ -1,0 +1,517 @@
+{
+  "version": 1,
+  "generatedAt": "2026-11-26T03:20:31Z",
+  "allPassed": true,
+  "blender": "5.3.0",
+  "engine": "Cycles",
+  "seed": 20261125,
+  "draft": false,
+  "tileSizeMeters": 1.2,
+  "scatter": {
+    "count": 2640,
+    "diametersMm": [
+      4.001357313397918,
+      27.88952355104339
+    ],
+    "countsUnder14Mm": 1901,
+    "countsAtLeast14Mm": 739,
+    "diameterPowerLawExponents": [
+      1.2,
+      1.62
+    ],
+    "crossesX": 19,
+    "crossesY": 18,
+    "crossesCorner": 1,
+    "periodicCopiesPerMesh": 8,
+    "gravelTriangles": 675840,
+    "positionsSha256": "89f9c66040ef0b8d260d036f301fa57cdb41d514cd548536f3c06f7fa5f018ec",
+    "sandVertices": 410881,
+    "sandQuads": 409600,
+    "sandHeightMm": [
+      -1.921087949772985,
+      1.9091139747245456
+    ],
+    "sourceMeshInstances": 18,
+    "northSouthAndEastWestIdentical": true,
+    "maximumGravelElevationMm": 10.502925142645836
+  },
+  "ambientOcclusion": {
+    "samples": 32,
+    "distanceMeters": 0.035,
+    "rayTraced": true
+  },
+  "textures": {
+    "albedo": {
+      "path": "shore_albedo.webp",
+      "size": [
+        2048,
+        2048
+      ],
+      "mode": "RGB",
+      "format": "WEBP",
+      "fileBytes": 389596,
+      "quality": 88,
+      "normalQuantization8BitStep": null,
+      "rawEdges": {
+        "topBottom": {
+          "rmse8Bit": 2.9633705615997314,
+          "referenceAdjacentRmse8Bit": 3.2279313802719116
+        },
+        "leftRight": {
+          "rmse8Bit": 3.94983172416687,
+          "referenceAdjacentRmse8Bit": 3.6756781339645386
+        }
+      },
+      "encodedEdges": {
+        "topBottom": {
+          "rmse8Bit": 2.2555270195007324,
+          "referenceAdjacentRmse8Bit": 2.4010955095291138
+        },
+        "leftRight": {
+          "rmse8Bit": 2.366555690765381,
+          "referenceAdjacentRmse8Bit": 2.7013133764266968
+        }
+      },
+      "sha256": "78f5bfd68e9c1d02d59a398cc1c37ff3942a6501539e841127a0e4cb5c644d3c",
+      "srgbLuminanceMinMax": [
+        0.3929592156862745,
+        0.7114243137254902
+      ],
+      "maxChannelSpread": 0.10588235294117647
+    },
+    "normal": {
+      "path": "shore_normal.png",
+      "size": [
+        2048,
+        2048
+      ],
+      "mode": "RGB",
+      "format": "PNG",
+      "fileBytes": 2266124,
+      "quality": null,
+      "normalQuantization8BitStep": 5,
+      "rawEdges": {
+        "topBottom": {
+          "rmse8Bit": 10.43761920928955,
+          "referenceAdjacentRmse8Bit": 9.792922496795654
+        },
+        "leftRight": {
+          "rmse8Bit": 11.899669647216797,
+          "referenceAdjacentRmse8Bit": 10.706021308898926
+        }
+      },
+      "encodedEdges": {
+        "topBottom": {
+          "rmse8Bit": 0.0,
+          "referenceAdjacentRmse8Bit": 10.306415557861328
+        },
+        "leftRight": {
+          "rmse8Bit": 0.0,
+          "referenceAdjacentRmse8Bit": 11.63068437576294
+        }
+      },
+      "sha256": "4d7b3f8a0c046f24a1d6704cdca6e2f91baef64dad7512e885b9414d811547da",
+      "openGL": true,
+      "angularErrorP99Deg": 1.8773226737976074
+    },
+    "roughness": {
+      "path": "shore_roughness.webp",
+      "size": [
+        2048,
+        2048
+      ],
+      "mode": "RGB",
+      "format": "WEBP",
+      "fileBytes": 307410,
+      "quality": "lossless",
+      "normalQuantization8BitStep": null,
+      "rawEdges": {
+        "topBottom": {
+          "rmse8Bit": 7.304869651794434,
+          "referenceAdjacentRmse8Bit": 6.718042373657227
+        },
+        "leftRight": {
+          "rmse8Bit": 8.934327125549316,
+          "referenceAdjacentRmse8Bit": 6.6805336475372314
+        }
+      },
+      "encodedEdges": {
+        "topBottom": {
+          "rmse8Bit": 0.0,
+          "referenceAdjacentRmse8Bit": 6.250741481781006
+        },
+        "leftRight": {
+          "rmse8Bit": 0.0,
+          "referenceAdjacentRmse8Bit": 6.392734527587891
+        }
+      },
+      "sha256": "5ec89d14c53c6e52139d65aa38499f25e5705eb66b54baf44cdc3a96a51bd08a",
+      "valueMinMax": [
+        0.6274509803921569,
+        0.9568627450980393
+      ],
+      "roughnessQuantization8BitStep": 12
+    },
+    "ao": {
+      "path": "shore_ao.webp",
+      "size": [
+        2048,
+        2048
+      ],
+      "mode": "RGB",
+      "format": "WEBP",
+      "fileBytes": 255584,
+      "quality": 83,
+      "normalQuantization8BitStep": null,
+      "rawEdges": {
+        "topBottom": {
+          "rmse8Bit": 11.266762733459473,
+          "referenceAdjacentRmse8Bit": 9.014551639556885
+        },
+        "leftRight": {
+          "rmse8Bit": 11.419836044311523,
+          "referenceAdjacentRmse8Bit": 9.041420936584473
+        }
+      },
+      "encodedEdges": {
+        "topBottom": {
+          "rmse8Bit": 2.3794162273406982,
+          "referenceAdjacentRmse8Bit": 3.9698023796081543
+        },
+        "leftRight": {
+          "rmse8Bit": 2.598921775817871,
+          "referenceAdjacentRmse8Bit": 4.243590354919434
+        }
+      },
+      "sha256": "affe3ee624fa24d383c0d7edc7971da2d534e541c8b4263b790027b45d691dcd",
+      "valueMinMax": [
+        0.22745098039215686,
+        1.0
+      ]
+    }
+  },
+  "pebbles": [
+    {
+      "id": "pebble_01",
+      "fileBytes": 32780,
+      "sha256": "f70c277197a4e3a8504e1cf7396afbb0d74ceb3a5d4b9d55e8e4336cddfe0a70",
+      "identityTransform": true,
+      "textureMaps": {
+        "albedo": {
+          "size": [
+            256,
+            256
+          ],
+          "format": "WEBP",
+          "bytes": 7140
+        },
+        "normal": {
+          "size": [
+            256,
+            256
+          ],
+          "format": "WEBP",
+          "bytes": 11060
+        },
+        "roughness": {
+          "size": [
+            256,
+            256
+          ],
+          "format": "WEBP",
+          "bytes": 5782
+        }
+      },
+      "volumeM3": 4.076890164621792,
+      "centroidM": [
+        -1.4145001525493631e-08,
+        1.5229900549589525e-08,
+        2.9521070000576624e-08
+      ],
+      "centroidErrorMm": 3.610435587135643e-05,
+      "triangles": 144,
+      "vertices": 74,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensions": [
+        2.0999999046325684,
+        1.9399999976158142,
+        1.9399999380111694
+      ]
+    },
+    {
+      "id": "pebble_02",
+      "fileBytes": 34460,
+      "sha256": "4151d8dde6bca6cda713f34b3c9e1428e77140285c6459d48c1a990b68b91d14",
+      "identityTransform": true,
+      "textureMaps": {
+        "albedo": {
+          "size": [
+            256,
+            256
+          ],
+          "format": "WEBP",
+          "bytes": 6840
+        },
+        "normal": {
+          "size": [
+            256,
+            256
+          ],
+          "format": "WEBP",
+          "bytes": 11752
+        },
+        "roughness": {
+          "size": [
+            256,
+            256
+          ],
+          "format": "WEBP",
+          "bytes": 5390
+        }
+      },
+      "volumeM3": 3.7819856344900393,
+      "centroidM": [
+        -3.1283283691565586e-08,
+        2.404890112375066e-08,
+        -4.425173025841618e-08
+      ],
+      "centroidErrorMm": 5.928919897123367e-05,
+      "triangles": 168,
+      "vertices": 86,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensions": [
+        2.0399999618530273,
+        1.7599999904632568,
+        2.0199999809265137
+      ]
+    },
+    {
+      "id": "pebble_03",
+      "fileBytes": 33932,
+      "sha256": "e3da587d744c61d86dfb9791144a031613f5210f9146473fb0644b7483b7b42a",
+      "identityTransform": true,
+      "textureMaps": {
+        "albedo": {
+          "size": [
+            256,
+            256
+          ],
+          "format": "WEBP",
+          "bytes": 5702
+        },
+        "normal": {
+          "size": [
+            256,
+            256
+          ],
+          "format": "WEBP",
+          "bytes": 12888
+        },
+        "roughness": {
+          "size": [
+            256,
+            256
+          ],
+          "format": "WEBP",
+          "bytes": 4814
+        }
+      },
+      "volumeM3": 4.283089034302484,
+      "centroidM": [
+        2.7599359209380125e-08,
+        -2.5895389203838114e-08,
+        4.149232997096365e-08
+      ],
+      "centroidErrorMm": 5.615967643430631e-05,
+      "triangles": 168,
+      "vertices": 86,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensions": [
+        2.1200000047683716,
+        2.0,
+        1.899999976158142
+      ]
+    },
+    {
+      "id": "pebble_04",
+      "fileBytes": 33468,
+      "sha256": "dd5964b7871bfbf4ac1a7e0a7a6b60501fb57b9b32ec65195c4540d223f27d22",
+      "identityTransform": true,
+      "textureMaps": {
+        "albedo": {
+          "size": [
+            256,
+            256
+          ],
+          "format": "WEBP",
+          "bytes": 6526
+        },
+        "normal": {
+          "size": [
+            256,
+            256
+          ],
+          "format": "WEBP",
+          "bytes": 10716
+        },
+        "roughness": {
+          "size": [
+            256,
+            256
+          ],
+          "format": "WEBP",
+          "bytes": 5504
+        }
+      },
+      "volumeM3": 3.3105832881385586,
+      "centroidM": [
+        -1.7030356781805417e-08,
+        -1.6744940284082442e-08,
+        6.229424825257709e-08
+      ],
+      "centroidErrorMm": 6.671581103896419e-05,
+      "triangles": 192,
+      "vertices": 98,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensions": [
+        2.100000023841858,
+        1.9599999785423279,
+        1.8799999356269836
+      ]
+    },
+    {
+      "id": "pebble_05",
+      "fileBytes": 34388,
+      "sha256": "9419a908811b14c9002cf44a7e94967b2343334d5867fdaa5ddd67ab0e83968e",
+      "identityTransform": true,
+      "textureMaps": {
+        "albedo": {
+          "size": [
+            256,
+            256
+          ],
+          "format": "WEBP",
+          "bytes": 6190
+        },
+        "normal": {
+          "size": [
+            256,
+            256
+          ],
+          "format": "WEBP",
+          "bytes": 13926
+        },
+        "roughness": {
+          "size": [
+            256,
+            256
+          ],
+          "format": "WEBP",
+          "bytes": 4172
+        }
+      },
+      "volumeM3": 3.660252165079728,
+      "centroidM": [
+        4.748095587752087e-08,
+        -4.063258423308051e-09,
+        8.145365452048304e-09
+      ],
+      "centroidErrorMm": 4.834561219392189e-05,
+      "triangles": 168,
+      "vertices": 86,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensions": [
+        2.059999942779541,
+        1.7799999713897705,
+        2.0
+      ]
+    },
+    {
+      "id": "pebble_06",
+      "fileBytes": 29860,
+      "sha256": "cf4ab24803d01924db37eb184aec843e742d1ab2a7420bab87609557f1a00b3e",
+      "identityTransform": true,
+      "textureMaps": {
+        "albedo": {
+          "size": [
+            256,
+            256
+          ],
+          "format": "WEBP",
+          "bytes": 5742
+        },
+        "normal": {
+          "size": [
+            256,
+            256
+          ],
+          "format": "WEBP",
+          "bytes": 11080
+        },
+        "roughness": {
+          "size": [
+            256,
+            256
+          ],
+          "format": "WEBP",
+          "bytes": 4382
+        }
+      },
+      "volumeM3": 5.012546116498304,
+      "centroidM": [
+        -2.790995665919732e-08,
+        2.2967127563110346e-08,
+        3.656846535546076e-08
+      ],
+      "centroidErrorMm": 5.1416994152439425e-05,
+      "triangles": 144,
+      "vertices": 74,
+      "closedManifold": true,
+      "outwardNormals": true,
+      "connectedShell": true,
+      "nonManifoldEdges": 0,
+      "windingErrors": 0,
+      "degenerateFaces": 0,
+      "selfIntersections": 0,
+      "gltfDimensions": [
+        2.0199999809265137,
+        2.0,
+        2.0800000429153442
+      ]
+    }
+  ],
+  "previews": {
+    "shore-preview.png": "018d91b18ed30693bfb1b3126c77c6d997d3bfd32f2e2afa028135bece8a47bd",
+    "pebbles-preview.png": "aa8b8feeeef59219c919130424bc936c8f1e8e2836ec4864f7b8909753599e45"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "generatedAt": "2026-11-26T03:20:31Z",
+  "tileSizeMeters": 1.2,
+  "textures": {
+    "albedo": "/assets/shore/shore_albedo.webp",
+    "normal": "/assets/shore/shore_normal.png",
+    "roughness": "/assets/shore/shore_roughness.webp",
+    "ao": "/assets/shore/shore_ao.webp"
+  },
+  "pebbles": [
+    {
+      "id": "pebble_01",
+      "glbPath": "/assets/shore/pebble_01.glb"
+    },
+    {
+      "id": "pebble_02",
+      "glbPath": "/assets/shore/pebble_02.glb"
+    },
+    {
+      "id": "pebble_03",
+      "glbPath": "/assets/shore/pebble_03.glb"
+    },
+    {
+      "id": "pebble_04",
+      "glbPath": "/assets/shore/pebble_04.glb"
+    },
+    {
+      "id": "pebble_05",
+      "glbPath": "/assets/shore/pebble_05.glb"
+    },
+    {
+      "id": "pebble_06",
+      "glbPath": "/assets/shore/pebble_06.glb"
+    }
+  ]
+}

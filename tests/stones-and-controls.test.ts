@@ -135,3 +135,22 @@ test('Blender stone manifest loads cleanly, every GLB exists on disk, foraging i
     assert.equal(simBoulder.skips, 0, `340g plunge_boulder should plunge straight in (got ${simBoulder.skips} skips)`);
     assert.ok(simMaster.skips >= 5 && simMaster.p.x > simBoulder.p.x * 2, `master_disc (${simMaster.skips} skips, ${simMaster.p.x.toFixed(1)}m) should vastly outperform plunge_boulder (${simBoulder.p.x.toFixed(1)}m)`);
 });
+
+test('Blender Cycles 2K shore bed manifest and all 10 texture/pebble assets exist on disk', () => {
+    const manifestUrl = new URL('../public/assets/shore/manifest.json', import.meta.url);
+    const manifest = JSON.parse(readFileSync(manifestUrl, 'utf8')) as {
+        tileSizeMeters: number;
+        textures: Record<string, string>;
+        pebbles: Array<{ id: string; glbPath: string }>;
+    };
+    assert.ok(manifest.tileSizeMeters > 0.4);
+    for (const key of ['albedo', 'normal', 'roughness', 'ao']) {
+        const rel = manifest.textures[key];
+        assert.ok(rel?.startsWith('/assets/shore/'), `missing shore texture ${key}`);
+        assert.ok(existsSync(new URL(`../public${rel}`, import.meta.url)), `missing shore file on disk: ${rel}`);
+    }
+    assert.equal(manifest.pebbles.length, 6);
+    for (const p of manifest.pebbles) {
+        assert.ok(existsSync(new URL(`../public${p.glbPath}`, import.meta.url)), `missing shore pebble on disk: ${p.glbPath}`);
+    }
+});
