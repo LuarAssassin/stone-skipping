@@ -123,8 +123,8 @@ export function createWorld() {
     scene.add(waterField.mesh);
     const spray = createSpray(waterField.mesh.material.uniforms.heightState, COURSE_GRID);
     scene.add(spray.mesh);
-    // Underwater refraction pass only needs submerged riverbed & stone; skip sky, mountains, spray, weather & above-water scenery
-    const transmissionHidden: THREE.Object3D[] = [sunset.skyMesh, sunset.mountains, spray.mesh, weather.rootGroup, scenePacks.rootGroup];
+    // Underwater refraction pass only needs submerged riverbed & stone; skip sky, mountains, horizon panorama, spray, weather & above-water scenery
+    const transmissionHidden: THREE.Object3D[] = [sunset.skyMesh, sunset.mountains, sunset.horizonPanorama, spray.mesh, weather.rootGroup, scenePacks.rootGroup];
     waterField.setTransmissionHidden(transmissionHidden);
 
     // Natural gently-sloping riverbed (shallow warm pebble bank near shore -> deeper twilight basin)

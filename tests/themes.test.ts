@@ -46,6 +46,14 @@ test('scene theme registry exposes sunset as default and registers all different
     assert.equal(getSceneTheme('fuji_kawaguchi').scenePack, 'fuji');
     assert.equal(getSceneTheme('venice_lagoon').scenePack, 'venice');
     assert.equal(getSceneTheme('venice_lagoon').horizonStyle, 'open_sea');
+    assert.equal(getSceneTheme('venice_lagoon').horizonPanorama?.textureUrl, '/assets/horizons/venice_skyline.webp');
+    for (const theme of SCENE_THEMES) {
+        if (theme.horizonPanorama) {
+            const rel = theme.horizonPanorama.textureUrl.replace(/^\/+/, '');
+            const st = statSync(resolve('public', rel));
+            assert.ok(st.size > 20_000, `[${theme.id}] horizonPanorama ${rel} unexpectedly small (${st.size} bytes)`);
+        }
+    }
     assert.equal(getSceneTheme('tropical_lagoon').horizonStyle, 'open_sea');
     assert.equal(getSceneTheme('nile_sunset').horizonStyle, 'desert_dunes');
     assert.equal(getSceneTheme('zhangjiajie_peaks').horizonStyle, 'karst_spires');

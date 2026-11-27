@@ -306,6 +306,165 @@ function createMountainRings(theme: SceneTheme) {
     return { group, materials };
 }
 
+/** 360° transparent-top distant skyline panorama cylinder with live atmospheric haze & weather fog integration. */
+function createHorizonPanorama(initialTheme: SceneTheme) {
+    const geometry = new THREE.CylinderGeometry(1, 1, 1, 128, 1, true);
+    const placeholder = new THREE.DataTexture(new Uint8Array([0, 0, 0, 0]), 1, 1);
+    placeholder.needsUpdate = true;
+
+    const material = new THREE.ShaderMaterial({
+        side: THREE.DoubleSide,
+        transparent: true,
+        depthWrite: false,
+        depthTest: true,
+        fog: false,
+        uniforms: {
+            uMap: { value: placeholder },
+            uRepeatX: { value: 2.0 },
+            uSunDir: { value: themeSunDirection(initialTheme) },
+            uFogBase: { value: new THREE.Vector3(...initialTheme.water.fogBase) },
+            uFogSun: { value: new THREE.Vector3(...initialTheme.water.fogSun) },
+            uHazeStrength: { value: 0.34 },
+            uOvercast: { value: 0.0 },
+            uFogExtra: { value: 0.0 },
+            uOpacity: { value: 0.97 },
+        },
+        vertexShader: /* glsl */ `
+            varying vec2 vUv;
+            varying vec3 vWorldDir;
+            varying float vWorldY;
+            void main() {
+                // Flip U so inner cylinder wall reads left-to-right naturally when looking outward
+                vUv = vec2(1.0 - uv.x, uv.y);
+                vec4 worldPos = modelMatrix * vec4(position, 1.0);
+                vWorldDir = normalize(worldPos.xyz);
+                vWorldY = worldPos.y;
+                gl_Position = projectionMatrix * viewMatrix * worldPos;
+            }
+        `,
+        fragmentShader: /* glsl */ `
+            uniform sampler2D uMap;
+            uniform float uRepeatX, uHazeStrength, uOvercast, uFogExtra, uOpacity;
+            uniform vec3 uSunDir, uFogBase, uFogSun;
+            varying vec2 vUv;
+            varying vec3 vWorldDir;
+            varying float vWorldY;
+            void main() {
+                vec2 sampleUv = vec2(vUv.x * uRepeatX, clamp(vUv.y, 0.002, 0.998));
+                vec4 tex = texture2D(uMap, sampleUv);
+                float alpha = tex.a * uOpacity;
+                if (alpha < 0.015) discard;
+
+                vec3 dir = normalize(vWorldDir);
+                float sunAlign = max(0.0, dot(dir, uSunDir));
+                vec3 fogCol = mix(uFogBase, uFogSun, pow(sunAlign, 2.2));
+
+                // Heavier misty air right above the lagoon waterline, crisper up at spires/domes
+                float lowMist = exp(-max(0.0, vWorldY) * 0.16);
+                float haze = clamp(uHazeStrength + lowMist * 0.20 + uOvercast * 0.36 + uFogExtra, 0.0, 0.88);
+
+                // Warm sunset light modulation & subtle backlit silhouette wrap near the solar corridor
+                vec3 buildingCol = tex.rgb * mix(vec3(0.90, 0.90, 0.96), vec3(1.10, 0.98, 0.88), sunAlign);
+                float backSil = pow(sunAlign, 4.0) * (1.0 - uOvercast * 0.68);
+                buildingCol *= 1.0 - backSil * 0.24;
+
+                // Preserve warm sunlit terracotta & window glints slightly through distance haze
+                float warmth = clamp((tex.r - tex.b) * 1.4, 0.0, 1.0) * smoothstep(0.28, 0.72, tex.r);
+                vec3 col = mix(buildingCol, fogCol, haze * (1.0 - warmth * 0.22));
+                col += uFogSun * backSil * (0.12 + 0.14 * lowMist);
+
+                gl_FragColor = vec4(col, alpha);
+            }
+        `,
+    });
+
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.frustumCulled = false;
+    mesh.visible = false;
+
+    const loader = new THREE.TextureLoader();
+    const cache = new Map<string, THREE.Texture>();
+    const pending = new Set<string>();
+    let activeUrl: string | null = null;
+
+    function configure(theme: SceneTheme) {
+        const sunDir = themeSunDirection(theme);
+        material.uniforms.uSunDir.value.copy(sunDir);
+        material.uniforms.uFogBase.value.set(...theme.water.fogBase);
+        material.uniforms.uFogSun.value.set(...theme.water.fogSun);
+
+        const cfg = theme.horizonPanorama;
+        if (!cfg) {
+            activeUrl = null;
+            mesh.visible = false;
+            return;
+        }
+
+        const radius = cfg.radius ?? 146;
+        const height = cfg.height ?? 44;
+        const yOffset = cfg.yOffset ?? -0.9;
+        mesh.scale.set(radius, height, radius);
+        mesh.position.set(0, yOffset + height * 0.5, 0);
+        mesh.rotation.y = cfg.rotationY ?? 0;
+
+        material.uniforms.uRepeatX.value = cfg.repeatX ?? 2;
+        material.uniforms.uHazeStrength.value = cfg.hazeStrength ?? 0.34;
+        material.uniforms.uOpacity.value = cfg.opacity ?? 0.97;
+
+        activeUrl = cfg.textureUrl;
+        const cached = cache.get(cfg.textureUrl);
+        if (cached) {
+            material.uniforms.uMap.value = cached;
+            mesh.visible = true;
+            return;
+        }
+
+        mesh.visible = false;
+        if (typeof document === 'undefined' || pending.has(cfg.textureUrl)) return;
+        pending.add(cfg.textureUrl);
+        const url = cfg.textureUrl;
+        loader.load(
+            url,
+            tex => {
+                pending.delete(url);
+                tex.wrapS = THREE.RepeatWrapping;
+                tex.wrapT = THREE.ClampToEdgeWrapping;
+                tex.colorSpace = THREE.SRGBColorSpace;
+                tex.minFilter = THREE.LinearMipmapLinearFilter;
+                tex.magFilter = THREE.LinearFilter;
+                tex.anisotropy = 8;
+                tex.needsUpdate = true;
+                cache.set(url, tex);
+                if (activeUrl === url) {
+                    material.uniforms.uMap.value = tex;
+                    mesh.visible = true;
+                }
+            },
+            undefined,
+            () => {
+                pending.delete(url);
+            }
+        );
+    }
+
+    configure(initialTheme);
+
+    function applyWeather(weather: WeatherPreset) {
+        material.uniforms.uOvercast.value = weather.overcast;
+        material.uniforms.uFogExtra.value = Math.max(0, 1 - weather.fogFarScale) * 0.42;
+    }
+
+    function dispose() {
+        geometry.dispose();
+        material.dispose();
+        placeholder.dispose();
+        for (const tex of cache.values()) tex.dispose();
+        cache.clear();
+    }
+
+    return { mesh, configure, applyWeather, dispose };
+}
+
 export function shorelineCurveX(z: number): number {
     return -0.58 - 0.34 * Math.sin(z * 0.24 + 0.6) - 0.18 * Math.cos(z * 0.57 - 0.4);
 }
@@ -846,6 +1005,9 @@ export function createSunsetEnvironment(
     const { group: mountains, materials: mountainMaterials } = createMountainRings(initialTheme);
     scene.add(mountains);
 
+    const horizonPanorama = createHorizonPanorama(initialTheme);
+    scene.add(horizonPanorama.mesh);
+
     const { group: shoreGroup, shoreMesh, reedsMaterial } = createShoreAndReeds();
     scene.add(shoreGroup);
 
@@ -899,6 +1061,7 @@ export function createSunsetEnvironment(
             m.uSunAzimuth.value = sunAz;
             m.uHorizonMode.value = modeIdx;
         }
+        horizonPanorama.configure(theme);
 
         reedsMaterial.uniforms.uSunDir.value.copy(sunDir);
         reedsMaterial.uniforms.uBaseCol.value.set(...theme.reeds.base);
@@ -913,6 +1076,7 @@ export function createSunsetEnvironment(
     function applyWeather(weather: WeatherPreset = getWeatherPreset()) {
         skyMaterial.uniforms.uCloudBoost.value = weather.cloudBoost;
         skyMaterial.uniforms.uOvercast.value = weather.overcast;
+        horizonPanorama.applyWeather(weather);
         rebakeEnvironment(currentEnvIntensity * (1.0 - weather.overcast * 0.14));
     }
 
@@ -921,6 +1085,7 @@ export function createSunsetEnvironment(
     return {
         skyMesh,
         mountains,
+        horizonPanorama: horizonPanorama.mesh,
         shoreGroup,
         shoreMesh,
         applyTheme,
@@ -933,6 +1098,7 @@ export function createSunsetEnvironment(
             envTarget?.dispose();
             skyMesh.geometry.dispose();
             skyMaterial.dispose();
+            horizonPanorama.dispose();
         },
     };
 }

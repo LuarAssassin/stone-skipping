@@ -24,6 +24,25 @@ export interface MountainLayerPalette {
 
 export type HorizonStyle = 'rolling_hills' | 'foothills' | 'karst_spires' | 'desert_dunes' | 'open_sea';
 
+export interface HorizonPanoramaConfig {
+    /** Seamless 360°-tiling transparent-top distant skyline strip (e.g. 4096×512 WebP) */
+    textureUrl: string;
+    /** Cylinder radius in metres (between hero 3D landmarks ~90m and sky dome 165m) */
+    radius?: number;
+    /** Total vertical cylinder height in metres */
+    height?: number;
+    /** Bottom Y offset in metres (slightly negative to tuck seawall cleanly under y=0 waterline) */
+    yOffset?: number;
+    /** Horizontal wrap repeats around 360° (default 2) */
+    repeatX?: number;
+    /** Azimuthal phase rotation in radians around +Y */
+    rotationY?: number;
+    /** Base atmospheric distance haze blend toward theme horizon fog (0..1) */
+    hazeStrength?: number;
+    /** Overall alpha multiplier (0..1) */
+    opacity?: number;
+}
+
 export interface SceneTheme {
     id: SceneThemeId;
     name: string;
@@ -33,6 +52,8 @@ export interface SceneTheme {
     scenePack: ScenePackId;
     /** Distant 360° horizon silhouette profile matched to geography */
     horizonStyle: HorizonStyle;
+    /** Optional 360° panoramic distant skyline cylinder band (e.g. Venice lagoon waterfront) */
+    horizonPanorama?: HorizonPanoramaConfig;
     /** Optional animated Aurora Borealis curtains in sky shader (0..1) */
     auroraStrength?: number;
     /** Normalized sun/moon directional vector */
@@ -552,6 +573,16 @@ export const SCENE_THEMES: readonly SceneTheme[] = [
         subtitle: '意大利泻湖 · 金辉贡多拉',
         scenePack: 'venice',
         horizonStyle: 'open_sea',
+        horizonPanorama: {
+            textureUrl: '/assets/horizons/venice_skyline.webp',
+            radius: 146,
+            height: 30,
+            yOffset: -0.82,
+            repeatX: 3,
+            rotationY: 0.99,
+            hazeStrength: 0.30,
+            opacity: 0.98,
+        },
         sunDirection: [0.85, 0.18, -0.49],
         sunColor: '#ffbc6c',
         sunIntensity: 3.55,
