@@ -1,0 +1,349 @@
+{
+  "version": 1,
+  "packId": "nile",
+  "units": "metres",
+  "gltfAxes": [
+    "X",
+    "Y up",
+    "Z"
+  ],
+  "seed": 20261205,
+  "assets": [
+    {
+      "file": "nile_horizon_monuments.glb",
+      "name": "nile_horizon_monuments",
+      "title": "沙脊与三座金字塔",
+      "use": "远岸沙丘和阶梯金字塔，横向沿 X",
+      "bboxMeters": [
+        66.0,
+        25.99999964237213,
+        26.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -33.0,
+          -0.6000000238418579,
+          -13.0
+        ],
+        "max": [
+          33.0,
+          25.399999618530273,
+          13.0
+        ]
+      },
+      "origin": "groundContact",
+      "triangles": 3970,
+      "fileBytes": 286868,
+      "textureMaps": [
+        {
+          "name": "nile_horizon_monuments_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nile_horizon_monuments_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nile_horizon_monuments_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "42569485dab0ff79e9d7691e945823ee91c38702f1b5be8fb720d6d81f50e629"
+    },
+    {
+      "file": "nile_temple_quay.glb",
+      "name": "nile_temple_quay",
+      "title": "莲花石柱神庙码头",
+      "use": "水岸石阶、四根莲花柱和青铜火盆",
+      "bboxMeters": [
+        6.599999904632568,
+        6.799999952316284,
+        4.800000190734863
+      ],
+      "boundsMeters": {
+        "min": [
+          -3.299999952316284,
+          -1.2000000476837158,
+          -2.4000000953674316
+        ],
+        "max": [
+          3.299999952316284,
+          5.599999904632568,
+          2.4000000953674316
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 9916,
+      "fileBytes": 684284,
+      "textureMaps": [
+        {
+          "name": "nile_temple_quay_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nile_temple_quay_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nile_temple_quay_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "b642cfaee2c7549ca740b89cd8da694678c5231d9566a245a26ff2f4a6cd3ba5"
+    },
+    {
+      "file": "nile_felucca.glb",
+      "name": "nile_felucca",
+      "title": "尼罗三角帆船",
+      "use": "朝 +X 的暖木船，船尾提灯与斜挂帆索",
+      "bboxMeters": [
+        5.199999809265137,
+        5.799999803304672,
+        1.649999976158142
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.5999999046325684,
+          -0.3499999940395355,
+          -0.824999988079071
+        ],
+        "max": [
+          2.5999999046325684,
+          5.449999809265137,
+          0.824999988079071
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 6544,
+      "fileBytes": 469508,
+      "textureMaps": [
+        {
+          "name": "nile_felucca_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nile_felucca_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nile_felucca_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 3,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "998d55b967b9a23827c16900e1548603de3b09c4e8ed5756d25577090fa931d7"
+    },
+    {
+      "file": "nile_date_palm.glb",
+      "name": "nile_date_palm",
+      "title": "尼罗河枣椰",
+      "use": "接地高干，菱纹叶痕、灰绿扇羽和枣串",
+      "bboxMeters": [
+        5.3999998569488525,
+        9.199999839067459,
+        5.200000047683716
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.1688339710235596,
+          -0.28999999165534973,
+          -2.446383476257324
+        ],
+        "max": [
+          3.231165885925293,
+          8.90999984741211,
+          2.7536165714263916
+        ]
+      },
+      "origin": "groundContact",
+      "triangles": 7222,
+      "fileBytes": 466504,
+      "textureMaps": [
+        {
+          "name": "nile_date_palm_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nile_date_palm_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nile_date_palm_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": false,
+      "alphaMask": true,
+      "sha256": "64b79f6671b0730cd1af43cecf29c5b537e5116a973fca59f592e96136ccd79b"
+    },
+    {
+      "file": "aswan_granite_boulder.glb",
+      "name": "aswan_granite_boulder",
+      "title": "阿斯旺磨光河礁",
+      "use": "潮线半浸的暗红花岗岩巨石",
+      "bboxMeters": [
+        3.4000000953674316,
+        1.9500000476837158,
+        2.799999952316284
+      ],
+      "boundsMeters": {
+        "min": [
+          -1.7000000476837158,
+          -0.6000000238418579,
+          -1.399999976158142
+        ],
+        "max": [
+          1.7000000476837158,
+          1.350000023841858,
+          1.399999976158142
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 1886,
+      "fileBytes": 85920,
+      "textureMaps": [
+        {
+          "name": "aswan_granite_boulder_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "aswan_granite_boulder_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "aswan_granite_boulder_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "3b6f436236ea2c99889b1338433d66ce3c6be11895f0c4435e527b6eef2059e2"
+    },
+    {
+      "file": "nile_papyrus_clump.glb",
+      "name": "nile_papyrus_clump",
+      "title": "尼罗纸莎草伞冠",
+      "use": "涉水三棱茎，顶端放射羽丝，底部没入水线",
+      "bboxMeters": [
+        1.7999999523162842,
+        2.2999999821186066,
+        1.7999999523162842
+      ],
+      "boundsMeters": {
+        "min": [
+          -0.8999999761581421,
+          -0.4000000059604645,
+          -0.8999999761581421
+        ],
+        "max": [
+          0.8999999761581421,
+          1.899999976158142,
+          0.8999999761581421
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 3230,
+      "fileBytes": 191620,
+      "textureMaps": [
+        {
+          "name": "nile_papyrus_clump_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nile_papyrus_clump_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nile_papyrus_clump_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": false,
+      "alphaMask": true,
+      "sha256": "44f1b723bf1cbc6edc95a4b46af66baeee816ef465a7588e4df5f438d5efcc73"
+    }
+  ]
+}
