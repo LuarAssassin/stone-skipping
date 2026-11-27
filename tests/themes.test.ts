@@ -56,9 +56,18 @@ test('scene theme registry exposes sunset as default and registers all different
         }
     }
     assert.equal(getSceneTheme('tropical_lagoon').horizonStyle, 'open_sea');
-    assert.equal(getSceneTheme('nile_sunset').horizonStyle, 'desert_dunes');
-    assert.equal(getSceneTheme('zhangjiajie_peaks').horizonStyle, 'karst_spires');
-    assert.equal(getSceneTheme('fuji_kawaguchi').horizonStyle, 'foothills');
+    assert.equal(getSceneTheme('tropical_lagoon').horizonPanorama?.textureUrl, '/assets/horizons/lagoon_skyline.webp');
+    assert.equal(getSceneTheme('nile_sunset').horizonStyle, 'open_sea');
+    assert.equal(getSceneTheme('nile_sunset').horizonPanorama?.textureUrl, '/assets/horizons/nile_skyline.webp');
+    assert.equal(getSceneTheme('swiss_alps').horizonPanorama?.textureUrl, '/assets/horizons/alps_skyline.webp');
+    assert.equal(getSceneTheme('tahoe_alpine').horizonPanorama?.textureUrl, '/assets/horizons/tahoe_skyline.webp');
+    assert.equal(getSceneTheme('nordic_aurora').horizonPanorama?.textureUrl, '/assets/horizons/nordic_skyline.webp');
+    assert.equal(getSceneTheme('zhangjiajie_peaks').horizonStyle, 'open_sea');
+    assert.equal(getSceneTheme('zhangjiajie_peaks').horizonPanorama?.textureUrl, '/assets/horizons/zhangjiajie_skyline.webp');
+    assert.equal(getSceneTheme('fuji_kawaguchi').horizonStyle, 'open_sea');
+    assert.equal(getSceneTheme('fuji_kawaguchi').horizonPanorama?.textureUrl, '/assets/horizons/fuji_skyline.webp');
+    assert.equal(getSceneTheme('kyoto_autumn').horizonPanorama?.textureUrl, '/assets/horizons/kyoto_skyline.webp');
+    assert.equal(getSceneTheme('jiangnan_lotus').horizonPanorama?.textureUrl, '/assets/horizons/jiangnan_skyline.webp');
     assert.equal(getSceneTheme('swiss_alps').scenePack, 'alps');
     assert.equal(getSceneTheme('nile_sunset').scenePack, 'nile');
     assert.equal(getSceneTheme('nonexistent').id, DEFAULT_THEME_ID);
@@ -123,13 +132,13 @@ test('every registered 3D scene pack keeps throwing corridor and shore foraging 
 
 test('all 10 Blender scene packs and manifests exist and match exact byte sizes on disk', () => {
     const expectedPacks: Array<{ id: ScenePackId; count: number }> = [
-        { id: 'jiangnan', count: 12 },
+        { id: 'jiangnan', count: 14 },
         { id: 'tahoe', count: 7 },
-        { id: 'kyoto', count: 7 },
+        { id: 'kyoto', count: 10 },
         { id: 'nordic', count: 7 },
         { id: 'lagoon', count: 7 },
-        { id: 'fuji', count: 7 },
-        { id: 'zhangjiajie', count: 7 },
+        { id: 'fuji', count: 10 },
+        { id: 'zhangjiajie', count: 10 },
         { id: 'venice', count: 10 },
         { id: 'alps', count: 6 },
         { id: 'nile', count: 6 },

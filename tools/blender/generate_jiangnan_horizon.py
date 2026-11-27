@@ -3,9 +3,9 @@
     /snap/bin/blender -b --factory-startup -t 8 --python-exit-code 1 \
         -P tools/blender/generate_jiangnan_horizon.py --
 
-The existing nine GLBs are inputs to validation only. Use --output-root to
-stage the horizon alongside a copy of the original pack, or --seed to vary
-the weathering and tree shapes.
+Use --watertown-only to rebuild the corrected watertown and keep the other
+GLBs and horizon preview intact. Use --output-root to stage an export against
+a copy of the pack.
 """
 
 import argparse
@@ -22,6 +22,7 @@ ASSETS = Path("public/assets/scenes/jiangnan")
 PREVIEW = Path("tools/blender/preview_jiangnan_horizon.png")
 RESOLUTION = (1440, 480)
 SKIRT = -.60
+WATERTOWN_SKIRT = -1.02
 
 if "--compose-horizon" not in sys.argv:
     import bpy
@@ -29,6 +30,8 @@ if "--compose-horizon" not in sys.argv:
 
     sys.dont_write_bytecode = True
     sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from generate_jiangnan_midground import box, facade, publish as publish_selection
+    from generate_venice_midground import quad, strip
     from scene_pack_factory import (
         Asset, Surface, BARK, COVER, DETAIL, EMIT, GLOW, LEAF, LEAF2,
         NEEDLE, PANEL, ROCK, ROOF, TRIM, WOOD, basic_palette, catalog_lock,
@@ -39,8 +42,8 @@ if "--compose-horizon" not in sys.argv:
 def specs():
     return (
         Asset("jiangnan_watertown_horizon", "粉墙黛瓦 · 江南水镇",
-              "江南水镇远岸，临水立面朝 +Z", (64., 13.8, 16.), SKIRT,
-              (4000, 8000), camera=(1.4, -10., 2.0)),
+              "江南水镇远岸，临水立面朝 +Z", (64., 14.2, 16.), -1.,
+              (7000, 14500), camera=(1.4, -10., 2.0)),
         Asset("jiangnan_su_causeway_horizon", "苏堤 · 柳岸石桥",
               "西湖苏堤远岸，双座单孔石拱桥，堤岸朝 +Z", (74., 9.7, 14.), SKIRT,
               (4000, 8000), camera=(-1.8, -10., 1.75)),
@@ -112,7 +115,7 @@ def baked_materials(model, asset, surfaces, seed):
     return mats
 
 
-def roof(model, x, y, width, depth, eaves, rise, *, hip=0.):
+def roof(model, x, y, width, depth, eaves, rise, *, hip=0., ridge_smooth=True):
     """Clay-tile roof with eased pitch, lifted corners and a separate ridge cap."""
     def point(u, v, side, offset=0.):
         length = width*(1-hip*(1-v))
@@ -135,7 +138,7 @@ def roof(model, x, y, width, depth, eaves, rise, *, hip=0.):
 
     a = .5*width*(1-hip)
     ridge = [(x+a*t, y, eaves+rise+.07+.20*abs(t)**8) for t in (-1.,-.82,0.,.82,1.)]
-    twig(model, ridge, (.14,.12,.12,.12,.14),4,ROOF)
+    model.tube(ridge,(.14,.12,.12,.12,.14),4,ROOF,shade=ridge_smooth)
 
 
 def horse_head(model, x, y, depth, eaves):
@@ -144,40 +147,34 @@ def horse_head(model, x, y, depth, eaves):
         bottom = eaves-.6 if i == 0 else eaves+(.9,1.8,2.75)[i-1]-.18
         top = eaves+height
         model.box((x,y,(bottom+top)*.5),(w,depth*span,top-bottom),PANEL)
-        model.box((x,y,top),(w+.26,depth*span+.31,.20),ROOF)
-
-
-def pane(model, x, y, z, width, height, lit):
-    def rectangle(w,h,depth,offset,slot,group=0):
-        model.grid(lambda u,v:(x+(u-.5)*w,y-depth,z+offset+(v-.5)*h),
-                   1,1,slot,group=group,shade=False)
-
-    rectangle(width+.26,height+.22,.015,0.,TRIM)
-    rectangle(width,height,.025,0.,GLOW if lit else WOOD,EMIT if lit else 0)
-    rectangle(.075,height,.039,0.,TRIM)
-    rectangle(width,.07,.044,height*.19,TRIM)
+        model.box((x,y,top),(w+.43,depth*span+.46,.20),ROOF)
 
 
 def house(model, x, y, ground, w, d, height, pitch, *, gable=0, windows=3, offset=0):
     eaves = ground+height
-    model.box((x,y,ground+height*.5),(w,d,height),PANEL)
-    model.box((x,y,ground+.44),(w+.12,d+.12,.88),DETAIL)
-    roof(model,x,y,w+.48,d+.73,eaves-.07,pitch)
-    # Close the gables at the plaster wall plane under the cantilevered eaves.
+    face = y-d*.5
+    # Keep the plaster wall open at the window bays. The solid screens sit
+    # inside 0.29 m reveals, behind separate solid timber jambs and muntins.
+    positions = [w*.74*((j+.5)/windows-.5) for j in range(windows)]
+    lower = [(px,w*.50/windows,(j+offset)%4==1,1,1)
+             for j,px in enumerate(positions) if (j+offset)%3!=0]
+    upper = [(px,w*.55/windows,(j+offset)%3!=1,1,1) for j,px in enumerate(positions)]
+    upper_center = max(ground+2.55,ground+height*.64)
+    facade(model,x,face,w,ground,eaves,.65,
+           [(ground+.45,ground+1.94,lower),(upper_center-.51,upper_center+.51,upper)],
+           PANEL,TRIM)
+    box(model,x-w/2,x+w/2,face+.65,y+d/2,ground,eaves,PANEL)
+    # The footing is a separate overhanging course that ends at the wall.
+    box(model,x-w/2-.12,x+w/2+.12,face-.13,y+d/2+.13,ground-.36,ground,DETAIL)
+    roof(model,x,y,w+.48,d+.73,eaves-.07,pitch,ridge_smooth=False)
     for side in (-1, 1):
         def infill(u,v):
-            return (x+side*w*.5, y+d*(u-.5),
-                    eaves-.12+v*(pitch*(1-abs(2*u-1))**1.55+.16))
+            rise = pitch*(1-abs(2*u-1))**1.55+.16
+            return (x+side*w*.5, y+d*(u-.5), eaves+.017+v*rise)
         model.grid(infill,8,1,PANEL,flip=side<0,shade=False)
     if gable:
         horse_head(model,x+gable*(w*.5-.04),y,d,eaves)
-    facade = y-d*.5
-    model.box((x,facade-.06,eaves-.28),(w,.19,.26),TRIM)
-    for j in range(windows):
-        px = x+w*.74*((j+.5)/windows-.5)
-        pane(model,px,facade,ground+height*.63,w*.55/windows,1.02,(j+offset)%3!=1)
-        if (j+offset)%3 != 0:
-            pane(model,px,facade,ground+1.30,w*.50/windows,1.65,(j+offset)%4==1)
+    model.box((x,face-.15,eaves-.14),(w+.04,.54,.25),TRIM)
 
 
 def canopy(model, center, span, rng, slot, *, droop=0.):
@@ -230,7 +227,7 @@ def tree(model, x, y, ground, height, rng, *, willow=True, curtains=False):
            LEAF if willow else NEEDLE,droop=height*.07 if willow else 0.)
 
 
-def embankment(model, xs, center, half_width, deck, portals):
+def embankment(model, xs, center, half_width, deck, portals, *, solid_skirt=SKIRT):
     """Sweep stone faces and earth over the waterline, with real through-arches."""
     def edge(x,v):
         return center(x)+(2*v-1)*half_width(x)
@@ -240,7 +237,7 @@ def embankment(model, xs, center, half_width, deck, portals):
         arch = next((p for p in portals if p[0]-p[1]<=a+1e-6 and b<=p[0]+p[1]+1e-6),None)
         def sill(x):
             if arch is None:
-                return SKIRT
+                return solid_skirt
             mid,radius,rise = arch
             return SKIRT+rise*math.sqrt(max(0.,1-((x-mid)/radius)**2))
 
@@ -256,7 +253,7 @@ def embankment(model, xs, center, half_width, deck, portals):
                 return x, edge(x,side), z
             model.grid(wall,steps,2,ROCK,flip=bool(side),shade=False)
     for side, x in enumerate((xs[0],xs[-1])):
-        model.grid(lambda u,v:(x,edge(x,u),SKIRT+(deck(x)-SKIRT)*v),2,1,ROCK,
+        model.grid(lambda u,v:(x,edge(x,u),solid_skirt+(deck(x)-solid_skirt)*v),2,1,ROCK,
                    flip=not side,shade=False)
 
 
@@ -271,6 +268,27 @@ def arch_band(model, x, width, center, half_width, rise, face):
     model.grid(point,16,1,ROCK,flip=face>0,shade=False)
 
 
+def watertown_arch_ring(model, x, width, center, half_width, rise):
+    """Solid ashlar rim with an open soffit and an embedded back face."""
+    def profile(radius, height, projection):
+        points = []
+        for a in np.linspace(math.pi,0,17):
+            px = x+radius*math.cos(a)
+            py = center(px)-half_width(px)-projection
+            points.append(model.vertex((px,py,SKIRT+height*math.sin(a))))
+        return points
+
+    inner = profile(width,rise,.34)
+    outer = profile(width+.28,rise+.34,.38)
+    back_inner = profile(width,rise,-.14)
+    back_outer = profile(width+.28,rise+.34,-.14)
+    for a,b,slot in ((inner,outer,ROCK),(back_outer,back_inner,ROCK),
+                     (back_inner,inner,DETAIL),(outer,back_outer,ROCK)):
+        strip(model,a,b,slot,closed=False)
+    quad(model,(outer[0],back_outer[0],back_inner[0],inner[0]),ROCK)
+    quad(model,(inner[-1],back_inner[-1],back_outer[-1],outer[-1]),ROCK)
+
+
 def watertown(model, rng):
     center = lambda x: .40*math.sin(x*.155)+.018*x
     half = lambda x: 6.3-.0024*x*x+.42*math.cos(x*.23)-2.1*(abs(x)/32)**16
@@ -278,15 +296,15 @@ def watertown(model, rng):
     gates = ((-20.,1.62,2.10),(1.6,1.48,2.02),(22.7,1.64,1.98))
     xs = [-32.,-30.,-28.,-25.,-16.,-13.,-9.,-5.,5.,10.,14.,18.,26.,29.,30.,32.]
     xs = sorted((*xs,*(x+s*w for x,w,_ in gates for s in (-1,1))))
-    embankment(model,xs,center,half,deck,gates)
+    embankment(model,xs,center,half,deck,gates,solid_skirt=WATERTOWN_SKIRT)
     for x,w,h in gates:
-        arch_band(model,x,w,center,half,h,-1)
+        watertown_arch_ring(model,x,w,center,half,h)
 
     # Tall rear courtyards rise behind smaller warehouses and break at the quay gates.
     for i,(x,w,d,h,p,g) in enumerate(((-25.5,5.8,5.4,6.0,2.4,-1),(-16.7,8.,5.7,7.1,3.0,1),
                                      (-7.2,8.4,6.2,8.4,3.0,1),(3.0,7.1,6.2,6.6,3.1,-1),
                                      (12.0,7.3,5.8,6.1,2.6,1),(22.8,6.8,5.5,5.4,2.2,-1))):
-        house(model,x,3.05,deck(x)-.04,w,d,h,p,gable=g,windows=3,offset=i)
+        house(model,x,3.12,deck(x)-.04,w,d,h,p,gable=g,windows=3,offset=i)
     for i,(x,y,w,d,h,p,g) in enumerate(((-27.1,-1.7,5.8,5.1,3.9,1.9,0),(-15.8,-1.7,5.4,5.2,4.2,1.7,-1),
                                        (-9.25,-2.3,6.2,5.3,4.8,1.9,0),(-2.6,-1.9,5.1,4.7,3.7,1.9,1),
                                        (6.5,-1.8,5.6,5.4,4.5,2.25,0),(13.7,-2.1,6.8,5.2,4.1,1.8,1),
@@ -437,7 +455,7 @@ def publish(root, staged, work, rows, preview):
     with catalog_lock(dest):
         current = json.loads(manifest.read_text(encoding="utf-8"))
         original = [row for row in current["assets"] if row["file"] not in new_files]
-        require(current["packId"]=="jiangnan" and len(original)==9,"Expected the original nine Jiangnan assets")
+        require(current["packId"]=="jiangnan" and len(original)>=9,"Expected the original Jiangnan assets")
         current["assets"] = original+rows
         for row in original:
             (staged/row["file"]).symlink_to(dest/row["file"])
@@ -466,8 +484,28 @@ def publish(root, staged, work, rows, preview):
             raise
 
 
+def publish_watertown(root, staged, work, row):
+    dest = root/ASSETS
+    manifest = dest/"manifest.json"
+    with catalog_lock(dest):
+        pack = json.loads(manifest.read_text(encoding="utf-8"))
+        require(any(asset["name"]==row["name"] for asset in pack["assets"]),"Missing watertown catalog row")
+        for i,asset in enumerate(pack["assets"]):
+            if asset["name"]==row["name"]:
+                pack["assets"][i] = row
+            else:
+                (staged/asset["file"]).symlink_to(dest/asset["file"])
+        write_json(staged/manifest.name,pack)
+        validator = ROOT/"tools/blender/validate_scene_pack.mjs"
+        subprocess.run(["node",str(validator),str(staged/manifest.name)],check=True)
+        publish_selection([(staged/row["file"],dest/row["file"]),
+                           (staged/manifest.name,manifest)],work)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--watertown-only",action="store_true",
+                        help="Replace only the watertown GLB and its manifest row.")
     parser.add_argument("--seed",type=int,default=20261126)
     parser.add_argument("--output-root",type=Path,default=ROOT)
     args = parser.parse_args(sys.argv[sys.argv.index("--")+1:] if "--" in sys.argv else [])
@@ -478,6 +516,10 @@ def main():
         work = Path(temp)
         staged = work/"jiangnan"
         staged.mkdir()
+        if args.watertown_only:
+            row = export(specs()[0],watertown,palette(),args.seed,staged,work,material_builder=baked_materials)
+            publish_watertown(root,staged,work,row)
+            return
         rows = []
         for i,(asset,build) in enumerate(zip(specs(),(watertown,causeway,hills))):
             row = export(asset,build,palette(),args.seed+113*i,staged,work,material_builder=baked_materials)

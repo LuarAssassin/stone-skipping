@@ -400,6 +400,175 @@
       "emissive": false,
       "alphaMask": true,
       "sha256": "b8ec1f0439baa4f9fd9ed070105b93e1d4ddbc09b7eded3a1823e143171e6b9d"
+    },
+    {
+      "file": "fuji_onsen_ryokan_mid.glb",
+      "name": "fuji_onsen_ryokan_mid",
+      "title": "河口湖临水温泉旅馆",
+      "use": "石垣、歇山瓦顶、亮障子和樱花，临水面朝 +Z",
+      "bboxMeters": [
+        26.0,
+        11.499999523162842,
+        11.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -13.0,
+          -1.059999942779541,
+          -5.5
+        ],
+        "max": [
+          13.0,
+          10.4399995803833,
+          5.5
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 7876,
+      "fileBytes": 1090292,
+      "textureMaps": [
+        {
+          "name": "fuji_onsen_ryokan_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "fuji_onsen_ryokan_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "fuji_onsen_ryokan_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "e9852d6957fd7e7ff97ee5fe21c14f553027dac9716c5eb9ef45ed59d19134a0"
+    },
+    {
+      "file": "fuji_torii_cape_mid.glb",
+      "name": "fuji_torii_cape_mid",
+      "title": "富士湖畔朱红鸟居岬角",
+      "use": "火山岩、神道石阶与石灯笼，临水面朝 +Z",
+      "bboxMeters": [
+        16.0,
+        9.50000011920929,
+        11.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -8.0,
+          -1.0800000429153442,
+          -5.5
+        ],
+        "max": [
+          8.0,
+          8.420000076293945,
+          5.5
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 4572,
+      "fileBytes": 937856,
+      "textureMaps": [
+        {
+          "name": "fuji_torii_cape_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "fuji_torii_cape_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "fuji_torii_cape_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "ce72f45643476eb1b2f919579490916d5110b8b98cf941a79f7fe2612c1d1284"
+    },
+    {
+      "file": "fuji_pleasure_boat_mid.glb",
+      "name": "fuji_pleasure_boat_mid",
+      "title": "河口湖复古游览木船",
+      "use": "双层湖船，船首朝 +X",
+      "bboxMeters": [
+        12.5,
+        4.599999904632568,
+        3.4000000953674316
+      ],
+      "boundsMeters": {
+        "min": [
+          -6.25,
+          -1.0299999713897705,
+          -1.7000000476837158
+        ],
+        "max": [
+          6.25,
+          3.569999933242798,
+          1.7000000476837158
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 4738,
+      "fileBytes": 743140,
+      "textureMaps": [
+        {
+          "name": "fuji_pleasure_boat_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "fuji_pleasure_boat_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "fuji_pleasure_boat_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "a03f14d3e60a01d622c88ac9831ae93938b30ae72781f4fb3cdd5f6903326d74",
+      "motion": "boat"
     }
   ]
 }

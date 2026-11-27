@@ -400,6 +400,174 @@
       "emissive": false,
       "alphaMask": true,
       "sha256": "809152a9fcaacf7636ad4769ef9dae6548ddb324d9aee3821bdd7630307cb262"
+    },
+    {
+      "file": "kyoto_togetsukyo_mid.glb",
+      "name": "kyoto_togetsukyo_mid",
+      "title": "岚山渡月桥",
+      "use": "三孔桂川木栏石桥，船行水道贯通",
+      "bboxMeters": [
+        32.0,
+        6.799999833106995,
+        7.5
+      ],
+      "boundsMeters": {
+        "min": [
+          -16.0,
+          -1.100000023841858,
+          -3.75
+        ],
+        "max": [
+          16.0,
+          5.699999809265137,
+          3.75
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 6396,
+      "fileBytes": 995020,
+      "textureMaps": [
+        {
+          "name": "kyoto_togetsukyo_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "kyoto_togetsukyo_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "kyoto_togetsukyo_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "218d5cc6e63a6f34bfa3612dd058ff4d59fe039c4a4fa9e8b922553feee2735b"
+    },
+    {
+      "file": "kyoto_teahouse_row_mid.glb",
+      "name": "kyoto_teahouse_row_mid",
+      "title": "岚山临水町家茶屋群",
+      "use": "烧杉格栅、暖障子、红叶与临水缘侧",
+      "bboxMeters": [
+        24.0,
+        10.499999761581421,
+        10.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -12.0,
+          -1.0499999523162842,
+          -5.0
+        ],
+        "max": [
+          12.0,
+          9.449999809265137,
+          5.0
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 7972,
+      "fileBytes": 1181520,
+      "textureMaps": [
+        {
+          "name": "kyoto_teahouse_row_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "kyoto_teahouse_row_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "kyoto_teahouse_row_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "786768a9bd5d700999972d8df1fb35434488bd00ff4fffa37c5d29bd7f733d02"
+    },
+    {
+      "file": "kyoto_maple_shrine_isle_mid.glb",
+      "name": "kyoto_maple_shrine_isle_mid",
+      "title": "红叶湖心观音亭岬角",
+      "use": "红枫与金枫间的悬造佛堂，临水面朝 +Z",
+      "bboxMeters": [
+        18.0,
+        12.50000011920929,
+        13.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -9.0,
+          -1.0800000429153442,
+          -6.5
+        ],
+        "max": [
+          9.0,
+          11.420000076293945,
+          6.5
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 6990,
+      "fileBytes": 1096740,
+      "textureMaps": [
+        {
+          "name": "kyoto_maple_shrine_isle_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "kyoto_maple_shrine_isle_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "kyoto_maple_shrine_isle_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "0ecb75318711ecee7c034b2efe02378b4c8a2090ac72e558c76bfa372876c498"
     }
   ]
 }

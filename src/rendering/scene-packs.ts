@@ -73,9 +73,36 @@ export function buildJiangnanPlacements(): ScenePropPlacement[] {
             scale: 1.08,
             motion: 'static',
         },
-        // The quay sits behind the pagoda island. The bridges face the lake on the right.
-        { asset: 'jiangnan_watertown_horizon.glb', position: [94, -0.35, -35], rotationY: -1.214, scale: 1 },
-        { asset: 'jiangnan_su_causeway_horizon.glb', position: [91.5, -0.35, 27.5], rotationY: -1.863, scale: 1 },
+        // Midground West Lake zigzag bridge & lotus pavilion anchored beside the near water pavilion
+        {
+            asset: 'jiangnan_zigzag_bridge_mid.glb',
+            position: [35.4, 0.05, -14.2],
+            rotationY: -0.14,
+            scale: 1.0,
+            motion: 'static',
+            lanternLightOffset: [0, 2.57, 2.65],
+            lanternColor: '#ffbd69',
+        },
+        // Classical two-tier Jiangnan painted pleasure barge gliding across the right midground lake
+        {
+            asset: 'jiangnan_painted_barge_mid.glb',
+            position: [48.5, 0, 12.4],
+            rotationY: -2.68,
+            scale: 1.0,
+            motion: 'boat',
+            lanternLightOffset: [5.48, 1.36, 0.76],
+            lanternColor: '#ffad5a',
+        },
+        // The quay sits behind the pagoda island (lifted cleanly to waterline). The bridges face the lake on the right.
+        {
+            asset: 'jiangnan_watertown_horizon.glb',
+            position: [94, 0.04, -35],
+            rotationY: -1.214,
+            scale: 1,
+            lanternLightOffset: [7.54, 4.70, 5.51],
+            lanternColor: '#ffbd69',
+        },
+        { asset: 'jiangnan_su_causeway_horizon.glb', position: [91.5, 0.04, 27.5], rotationY: -1.863, scale: 1 },
         // Submerged ridge ends overlap in plan, with a lower crest under the sun.
         { asset: 'jiangnan_misty_hills_horizon.glb', position: [64.65, -0.35, -103.46], rotationY: -0.629, scale: 0.99 },
         { asset: 'jiangnan_misty_hills_horizon.glb', position: [109.54, -0.35, -46.50], rotationY: -1.149, scale: 0.91 },
@@ -241,6 +268,44 @@ export function buildKyotoPlacements(): ScenePropPlacement[] {
         { asset: 'japanese_maple_gold.glb', position: [16.4, 0.25, -14.8], rotationY: 0.55, scale: 1.08, motion: 'willow' },
         { asset: 'japanese_maple_red.glb', position: [26.8, 0.28, -15.8], rotationY: -0.85, scale: 1.12, motion: 'willow' },
         { asset: 'japanese_maple_gold.glb', position: [-1.4, 0, 9.4], rotationY: 0.45, scale: 0.96, motion: 'willow', snapToShore: -0.06 },
+        // === MIDGROUND ARASHIYAMA ENSEMBLE (left riverside machiya + right connected maple shrine isle -> Togetsukyo -> teahouse row) ===
+        {
+            asset: 'kyoto_teahouse_row_mid.glb',
+            position: [48.5, 0.06, -19.2],
+            rotationY: -0.20,
+            scale: 1.02,
+            motion: 'static',
+            lanternLightOffset: [2.11, 2.93, 3.12],
+            lanternColor: '#ffae58',
+        },
+        {
+            asset: 'kyoto_maple_shrine_isle_mid.glb',
+            position: [38.0, 0.06, 23.4],
+            rotationY: -2.84,
+            scale: 1.02,
+            motion: 'static',
+            lanternLightOffset: [1.45, 6.63, 2.84],
+            lanternColor: '#ffb25c',
+        },
+        // Togetsukyo-inspired multi-span timber bridge anchored cleanly between the maple shrine isle and far teahouse bank
+        {
+            asset: 'kyoto_togetsukyo_mid.glb',
+            position: [59.8, 0.06, 16.6],
+            rotationY: -2.84,
+            scale: 1.0,
+            motion: 'static',
+            lanternLightOffset: [0.73, 5.04, 2.18],
+            lanternColor: '#ffba66',
+        },
+        {
+            asset: 'kyoto_teahouse_row_mid.glb',
+            position: [84.6, 0.06, 10.8],
+            rotationY: -2.84,
+            scale: 1.0,
+            motion: 'static',
+            lanternLightOffset: [2.11, 2.93, 3.12],
+            lanternColor: '#ffae58',
+        },
     ];
 
     // Drifting crimson & amber floating maple-leaf rafts along calm outer coves
@@ -402,6 +467,34 @@ export function buildFujiPlacements(): ScenePropPlacement[] {
         { asset: 'fuji_lava_rock.glb', position: [10.6, 0, -7.2], rotationY: 0.5, scale: 0.98, motion: 'static' },
         { asset: 'fuji_lava_rock.glb', position: [14.6, 0, 7.2], rotationY: -1.1, scale: 1.06, motion: 'static' },
         { asset: 'fuji_lava_rock.glb', position: [28.8, 0, 11.0], rotationY: 1.9, scale: 1.15, motion: 'static' },
+        // === MIDGROUND KAWAGUCHIKO ENSEMBLE (left onsen ryokan, right vermilion torii lava cape & sightseeing boat) ===
+        {
+            asset: 'fuji_onsen_ryokan_mid.glb',
+            position: [46.5, 0.06, -19.8],
+            rotationY: -0.22,
+            scale: 1.02,
+            motion: 'static',
+            lanternLightOffset: [3.16, 3.24, 3.54],
+            lanternColor: '#ffc67a',
+        },
+        {
+            asset: 'fuji_torii_cape_mid.glb',
+            position: [42.5, 0.06, 16.4],
+            rotationY: -2.64,
+            scale: 1.04,
+            motion: 'static',
+            lanternLightOffset: [2.27, 3.26, 3.65],
+            lanternColor: '#ffc272',
+        },
+        {
+            asset: 'fuji_pleasure_boat_mid.glb',
+            position: [57.5, 0, 9.8],
+            rotationY: -2.74,
+            scale: 1.0,
+            motion: 'boat',
+            lanternLightOffset: [4.88, 1.27, 0.72],
+            lanternColor: '#ffc67e',
+        },
     ];
 
     // Drifting spring pink sakura petal rafts along calm outer coves
@@ -472,103 +565,167 @@ export function buildZhangjiajiePlacements(): ScenePropPlacement[] {
         { asset: 'wuling_cliff_rock.glb', position: [10.6, 0, -7.2], rotationY: 0.5, scale: 1.00, motion: 'static' },
         { asset: 'wuling_cliff_rock.glb', position: [14.4, 0, 7.2], rotationY: -0.8, scale: 1.05, motion: 'static' },
         { asset: 'wuling_cliff_rock.glb', position: [30.2, 0, 11.4], rotationY: 2.1, scale: 1.18, motion: 'static' },
+        // === MIDGROUND WULINGYUAN CANYON ENSEMBLE (left cliff plankway pavilion, right natural sandstone arch & canopy boat) ===
+        {
+            asset: 'zjj_cliff_pavilion_mid.glb',
+            position: [38.2, 0.05, -16.8],
+            rotationY: -0.32,
+            scale: 1.02,
+            motion: 'static',
+            lanternLightOffset: [3.70, 10.17, 6.24],
+            lanternColor: '#ff8a48',
+        },
+        {
+            asset: 'zjj_natural_arch_mid.glb',
+            position: [65.5, 0.04, 17.0],
+            rotationY: -2.28,
+            scale: 1.04,
+            motion: 'static',
+        },
+        {
+            asset: 'zjj_canyon_canopy_boat_mid.glb',
+            position: [44.5, 0, 10.2],
+            rotationY: -2.72,
+            scale: 1.0,
+            motion: 'boat',
+            lanternLightOffset: [0.33, 1.49, 1.51],
+            lanternColor: '#ff9c48',
+        },
     ];
 }
 
-/** Curated postcard composition for 「威尼斯水巷 · 意大利威尼斯泻湖」. */
+/** Curated 3-tier postcard composition for 「威尼斯水巷 · 意大利威尼斯泻湖」.
+ *  Every waterfront bridge and landing step physically docks into neighboring palazzo quays
+ *  with waterlines cleanly above y = 0 (no floating bridges or submerged foundations). */
 export function buildVenicePlacements(): ScenePropPlacement[] {
     return [
         // Iconic San Giorgio Maggiore campanile & dome silhouette across the golden lagoon
         {
             asset: 'venice_campanile_island.glb',
-            position: [90.0, -0.35, -15.0],
+            position: [90.0, 0.04, -15.0],
             rotationY: Math.PI / 2 - 0.14,
             scale: 1.18,
             motion: 'static',
         },
-        // Warm terracotta Venetian palazzetto waterfront corner with glowing arched windows
+
+        // === LEFT GRAND CANAL EMBANKMENT (continuous connected waterfront: steps -> palazzo -> arch bridge -> canal row) ===
+        // Istrian limestone landing steps docked flush against the near-left palazzo quay
+        { asset: 'venice_stone_steps.glb', position: [19.4, 0.05, -12.6], rotationY: -0.14, scale: 1.04, motion: 'static' },
+        // Warm terracotta Venetian palazzetto corner anchoring the near-left canal bank
         {
             asset: 'venice_palazzo_corner.glb',
-            position: [23.8, 0, -13.0],
-            rotationY: -0.72,
-            scale: 1.04,
+            position: [22.8, 0.06, -14.8],
+            rotationY: -0.14,
+            scale: 1.08,
             motion: 'static',
             lanternLightOffset: [0.4, 2.6, 2.4],
             lanternColor: '#ffbb6a',
         },
-        // Venetian Istrian-stone canal arch bridge with classical wrought-iron street lamp
+        // Istrian-stone canal arch bridge spanning directly from the palazzo corner into the midground canal row
         {
             asset: 'venice_stone_arch.glb',
-            position: [36.5, 0, -16.8],
-            rotationY: -0.35,
-            scale: 1.06,
+            position: [29.4, 0.06, -13.9],
+            rotationY: -0.14,
+            scale: 1.08,
             motion: 'static',
             lanternLightOffset: [-2.6, 3.1, 0.8],
             lanternColor: '#ffc274',
         },
-        // Sleek black lacquered Venetian Gondola with brass ferro bobbing in the right lagoon
+        // Midground Venetian waterfront palazzetti row receiving the arch bridge's far abutment cleanly
+        {
+            asset: 'venice_canal_row_mid.glb',
+            position: [46.8, 0.06, -17.0],
+            rotationY: -0.12,
+            scale: 1.02,
+            motion: 'static',
+        },
+
+        // === RIGHT GRAND CANAL & RIALTO EMBANKMENT (continuous connected waterfront: steps -> palazzo -> Rialto arcade -> canal row) ===
+        // Landing steps docked flush against the near-right palazzo quay beside the gondola cove
+        { asset: 'venice_stone_steps.glb', position: [29.0, 0.05, 16.5], rotationY: -2.86, scale: 1.04, motion: 'static' },
+        // Near-right Venetian palazzo anchoring the near abutment of the Rialto arcade bridge
+        {
+            asset: 'venice_palazzo_corner.glb',
+            position: [32.0, 0.06, 19.6],
+            rotationY: -2.86,
+            scale: 1.08,
+            motion: 'static',
+            lanternLightOffset: [0.4, 2.6, 2.4],
+            lanternColor: '#ffbb6a',
+        },
+        // Rialto-inspired covered stone arcade bridge spanning directly between the near-right palazzo and midground row
+        {
+            asset: 'venice_rialto_arcade_mid.glb',
+            position: [45.2, 0.06, 16.8],
+            rotationY: -2.86,
+            scale: 1.0,
+            motion: 'static',
+        },
+        // Far-right midground Venetian palazzetti row receiving the Rialto bridge's far abutment flush
+        {
+            asset: 'venice_canal_row_mid.glb',
+            position: [69.2, 0.06, 14.4],
+            rotationY: -2.86,
+            scale: 1.0,
+            motion: 'static',
+        },
+
+        // === WATERCRAFT & CANAL NAVIGATION MARKERS ===
+        // Sleek black lacquered Venetian Gondola with brass ferro bobbing in the right foreground cove
         {
             asset: 'venice_gondola.glb',
-            position: [25.6, 0, 8.9],
+            position: [24.8, 0, 9.2],
             rotationY: 2.62,
             scale: 1.05,
             motion: 'boat',
             lanternLightOffset: [2.1, 0.65, 0],
             lanternColor: '#ffbd66',
         },
-        // Iconic candy-striped Venetian wooden mooring poles (Pali) flanking both foreground coves
+        // Striped terracotta-sailed Bragozzo boats sailing cleanly along the midground canal fairway
+        {
+            asset: 'venice_bragozzo_boat_mid.glb',
+            position: [43.5, 0, -9.2],
+            rotationY: -0.35,
+            scale: 1.0,
+            motion: 'boat',
+            lanternLightOffset: [-4.17, 1.97, 0.58],
+            lanternColor: '#ffbd66',
+        },
+        {
+            asset: 'venice_bragozzo_boat_mid.glb',
+            position: [61.5, 0, 8.6],
+            rotationY: -2.62,
+            scale: 1.0,
+            motion: 'boat',
+            lanternLightOffset: [-4.17, 1.97, 0.58],
+            lanternColor: '#ffbd66',
+        },
+        // Candy-striped Venetian wooden mooring poles (Pali) flanking foreground coves
         { asset: 'venice_pali_cluster.glb', position: [10.4, 0, -7.0], rotationY: 0.3, scale: 1.00, motion: 'static' },
-        { asset: 'venice_pali_cluster.glb', position: [17.8, 0, -9.6], rotationY: 1.8, scale: 1.04, motion: 'static' },
+        { asset: 'venice_pali_cluster.glb', position: [16.8, 0, -9.8], rotationY: 1.8, scale: 1.04, motion: 'static' },
         { asset: 'venice_pali_cluster.glb', position: [13.8, 0, 7.0], rotationY: -0.9, scale: 1.02, motion: 'static' },
-        { asset: 'venice_pali_cluster.glb', position: [29.4, 0, 10.6], rotationY: 2.4, scale: 1.06, motion: 'static' },
-        // Mossy Istrian limestone waterfront landing steps
-        { asset: 'venice_stone_steps.glb', position: [15.4, 0, -11.4], rotationY: -0.6, scale: 1.05, motion: 'static' },
-        { asset: 'venice_stone_steps.glb', position: [19.2, 0, 10.8], rotationY: 2.5, scale: 1.02, motion: 'static' },
-
-        // Keep the left quay oblique so its far end clears the campanile and the sunset path.
-        { asset: 'venice_canal_row_mid.glb', position: [60.5, -0.35, -17.2], rotationY: -0.315, scale: 1, motion: 'static' },
-        { asset: 'venice_rialto_arcade_mid.glb', position: [48.5, -0.35, 18.2], rotationY: -2.27, scale: 1, motion: 'static' },
-        { asset: 'venice_canal_row_mid.glb', position: [64.0, -0.35, 27.8], rotationY: -2.20, scale: 1, motion: 'static' },
-        // The beacons mark the fairway. The nearer pair also light neighboring geometry.
+        { asset: 'venice_pali_cluster.glb', position: [27.4, 0, 11.4], rotationY: 2.4, scale: 1.04, motion: 'static' },
+        // Midground Venetian lagoon Bricola channel beacons marking the fairway
         {
             asset: 'venice_bricola_beacon_mid.glb',
-            position: [37.5, 0, -10.5],
+            position: [35.5, 0, -8.6],
             rotationY: 0.47,
-            scale: 1,
+            scale: 1.0,
             motion: 'static',
             lanternLightOffset: [0.04, 3.43, 0.06],
             lanternColor: '#ffbd66',
         },
         {
             asset: 'venice_bricola_beacon_mid.glb',
-            position: [41.5, 0, 11.0],
+            position: [37.5, 0, 9.6],
             rotationY: 1.25,
-            scale: 1,
+            scale: 1.0,
             motion: 'static',
             lanternLightOffset: [0.04, 3.43, 0.06],
             lanternColor: '#ffbd66',
         },
-        { asset: 'venice_bricola_beacon_mid.glb', position: [54.7, 0, -8.5], rotationY: -0.38, scale: 1, motion: 'static' },
-        { asset: 'venice_bricola_beacon_mid.glb', position: [64.0, 0, 16.0], rotationY: 0.92, scale: 1, motion: 'static' },
-        // Bring the left sail in front of the palazzetti and leave the right bridge opening clear.
-        {
-            asset: 'venice_bragozzo_boat_mid.glb',
-            position: [46.0, 0, -12.0],
-            rotationY: -0.83,
-            scale: 1,
-            motion: 'boat',
-            lanternLightOffset: [-4.17, 1.97, 0.58],
-            lanternColor: '#ffbd66',
-        },
-        {
-            asset: 'venice_bragozzo_boat_mid.glb',
-            position: [70.0, 0, 6.5],
-            rotationY: -1.70,
-            scale: 1,
-            motion: 'boat',
-            lanternLightOffset: [-4.17, 1.97, 0.58],
-            lanternColor: '#ffbd66',
-        },
+        { asset: 'venice_bricola_beacon_mid.glb', position: [57.5, 0, -8.4], rotationY: -0.38, scale: 1.0, motion: 'static' },
+        { asset: 'venice_bricola_beacon_mid.glb', position: [74.5, 0, 9.2], rotationY: 0.92, scale: 1.0, motion: 'static' },
     ];
 }
 

@@ -520,13 +520,13 @@
       "use": "江南水镇远岸，临水立面朝 +Z",
       "bboxMeters": [
         64.0,
-        13.799999833106995,
+        14.199999809265137,
         16.0
       ],
       "boundsMeters": {
         "min": [
           -32.0,
-          -0.6000000238418579,
+          -1.0,
           -8.0
         ],
         "max": [
@@ -536,8 +536,8 @@
         ]
       },
       "origin": "waterline",
-      "triangles": 7948,
-      "fileBytes": 943204,
+      "triangles": 14104,
+      "fileBytes": 1448632,
       "textureMaps": [
         {
           "name": "jiangnan_watertown_horizon_baked_normal",
@@ -567,7 +567,7 @@
       "materialCount": 2,
       "emissive": true,
       "alphaMask": false,
-      "sha256": "0c863bb10d29a95f81bc31af593c93558d9b9c94297a12a8429b2703e39e6f5f"
+      "sha256": "8d574209cb624f4ea64de8c6155eac3479e1194cc7c6dcac2a5f6d9df5637f31"
     },
     {
       "file": "jiangnan_su_causeway_horizon.glb",
@@ -680,6 +680,119 @@
       "emissive": false,
       "alphaMask": false,
       "sha256": "ed9d3f2c08ce32a9a3efeb1129d31899d67acf40b18cf0fd87a880520f2871d8"
+    },
+    {
+      "file": "jiangnan_zigzag_bridge_mid.glb",
+      "name": "jiangnan_zigzag_bridge_mid",
+      "title": "曲院九曲石桥与荷心水亭",
+      "use": "西湖九曲石桥，暖灯水亭朝 +Z",
+      "bboxMeters": [
+        24.0,
+        6.5,
+        10.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -12.0,
+          -1.059999942779541,
+          -5.0
+        ],
+        "max": [
+          12.0,
+          5.440000057220459,
+          5.0
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 5828,
+      "fileBytes": 770348,
+      "textureMaps": [
+        {
+          "name": "jiangnan_zigzag_bridge_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "jiangnan_zigzag_bridge_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "jiangnan_zigzag_bridge_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "3c83208273bb57ae975db779a770e62ebd0b0b034b509842deca6fd0f174b581"
+    },
+    {
+      "file": "jiangnan_painted_barge_mid.glb",
+      "name": "jiangnan_painted_barge_mid",
+      "title": "西湖古典画舫",
+      "use": "双层漆木船，船首朝 +X",
+      "bboxMeters": [
+        13.5,
+        4.799999952316284,
+        4.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -6.75,
+          -1.0199999809265137,
+          -2.0
+        ],
+        "max": [
+          6.75,
+          3.7799999713897705,
+          2.0
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 6490,
+      "fileBytes": 796976,
+      "textureMaps": [
+        {
+          "name": "jiangnan_painted_barge_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "jiangnan_painted_barge_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "jiangnan_painted_barge_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "21e30c430c3c41d489beb9e44425ba44c032a57405510334f0f9428744550440",
+      "motion": "boat"
     }
   ]
 }

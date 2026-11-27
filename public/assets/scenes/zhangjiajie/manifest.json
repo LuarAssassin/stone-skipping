@@ -400,6 +400,175 @@
       "emissive": false,
       "alphaMask": false,
       "sha256": "e979d1b6ae1ddf4aea8e8766d4d61e94f6089b43b94ab5882bde64e88580b5dd"
+    },
+    {
+      "file": "zjj_natural_arch_mid.glb",
+      "name": "zjj_natural_arch_mid",
+      "title": "武陵源天生石桥拱门",
+      "use": "横向石英砂岩层、贯通水拱与山松，临水面朝 +Z",
+      "bboxMeters": [
+        28.0,
+        21.99999988079071,
+        13.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -14.0,
+          -1.090000033378601,
+          -6.5
+        ],
+        "max": [
+          14.0,
+          20.90999984741211,
+          6.5
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 4628,
+      "fileBytes": 626408,
+      "textureMaps": [
+        {
+          "name": "zjj_natural_arch_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "zjj_natural_arch_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "zjj_natural_arch_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "65c6d89325c1a899d427c0ab0326390ebbe6ec22438eb7fc8f3ce04bca5c3c71"
+    },
+    {
+      "file": "zjj_cliff_pavilion_mid.glb",
+      "name": "zjj_cliff_pavilion_mid",
+      "title": "崖壁悬空栈道与土家飞檐亭",
+      "use": "悬空栈道与重檐土家观景亭，临水面朝 +Z",
+      "bboxMeters": [
+        20.0,
+        17.999999165534973,
+        13.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -10.0,
+          -1.1200000047683716,
+          -6.5
+        ],
+        "max": [
+          10.0,
+          16.8799991607666,
+          6.5
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 7756,
+      "fileBytes": 1152760,
+      "textureMaps": [
+        {
+          "name": "zjj_cliff_pavilion_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "zjj_cliff_pavilion_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "zjj_cliff_pavilion_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "24bbc430faf81a8fafa5a3bfd1b1644c83fe15d3420d206fa16ecc07742b7a5a"
+    },
+    {
+      "file": "zjj_canyon_canopy_boat_mid.glb",
+      "name": "zjj_canyon_canopy_boat_mid",
+      "title": "宝峰湖土家画舫游船",
+      "use": "木棚、雕栏与红灯笼，船首朝 +X",
+      "bboxMeters": [
+        11.5,
+        3.799999952316284,
+        3.200000047683716
+      ],
+      "boundsMeters": {
+        "min": [
+          -5.75,
+          -1.0099999904632568,
+          -1.600000023841858
+        ],
+        "max": [
+          5.75,
+          2.7899999618530273,
+          1.600000023841858
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 5094,
+      "fileBytes": 725432,
+      "textureMaps": [
+        {
+          "name": "zjj_canyon_canopy_boat_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "zjj_canyon_canopy_boat_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "zjj_canyon_canopy_boat_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "a9ea1a2f3613a1c2a14ee8ebaff357e52b1323d4e6113db840973afaca64d321",
+      "motion": "boat"
     }
   ]
 }
