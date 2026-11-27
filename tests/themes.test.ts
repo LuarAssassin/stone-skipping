@@ -37,6 +37,7 @@ test('scene theme registry exposes sunset as default and registers all different
 
     assert.equal(getSceneTheme('sunset').id, 'sunset');
     assert.equal(getSceneTheme('jiangnan_lotus').scenePack, 'jiangnan');
+    assert.equal(getSceneTheme('jiangnan_lotus').horizonStyle, 'open_sea');
     assert.equal(getSceneTheme('tahoe_alpine').scenePack, 'tahoe');
     assert.equal(getSceneTheme('kyoto_autumn').scenePack, 'kyoto');
     assert.equal(getSceneTheme('nordic_aurora').scenePack, 'nordic');
@@ -120,9 +121,9 @@ test('every registered 3D scene pack keeps throwing corridor and shore foraging 
     }
 });
 
-test('all 10 Blender scene packs (69 PBR GLBs) and manifests exist and match exact byte sizes on disk', () => {
+test('all 10 Blender scene packs and manifests exist and match exact byte sizes on disk', () => {
     const expectedPacks: Array<{ id: ScenePackId; count: number }> = [
-        { id: 'jiangnan', count: 9 },
+        { id: 'jiangnan', count: 12 },
         { id: 'tahoe', count: 7 },
         { id: 'kyoto', count: 7 },
         { id: 'nordic', count: 7 },

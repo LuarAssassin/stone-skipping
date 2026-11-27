@@ -512,6 +512,174 @@
       "emissive": false,
       "alphaMask": false,
       "sha256": "1898336d0814ff82b20af2dfaec0e7e172d7a61d10d4959b3cf0a0041fc1cb74"
+    },
+    {
+      "file": "jiangnan_watertown_horizon.glb",
+      "name": "jiangnan_watertown_horizon",
+      "title": "粉墙黛瓦 · 江南水镇",
+      "use": "江南水镇远岸，临水立面朝 +Z",
+      "bboxMeters": [
+        64.0,
+        13.799999833106995,
+        16.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -32.0,
+          -0.6000000238418579,
+          -8.0
+        ],
+        "max": [
+          32.0,
+          13.199999809265137,
+          8.0
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 7948,
+      "fileBytes": 943204,
+      "textureMaps": [
+        {
+          "name": "jiangnan_watertown_horizon_baked_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "jiangnan_watertown_horizon_baked_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "jiangnan_watertown_horizon_baked_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "0c863bb10d29a95f81bc31af593c93558d9b9c94297a12a8429b2703e39e6f5f"
+    },
+    {
+      "file": "jiangnan_su_causeway_horizon.glb",
+      "name": "jiangnan_su_causeway_horizon",
+      "title": "苏堤 · 柳岸石桥",
+      "use": "西湖苏堤远岸，双座单孔石拱桥，堤岸朝 +Z",
+      "bboxMeters": [
+        74.0,
+        9.700000405311584,
+        14.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -37.0,
+          -0.6000000238418579,
+          -7.0
+        ],
+        "max": [
+          37.0,
+          9.100000381469727,
+          7.0
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 7530,
+      "fileBytes": 825856,
+      "textureMaps": [
+        {
+          "name": "jiangnan_su_causeway_horizon_baked_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "jiangnan_su_causeway_horizon_baked_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "jiangnan_su_causeway_horizon_baked_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "dbd161285dc3e2706624c2f3f8469bd262bfea5082f3f2443a00014ad14e0d5d"
+    },
+    {
+      "file": "jiangnan_misty_hills_horizon.glb",
+      "name": "jiangnan_misty_hills_horizon",
+      "title": "烟岚 · 西湖群山",
+      "use": "渐没入湖的青绿远山群脊，主坡朝 +Z",
+      "bboxMeters": [
+        94.0,
+        22.399999260902405,
+        24.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -47.0,
+          -0.6000000238418579,
+          -12.0
+        ],
+        "max": [
+          47.0,
+          21.799999237060547,
+          12.0
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 5740,
+      "fileBytes": 292896,
+      "textureMaps": [
+        {
+          "name": "jiangnan_misty_hills_horizon_baked_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "jiangnan_misty_hills_horizon_baked_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "jiangnan_misty_hills_horizon_baked_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "ed9d3f2c08ce32a9a3efeb1129d31899d67acf40b18cf0fd87a880520f2871d8"
     }
   ]
 }

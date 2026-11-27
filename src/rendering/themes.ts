@@ -172,7 +172,7 @@ export const SCENE_THEMES: readonly SceneTheme[] = [
         shortLabel: '江南',
         subtitle: '江南水榭 · 荷塘掠水',
         scenePack: 'jiangnan',
-        horizonStyle: 'rolling_hills',
+        horizonStyle: 'open_sea',
         sunDirection: [0.85, 0.21, -0.47],
         sunColor: '#ffd7a3',
         sunIntensity: 3.35,

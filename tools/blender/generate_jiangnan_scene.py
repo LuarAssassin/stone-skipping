@@ -870,7 +870,7 @@ def export(spec, build, seed, assets, work):
     return inspect_glb(path,spec,np.array(model.xyz),work)
 
 
-def preview_image(spec, info, assets, work):
+def preview_image(spec, info, assets, work, *, resolution=(720,575)):
     scene = fresh_scene()
     status = bpy.ops.import_scene.gltf(filepath=str(assets/info["file"]))
     require("FINISHED" in status and len(bpy.context.selected_objects)==1,
@@ -881,7 +881,7 @@ def preview_image(spec, info, assets, work):
     points = np.asarray([stone.matrix_world @ Vector(p) for p in stone.bound_box])
     mn,mx = points.min(axis=0),points.max(axis=0)
     center = Vector((mn+mx)/2)
-    width,height = 720,575
+    width,height = resolution
     data = bpy.data.cameras.new("Jiangnan specimen")
     data.type = "ORTHO"
     data.clip_start = .003

@@ -41,7 +41,7 @@ function hash2(a: number, b: number): number {
 }
 
 /**
- * Curated postcard composition for 「曲院荷风 · 江南水榭」 calibrated to the default
+ * Curated postcard composition for 「曲院荷风 · 江南西湖」 calibrated to the default
  * lakeside overview frustum (camera (-2.28, 2.10, 0.74) -> (2.8, 0, 0), FOV 42°)
  * and course-replay sweep.
  *
@@ -73,6 +73,14 @@ export function buildJiangnanPlacements(): ScenePropPlacement[] {
             scale: 1.08,
             motion: 'static',
         },
+        // The quay sits behind the pagoda island. The bridges face the lake on the right.
+        { asset: 'jiangnan_watertown_horizon.glb', position: [94, -0.35, -35], rotationY: -1.214, scale: 1 },
+        { asset: 'jiangnan_su_causeway_horizon.glb', position: [91.5, -0.35, 27.5], rotationY: -1.863, scale: 1 },
+        // Submerged ridge ends overlap in plan, with a lower crest under the sun.
+        { asset: 'jiangnan_misty_hills_horizon.glb', position: [64.65, -0.35, -103.46], rotationY: -0.629, scale: 0.99 },
+        { asset: 'jiangnan_misty_hills_horizon.glb', position: [109.54, -0.35, -46.50], rotationY: -1.149, scale: 0.91 },
+        { asset: 'jiangnan_misty_hills_horizon.glb', position: [114.00, -0.35, 26.32], rotationY: -1.838, scale: 1.03 },
+        { asset: 'jiangnan_misty_hills_horizon.glb', position: [68.77, -0.35, 94.65], rotationY: -2.460, scale: 1.06 },
         {
             asset: 'willow_tree.glb',
             position: [-0.8, 0, -7.2],

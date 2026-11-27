@@ -667,14 +667,14 @@ def normalize_exported_tangents(path):
     path.write_bytes(blob)
 
 
-def export(asset, build, palette, seed, assets, work):
+def export(asset, build, palette, seed, assets, work, *, material_builder=pbr_materials):
     fresh_scene()
     model = Model(asset.name)
     build(model,np.random.default_rng(seed))
     normalize(model,asset)
     if callable(palette):
         palette = palette(asset)
-    obj = model.object(asset.size,pbr_materials(model,asset,palette,seed))
+    obj = model.object(asset.size,material_builder(model,asset,palette,seed))
     select_only(obj)
     modifier = obj.modifiers.new("Explicit atlas triangles","TRIANGULATE")
     bpy.ops.object.modifier_apply(modifier=modifier.name)
