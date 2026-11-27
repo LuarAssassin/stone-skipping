@@ -45,6 +45,11 @@ test('scene theme registry exposes sunset as default and registers all different
     assert.equal(getSceneTheme('zhangjiajie_peaks').scenePack, 'zhangjiajie');
     assert.equal(getSceneTheme('fuji_kawaguchi').scenePack, 'fuji');
     assert.equal(getSceneTheme('venice_lagoon').scenePack, 'venice');
+    assert.equal(getSceneTheme('venice_lagoon').horizonStyle, 'open_sea');
+    assert.equal(getSceneTheme('tropical_lagoon').horizonStyle, 'open_sea');
+    assert.equal(getSceneTheme('nile_sunset').horizonStyle, 'desert_dunes');
+    assert.equal(getSceneTheme('zhangjiajie_peaks').horizonStyle, 'karst_spires');
+    assert.equal(getSceneTheme('fuji_kawaguchi').horizonStyle, 'foothills');
     assert.equal(getSceneTheme('swiss_alps').scenePack, 'alps');
     assert.equal(getSceneTheme('nile_sunset').scenePack, 'nile');
     assert.equal(getSceneTheme('nonexistent').id, DEFAULT_THEME_ID);
@@ -107,13 +112,18 @@ test('every registered 3D scene pack keeps throwing corridor and shore foraging 
     }
 });
 
-test('all 5 Blender scene packs (37 PBR GLBs) and manifests exist and match exact byte sizes on disk', () => {
+test('all 10 Blender scene packs (69 PBR GLBs) and manifests exist and match exact byte sizes on disk', () => {
     const expectedPacks: Array<{ id: ScenePackId; count: number }> = [
         { id: 'jiangnan', count: 9 },
         { id: 'tahoe', count: 7 },
         { id: 'kyoto', count: 7 },
         { id: 'nordic', count: 7 },
         { id: 'lagoon', count: 7 },
+        { id: 'fuji', count: 7 },
+        { id: 'zhangjiajie', count: 7 },
+        { id: 'venice', count: 6 },
+        { id: 'alps', count: 6 },
+        { id: 'nile', count: 6 },
     ];
     for (const { id, count } of expectedPacks) {
         const dir = resolve('public/assets/scenes', id);

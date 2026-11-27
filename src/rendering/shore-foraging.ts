@@ -105,15 +105,15 @@ export function createShoreForaging(
     hoverRing.visible = false;
     rootGroup.add(hoverRing);
 
-    // Delicate golden horizontal waterline plane ring around the lifted stone so tilt & roll read at a glance
+    // Delicate hairline horizontal waterline ring around the lifted stone so tilt & roll read cleanly without visual clutter
     const postureRingMat = new THREE.MeshBasicMaterial({
-        color: 0xffcf88,
+        color: 0xffd596,
         transparent: true,
         opacity: 0,
         side: THREE.DoubleSide,
         depthWrite: false,
     });
-    const postureRing = new THREE.Mesh(new THREE.RingGeometry(0.068, 0.0715, 64), postureRingMat);
+    const postureRing = new THREE.Mesh(new THREE.RingGeometry(0.062, 0.0636, 72), postureRingMat);
     postureRing.rotation.x = -Math.PI / 2;
     postureRing.visible = false;
     rootGroup.add(postureRing);
@@ -136,7 +136,7 @@ export function createShoreForaging(
     const sunCastX = sunShadowDirX / sunShadowLen;
     const sunCastZ = sunShadowDirZ / sunShadowLen;
 
-    // Mount minimal cinematic Forage & Posture-Tuning HUD inside #app
+    // Mount minimalist cinematic Forage & Posture-Tuning HUD inside #app
     const hud = document.createElement('div');
     hud.id = 'forage-hud';
     hud.className = 'forage-hud';
@@ -144,12 +144,12 @@ export function createShoreForaging(
       <div class="forage-top-bar">
         <div class="forage-banner">
           <span class="pill-dot"></span>
-          <span id="forage-banner-text">暮色浅滩寻石 · 鼠标直接点选河石 · 抬起放大调好出手角度</span>
+          <span id="forage-banner-text">浅滩寻石</span>
         </div>
         <div class="forage-top-actions">
           <span class="career-pill" id="forage-career">累计 0 跳</span>
-          <button id="forage-walk-more" class="glass-pill" type="button">换一片浅滩</button>
-          <button id="forage-return" class="glass-pill active" type="button">回到湖面 <kbd>F</kbd></button>
+          <button id="forage-walk-more" class="glass-pill" type="button">换一片</button>
+          <button id="forage-return" class="glass-pill active" type="button">回湖面 <kbd>F</kbd></button>
         </div>
       </div>
 
@@ -158,16 +158,13 @@ export function createShoreForaging(
           <strong id="forage-stone-name"></strong>
           <span id="forage-stone-rarity" class="rarity-tag"></span>
           <span id="forage-stone-dims" class="forage-dims"></span>
+          <div class="tune-mode-seg" role="group" aria-label="交互模式">
+            <button id="mode-tune" class="seg active" type="button">调姿</button>
+            <button id="mode-flip" class="seg" type="button">360°</button>
+          </div>
         </div>
         <p id="forage-stone-feel" class="forage-feel"></p>
         <div id="forage-inspect-actions" class="forage-inspect-actions">
-          <div class="tune-mode-bar">
-            <div class="tune-mode-seg" role="group" aria-label="交互模式">
-              <button id="mode-tune" class="seg active" type="button">调投姿</button>
-              <button id="mode-flip" class="seg" type="button">360° 翻看</button>
-            </div>
-            <span id="inspect-tip" class="inspect-tip">拖动上下调攻角 · 左右调侧倾 · 滚轮调抛角</span>
-          </div>
           <div class="tune-grid">
             <label class="tune-cell">
               <span>攻角 <b id="tune-tilt-val">6°</b></span>
@@ -184,9 +181,9 @@ export function createShoreForaging(
             <button id="tune-spin" class="tune-spin-btn" type="button" title="切换顺/逆自旋方向 (Q/E)">↻ 顺旋</button>
           </div>
           <div class="inspect-btns">
-            <button id="forage-take" class="dock-btn primary" type="button">拿去投 <kbd>↵</kbd></button>
-            <button id="forage-collect" class="dock-btn" type="button">收入石匣</button>
-            <button id="forage-putback" class="dock-btn" type="button">放回岸滩</button>
+            <button id="forage-take" class="forage-action primary" type="button">拿去投 <kbd>↵</kbd></button>
+            <button id="forage-collect" class="forage-action" type="button">收入石匣</button>
+            <button id="forage-putback" class="forage-action ghost" type="button">放回</button>
           </div>
         </div>
         <p id="forage-msg" class="forage-msg"></p>
@@ -194,7 +191,7 @@ export function createShoreForaging(
 
       <div class="forage-pocket" aria-label="随身石匣">
         <div class="forage-pocket-head">
-          <span>随身石匣</span>
+          <span>石匣</span>
           <small id="forage-pocket-count">1 / ${MAX_COLLECTION_SIZE}</small>
         </div>
         <div id="forage-pocket-list" class="forage-pocket-list"></div>
@@ -242,7 +239,6 @@ export function createShoreForaging(
     const captionEl = hud.querySelector<HTMLElement>('#forage-caption')!;
     const msgEl = hud.querySelector<HTMLElement>('#forage-msg')!;
     const bannerTextEl = hud.querySelector<HTMLElement>('#forage-banner-text')!;
-    const inspectTipEl = hud.querySelector<HTMLElement>('#inspect-tip')!;
     const collectBtn = hud.querySelector<HTMLButtonElement>('#forage-collect')!;
     const putbackBtn = hud.querySelector<HTMLButtonElement>('#forage-putback')!;
     const modeTuneBtn = hud.querySelector<HTMLButtonElement>('#mode-tune')!;
@@ -258,7 +254,7 @@ export function createShoreForaging(
 
     function syncBannerCount() {
         const shoreCount = items.filter(it => !it.isTemporaryTune).length;
-        bannerTextEl.textContent = `暮色浅滩寻石 · 眼前 ${shoreCount} 块可拾河石 · 点击拾起放大直接调投姿`;
+        bannerTextEl.textContent = `浅滩寻石 · ${shoreCount} 块`;
     }
 
     function syncTuneReadout() {
@@ -279,9 +275,6 @@ export function createShoreForaging(
         inspectMode = mode;
         modeTuneBtn.classList.toggle('active', mode === 'tune');
         modeFlipBtn.classList.toggle('active', mode === 'flip');
-        inspectTipEl.textContent = mode === 'tune'
-            ? '按住拖动：上下调攻角 · 左右调侧倾 · 滚轮调抛角'
-            : '按住任意拖动 360° 翻转查看石子薄厚与岩纹';
     }
 
     /** Sample the EXACT rendered triangle height & normal on shoreMesh so stones sit with 0.0 mm gap. */
@@ -562,6 +555,7 @@ export function createShoreForaging(
 
     function syncCaption() {
         const target = inspected ?? hovered;
+        hud.classList.toggle('is-inspecting', Boolean(inspected));
         if (!target) {
             captionEl.classList.remove('visible', 'inspecting');
             return;
@@ -580,8 +574,8 @@ export function createShoreForaging(
             syncTuneReadout();
             const alreadySaved = box.stones.some(saved => saved.id === s.id);
             collectBtn.disabled = alreadySaved;
-            collectBtn.textContent = alreadySaved ? '已在石匣中' : '收入石匣';
-            putbackBtn.textContent = inspected.isTemporaryTune ? '返回湖面' : '放回岸滩';
+            collectBtn.textContent = alreadySaved ? '已收录' : '收入石匣';
+            putbackBtn.textContent = inspected.isTemporaryTune ? '返回' : '放回';
         }
     }
 
@@ -946,6 +940,7 @@ export function createShoreForaging(
         dragState = undefined;
         rootGroup.visible = false;
         document.body.classList.remove('forage-open');
+        hud.classList.remove('is-inspecting');
         captionEl.classList.remove('visible', 'inspecting');
         canvas.style.cursor = 'crosshair';
     }
@@ -1012,7 +1007,7 @@ export function createShoreForaging(
                     goalInspectPos
                         .copy(camera.position)
                         .addScaledVector(camForward, inspectDist)
-                        .addScaledVector(camUp, 0.032);
+                        .addScaledVector(camUp, 0.052);
 
                     // Graceful upward arc while lifting off the shore
                     item.root.position.lerpVectors(item.restPos, goalInspectPos, item.inspectBlend);
@@ -1029,8 +1024,8 @@ export function createShoreForaging(
 
                         activeRingBlend = item.inspectBlend;
                         postureRing.position.copy(item.root.position);
-                        postureRing.position.y -= item.spec.h * scale + 0.012;
-                        const ringScale = (maxR * scale) / 0.052;
+                        postureRing.position.y -= item.spec.h * scale + 0.010;
+                        const ringScale = Math.min((maxR * scale) / 0.058, 1.12);
                         postureRing.scale.set(ringScale, ringScale, 1);
                     } else {
                         inspectEuler.set(inspectPitch, inspectYaw, 0, 'YXZ');
@@ -1047,7 +1042,7 @@ export function createShoreForaging(
 
             if (activeRingBlend > 0.05) {
                 postureRing.visible = true;
-                postureRingMat.opacity = 0.42 * activeRingBlend;
+                postureRingMat.opacity = 0.34 * activeRingBlend;
             } else {
                 postureRing.visible = false;
             }

@@ -153,6 +153,15 @@ function createSkyMaterial(theme: SceneTheme) {
     });
 }
 
+function horizonModeIndex(style: SceneTheme['horizonStyle']): number {
+    switch (style) {
+        case 'foothills': return 1;
+        case 'karst_spires': return 2;
+        case 'desert_dunes': return 3;
+        default: return 0;
+    }
+}
+
 function createMountainRings(theme: SceneTheme) {
     const group = new THREE.Group();
     const specs = [
@@ -167,9 +176,10 @@ function createMountainRings(theme: SceneTheme) {
     for (let layerIdx = 0; layerIdx < specs.length; layerIdx++) {
         const layer = specs[layerIdx];
         const palette = theme.mountains[layerIdx];
-        const segments = 160;
+        const segments = 220;
         const positions = new Float32Array((segments + 1) * 2 * 3);
         const heights = new Float32Array((segments + 1) * 2);
+        const angles = new Float32Array((segments + 1) * 2);
         const indices: number[] = [];
 
         for (let i = 0; i <= segments; i++) {
@@ -178,28 +188,19 @@ function createMountainRings(theme: SceneTheme) {
             const cos = Math.cos(angle);
             const sin = Math.sin(angle);
 
-            const dSun = Math.atan2(Math.sin(angle - sunAzimuth), Math.cos(angle - sunAzimuth));
-            const sunGap = 1.0 - 0.68 * Math.exp(-(dSun * dSun) / 0.14);
-
-            const ridge =
-                0.52 * (0.5 + 0.5 * Math.sin(angle * 3.0 * layer.ridgeScale + layer.seed)) +
-                0.28 * (0.5 + 0.5 * Math.sin(angle * 7.0 * layer.ridgeScale - layer.seed * 1.4)) +
-                0.14 * (0.5 + 0.5 * Math.sin(angle * 15.0 * layer.ridgeScale + layer.seed * 2.1)) +
-                0.06 * (0.5 + 0.5 * Math.sin(angle * 29.0 * layer.ridgeScale - layer.seed * 0.7));
-
-            const peakY = Math.max(0.45, layer.baseHeight * (0.28 + 0.92 * ridge * ridge) * sunGap);
-
             const bottomIdx = i * 2;
             const topIdx = i * 2 + 1;
             positions[bottomIdx * 3] = cos * layer.radius;
             positions[bottomIdx * 3 + 1] = -0.8;
             positions[bottomIdx * 3 + 2] = sin * layer.radius;
             heights[bottomIdx] = 0;
+            angles[bottomIdx] = angle;
 
             positions[topIdx * 3] = cos * layer.radius;
-            positions[topIdx * 3 + 1] = peakY;
+            positions[topIdx * 3 + 1] = layer.baseHeight;
             positions[topIdx * 3 + 2] = sin * layer.radius;
             heights[topIdx] = 1;
+            angles[topIdx] = angle;
 
             if (i < segments) {
                 const a = bottomIdx;
@@ -213,6 +214,7 @@ function createMountainRings(theme: SceneTheme) {
         const geometry = new THREE.BufferGeometry();
         geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
         geometry.setAttribute('aHeight', new THREE.BufferAttribute(heights, 1));
+        geometry.setAttribute('aAngle', new THREE.BufferAttribute(angles, 1));
         geometry.setIndex(indices);
 
         const material = new THREE.ShaderMaterial({
@@ -223,15 +225,62 @@ function createMountainRings(theme: SceneTheme) {
                 uBottom: { value: new THREE.Color(palette.bottom) },
                 uGlow: { value: new THREE.Vector3(...palette.glow) },
                 uSunDir: { value: sunDir.clone() },
+                uSunAzimuth: { value: sunAzimuth },
+                uBaseHeight: { value: layer.baseHeight },
+                uRidgeScale: { value: layer.ridgeScale },
+                uSeed: { value: layer.seed },
+                uHorizonMode: { value: horizonModeIndex(theme.horizonStyle) },
             },
             vertexShader: /* glsl */ `
                 attribute float aHeight;
+                attribute float aAngle;
+                uniform float uSunAzimuth, uBaseHeight, uRidgeScale, uSeed, uHorizonMode;
                 varying float vHeight;
                 varying vec3 vDir;
                 void main() {
                     vHeight = aHeight;
-                    vDir = normalize(position);
-                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    vec3 pos = position;
+                    if (aHeight > 0.5) {
+                        float dSun = atan(sin(aAngle - uSunAzimuth), cos(aAngle - uSunAzimuth));
+                        float sunGap = 1.0 - 0.68 * exp(-(dSun * dSun) / 0.14);
+                        float dFront = atan(sin(aAngle), cos(aAngle));
+                        float peakY = uBaseHeight;
+                        if (uHorizonMode < 0.5) {
+                            // 0: rolling_hills — classic 3-layer ink-wash mountain silhouettes
+                            float ridge =
+                                0.52 * (0.5 + 0.5 * sin(aAngle * 3.0 * uRidgeScale + uSeed)) +
+                                0.28 * (0.5 + 0.5 * sin(aAngle * 7.0 * uRidgeScale - uSeed * 1.4)) +
+                                0.14 * (0.5 + 0.5 * sin(aAngle * 15.0 * uRidgeScale + uSeed * 2.1)) +
+                                0.06 * (0.5 + 0.5 * sin(aAngle * 29.0 * uRidgeScale - uSeed * 0.7));
+                            peakY = max(0.45, uBaseHeight * (0.28 + 0.92 * ridge * ridge) * sunGap);
+                        } else if (uHorizonMode < 1.5) {
+                            // 1: foothills — low framing ridges with wide clear central notch for hero 3D peaks
+                            float ridge =
+                                0.58 * (0.5 + 0.5 * sin(aAngle * 4.0 * uRidgeScale + uSeed)) +
+                                0.30 * (0.5 + 0.5 * sin(aAngle * 9.0 * uRidgeScale - uSeed * 1.2)) +
+                                0.12 * (0.5 + 0.5 * sin(aAngle * 17.0 * uRidgeScale + uSeed * 1.7));
+                            float centerNotch = 1.0 - 0.84 * exp(-(dFront * dFront) / 0.22);
+                            peakY = max(0.32, uBaseHeight * 0.44 * (0.24 + 0.78 * ridge * ridge) * centerNotch);
+                        } else if (uHorizonMode < 2.5) {
+                            // 2: karst_spires — steep vertical Zhangjiajie sandstone pillar horizon
+                            float w1 = 0.5 + 0.5 * sin(aAngle * 18.0 * uRidgeScale + uSeed * 2.1);
+                            float w2 = 0.5 + 0.5 * sin(aAngle * 33.0 * uRidgeScale - uSeed * 1.3);
+                            float spire = smoothstep(0.38, 0.62, w1 * 0.62 + w2 * 0.38);
+                            float macro = 0.45 + 0.55 * (0.5 + 0.5 * sin(aAngle * 5.0 + uSeed));
+                            float frontFrame = 1.0 - 0.45 * exp(-(dFront * dFront) / 0.16);
+                            peakY = max(0.55, uBaseHeight * (0.22 + 0.92 * pow(spire, 0.45) * macro) * frontFrame);
+                        } else {
+                            // 3: desert_dunes — low, sweeping Sahara sand dunes
+                            float dune =
+                                0.64 * (0.5 + 0.5 * sin(aAngle * 2.0 * uRidgeScale + uSeed)) +
+                                0.36 * (0.5 + 0.5 * sin(aAngle * 5.0 * uRidgeScale - uSeed * 0.9));
+                            float valley = 1.0 - 0.58 * exp(-(dFront * dFront) / 0.24);
+                            peakY = max(0.35, uBaseHeight * 0.24 * (0.35 + 0.75 * dune) * valley);
+                        }
+                        pos.y = peakY;
+                    }
+                    vDir = normalize(pos);
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
                 }
             `,
             fragmentShader: /* glsl */ `
@@ -253,6 +302,7 @@ function createMountainRings(theme: SceneTheme) {
         group.add(mesh);
     }
 
+    group.visible = theme.horizonStyle !== 'open_sea';
     return { group, materials };
 }
 
@@ -836,6 +886,9 @@ export function createSunsetEnvironment(
         u.uBelowDark.value.set(...theme.sky.belowDark);
         u.uAuroraStrength.value = theme.auroraStrength ?? 0;
 
+        mountains.visible = theme.horizonStyle !== 'open_sea';
+        const sunAz = Math.atan2(sunDir.z, sunDir.x);
+        const modeIdx = horizonModeIndex(theme.horizonStyle);
         for (let i = 0; i < mountainMaterials.length; i++) {
             const p = theme.mountains[i];
             const m = mountainMaterials[i].uniforms;
@@ -843,6 +896,8 @@ export function createSunsetEnvironment(
             m.uBottom.value.set(p.bottom);
             m.uGlow.value.set(...p.glow);
             m.uSunDir.value.copy(sunDir);
+            m.uSunAzimuth.value = sunAz;
+            m.uHorizonMode.value = modeIdx;
         }
 
         reedsMaterial.uniforms.uSunDir.value.copy(sunDir);

@@ -372,7 +372,7 @@ export function buildFujiPlacements(): ScenePropPlacement[] {
             rotationY: -1.16,
             scale: 1.04,
             motion: 'static',
-            lanternLightOffset: [5.4, 1.95, 0.0],
+            lanternLightOffset: [5.4, 1.85, 0.0],
             lanternColor: '#ffc884',
         },
         // Classic Kawaguchiko wooden rowboat gently bobbing in the right midground
@@ -382,7 +382,7 @@ export function buildFujiPlacements(): ScenePropPlacement[] {
             rotationY: 2.58,
             scale: 1.05,
             motion: 'boat',
-            lanternLightOffset: [1.85, 0.65, 0],
+            lanternLightOffset: [1.85, 0.52, 0],
             lanternColor: '#ffc67e',
         },
         // Blooming spring cherry blossom trees framing both sides of the lake
@@ -442,7 +442,7 @@ export function buildZhangjiajiePlacements(): ScenePropPlacement[] {
             rotationY: -0.68,
             scale: 1.04,
             motion: 'static',
-            lanternLightOffset: [0, 2.8, 2.0],
+            lanternLightOffset: [0, 3.3, 1.9],
             lanternColor: '#ff8a48',
         },
         // Mountain bamboo raft with cormorant lantern gliding in the right cove
@@ -452,7 +452,7 @@ export function buildZhangjiajiePlacements(): ScenePropPlacement[] {
             rotationY: 2.64,
             scale: 1.05,
             motion: 'boat',
-            lanternLightOffset: [1.9, 0.78, 0],
+            lanternLightOffset: [1.9, 0.66, 0],
             lanternColor: '#ffad54',
         },
         // Cliff-clinging gnarled pines & lush emerald bamboo framing the shore
@@ -495,7 +495,7 @@ export function buildVenicePlacements(): ScenePropPlacement[] {
             rotationY: -0.35,
             scale: 1.06,
             motion: 'static',
-            lanternLightOffset: [0, 3.6, 0.8],
+            lanternLightOffset: [-2.6, 3.1, 0.8],
             lanternColor: '#ffc274',
         },
         // Sleek black lacquered Venetian Gondola with brass ferro bobbing in the right lagoon
@@ -505,7 +505,7 @@ export function buildVenicePlacements(): ScenePropPlacement[] {
             rotationY: 2.62,
             scale: 1.05,
             motion: 'boat',
-            lanternLightOffset: [2.1, 0.72, 0],
+            lanternLightOffset: [2.1, 0.65, 0],
             lanternColor: '#ffbd66',
         },
         // Iconic candy-striped Venetian wooden mooring poles (Pali) flanking both foreground coves
@@ -547,7 +547,7 @@ export function buildAlpsPlacements(): ScenePropPlacement[] {
             rotationY: -1.16,
             scale: 1.04,
             motion: 'static',
-            lanternLightOffset: [5.0, 1.75, 0],
+            lanternLightOffset: [5.2, 1.10, 0.5],
         },
         // Classic Swiss lake wooden sailboat gently rocking in the right midground
         {
@@ -587,7 +587,7 @@ export function buildNilePlacements(): ScenePropPlacement[] {
             rotationY: -0.70,
             scale: 1.04,
             motion: 'static',
-            lanternLightOffset: [0, 2.2, 2.2],
+            lanternLightOffset: [0, 1.85, 2.0],
             lanternColor: '#ff9638',
         },
         // Iconic Nile Felucca lateen-sail wooden boat gliding on the right cove
@@ -597,7 +597,7 @@ export function buildNilePlacements(): ScenePropPlacement[] {
             rotationY: 2.58,
             scale: 1.04,
             motion: 'boat',
-            lanternLightOffset: [-2.0, 0.85, 0],
+            lanternLightOffset: [-2.1, 0.65, 0],
             lanternColor: '#ffaa4a',
         },
         // Tall Nile date palms framing both banks

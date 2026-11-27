@@ -22,6 +22,8 @@ export interface MountainLayerPalette {
     glow: [number, number, number];
 }
 
+export type HorizonStyle = 'rolling_hills' | 'foothills' | 'karst_spires' | 'desert_dunes' | 'open_sea';
+
 export interface SceneTheme {
     id: SceneThemeId;
     name: string;
@@ -29,6 +31,8 @@ export interface SceneTheme {
     subtitle: string;
     /** Optional 3D Blender scenery pack mounted alongside this theme */
     scenePack: ScenePackId;
+    /** Distant 360° horizon silhouette profile matched to geography */
+    horizonStyle: HorizonStyle;
     /** Optional animated Aurora Borealis curtains in sky shader (0..1) */
     auroraStrength?: number;
     /** Normalized sun/moon directional vector */
@@ -90,6 +94,7 @@ export const SCENE_THEMES: readonly SceneTheme[] = [
         shortLabel: '暮色',
         subtitle: '暮色湖畔 · 真实水漂',
         scenePack: 'none',
+        horizonStyle: 'rolling_hills',
         sunDirection: [0.88, 0.165, -0.44],
         sunColor: '#ffad60',
         sunIntensity: 3.6,
@@ -146,6 +151,7 @@ export const SCENE_THEMES: readonly SceneTheme[] = [
         shortLabel: '江南',
         subtitle: '江南水榭 · 荷塘掠水',
         scenePack: 'jiangnan',
+        horizonStyle: 'rolling_hills',
         sunDirection: [0.85, 0.21, -0.47],
         sunColor: '#ffd7a3',
         sunIntensity: 3.35,
@@ -202,6 +208,7 @@ export const SCENE_THEMES: readonly SceneTheme[] = [
         shortLabel: '冰川',
         subtitle: '北美高山湖 · 澄蓝掠水',
         scenePack: 'tahoe',
+        horizonStyle: 'foothills',
         sunDirection: [0.80, 0.34, -0.49],
         sunColor: '#fff0d6',
         sunIntensity: 3.55,
@@ -258,6 +265,7 @@ export const SCENE_THEMES: readonly SceneTheme[] = [
         shortLabel: '秋枫',
         subtitle: '红叶渡口 · 镜湖掠水',
         scenePack: 'kyoto',
+        horizonStyle: 'rolling_hills',
         sunDirection: [0.86, 0.19, -0.47],
         sunColor: '#ffb76b',
         sunIntensity: 3.45,
@@ -314,6 +322,7 @@ export const SCENE_THEMES: readonly SceneTheme[] = [
         shortLabel: '极光',
         subtitle: '罗弗敦极夜 · 冰海掠水',
         scenePack: 'nordic',
+        horizonStyle: 'foothills',
         auroraStrength: 1.0,
         sunDirection: [0.82, 0.24, -0.52],
         sunColor: '#98f2dc',
@@ -371,6 +380,7 @@ export const SCENE_THEMES: readonly SceneTheme[] = [
         shortLabel: '礁湖',
         subtitle: '南太平洋礁湾 · 碧水掠石',
         scenePack: 'lagoon',
+        horizonStyle: 'open_sea',
         sunDirection: [0.85, 0.23, -0.47],
         sunColor: '#ffc87a',
         sunIntensity: 3.65,
@@ -427,6 +437,7 @@ export const SCENE_THEMES: readonly SceneTheme[] = [
         shortLabel: '张家界',
         subtitle: '湖南武陵源 · 翡翠峡湖',
         scenePack: 'zhangjiajie',
+        horizonStyle: 'karst_spires',
         sunDirection: [0.84, 0.27, -0.47],
         sunColor: '#ffe3b8',
         sunIntensity: 3.35,
@@ -483,6 +494,7 @@ export const SCENE_THEMES: readonly SceneTheme[] = [
         shortLabel: '富士',
         subtitle: '日本河口湖 · 樱雪逆富士',
         scenePack: 'fuji',
+        horizonStyle: 'foothills',
         sunDirection: [0.82, 0.22, -0.52],
         sunColor: '#ffd4c4',
         sunIntensity: 3.30,
@@ -539,6 +551,7 @@ export const SCENE_THEMES: readonly SceneTheme[] = [
         shortLabel: '威尼斯',
         subtitle: '意大利泻湖 · 金辉贡多拉',
         scenePack: 'venice',
+        horizonStyle: 'open_sea',
         sunDirection: [0.85, 0.18, -0.49],
         sunColor: '#ffbc6c',
         sunIntensity: 3.55,
@@ -595,6 +608,7 @@ export const SCENE_THEMES: readonly SceneTheme[] = [
         shortLabel: '瑞士',
         subtitle: '阿尔卑斯冰湖 · 翡翠雪峰',
         scenePack: 'alps',
+        horizonStyle: 'foothills',
         sunDirection: [0.78, 0.38, -0.49],
         sunColor: '#fff5e0',
         sunIntensity: 3.60,
@@ -651,6 +665,7 @@ export const SCENE_THEMES: readonly SceneTheme[] = [
         shortLabel: '尼罗河',
         subtitle: '埃及阿斯旺 · 沙海金河',
         scenePack: 'nile',
+        horizonStyle: 'desert_dunes',
         sunDirection: [0.87, 0.155, -0.46],
         sunColor: '#ff9f48',
         sunIntensity: 3.70,
@@ -707,6 +722,7 @@ export const SCENE_THEMES: readonly SceneTheme[] = [
         shortLabel: '晨雾',
         subtitle: '青岚晓湖 · 真实水漂',
         scenePack: 'none',
+        horizonStyle: 'rolling_hills',
         sunDirection: [0.86, 0.24, -0.44],
         sunColor: '#ffe8ca',
         sunIntensity: 3.25,
@@ -763,6 +779,7 @@ export const SCENE_THEMES: readonly SceneTheme[] = [
         shortLabel: '月夜',
         subtitle: '清辉月湖 · 真实水漂',
         scenePack: 'none',
+        horizonStyle: 'rolling_hills',
         sunDirection: [0.84, 0.28, -0.46],
         sunColor: '#c4dcff',
         sunIntensity: 2.55,
