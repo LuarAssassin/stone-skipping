@@ -25,7 +25,7 @@ if "--compose-pack" not in sys.argv:
     )
 
 WOOD, TRIM, BARK, WEAVE, METAL, GLOW, ROCK, COVER, ROOF, SNOW, NEEDLE, LEAF, LEAF2, BLOOM, PANEL, DETAIL = range(16)
-OPAQUE, EMIT, MASK = range(3)
+OPAQUE, EMIT, MASK, CLOTH = range(4)
 
 
 @dataclass(frozen=True)
@@ -40,6 +40,7 @@ class Asset:
     origin: str = "waterline"
     camera: tuple = (4., -9., 4.)
     x_start: bool = False
+    anchor_xy: tuple | None = None
 
     @property
     def size(self):
@@ -218,16 +219,16 @@ def blades(u,v,rng,kind):
     alpha = np.zeros_like(u)
     relief = np.zeros_like(u)
     pigment = np.full_like(u,.48)
-    if kind in ("needle","spruce","palm"):
+    if kind in ("needle","spruce","palm","bamboo_leaf"):
         stem = (abs(u-.5-.015*np.sin(6*v))<.008)&(v>.024)&(v<.975)
         alpha[stem] = 1
         pigment[stem] = .22
-        pairs = {"needle":28,"spruce":30,"palm":24}[kind]
+        pairs = {"needle":28,"spruce":30,"palm":24,"bamboo_leaf":10}[kind]
         for i in range(pairs):
             anchor = .055+.877*i/(pairs-1)
             for sign in (-1,1):
                 dx,dy = (u-.5-.015*math.sin(6*anchor))*sign,v-anchor
-                slender = .019 if kind=="palm" else .016
+                slender = {"palm":.019,"bamboo_leaf":.027}.get(kind,.016)
                 sweep = .28+.22*anchor
                 length = (.105+.32*math.sin(math.pi*anchor)**.60)*rng.uniform(.82,1.06)
                 t = (dx+dy*.16)/length
@@ -278,6 +279,46 @@ def blades(u,v,rng,kind):
     return alpha,relief,pigment
 
 
+def flowering_mask(u,v,rng,pattern):
+    matte = np.zeros_like(u)
+    pigment = np.full_like(u,.45)
+    relief = np.zeros_like(u)
+    if pattern=="petal_single":
+        a,b = (u-.50)/.33,(v-.50)/.412
+        heart = (a*(1+.64*(b-.32)**2))**2+b*b
+        notch = np.hypot(a*.95,b-.98)
+        matte[(heart<1)&(notch>.18)] = 1.
+        return matte,.13*np.exp(-11*np.abs(a)),np.clip(.64-.27*b+.10*np.sin(4*a),0,1)
+    if pattern=="papyrus":
+        x,y = u-.5,v-.5
+        r,theta = np.hypot(x,y),np.arctan2(y,x)
+        points = rng.uniform(.39,.47,31)
+        for i,length in enumerate(points):
+            angle = TAU*i/len(points)+rng.uniform(-.034,.034)
+            arm = np.cos(theta-angle)*r
+            center = np.sin(theta-angle)*r-.14*arm**2
+            mask = (arm>0)&(arm<length)&(np.abs(center)<.011*(1-.81*arm/length))
+            matte[mask]=1
+            pigment[mask]=(.31+.31*arm/length)[mask]
+        heart = r<.043
+        matte[heart]=1
+        pigment[heart]=.74
+        return matte,relief,pigment
+    for cx in (.166,.50,.834):
+        for cy in (.13,.38,.62,.87):
+            x,y = u-cx-rng.uniform(-.072,.072),v-cy-rng.uniform(-.054,.054)
+            angle = np.arctan2(y,x)+rng.uniform(0,TAU)
+            radius = rng.uniform(.091,.146)
+            rho = np.hypot(.94*x,y)/radius
+            petal = 1+.19*np.cos(5*angle)-.11*np.cos(10*angle)
+            mask = rho<petal
+            color = .62+.28*smooth(rho)-.39*np.exp(-12*rho*rho)+rng.uniform(-.24,.10)
+            matte[mask] = 1.
+            pigment[mask] = color[mask]
+            relief[mask] = (.27*np.cos(angle*5)*smooth(rho))[mask]
+    return matte,relief,pigment
+
+
 def maps(surface, n, seed):
     rng = np.random.default_rng(seed)
     p = 5/n
@@ -293,13 +334,13 @@ def maps(surface, n, seed):
     rgb = np.array(surface.rgb)
     pattern = surface.pattern
     accent = np.array(surface.accent) if surface.accent is not None else None
-    if pattern in ("wood","bark","lacquer","carved","palm_trunk"):
+    if pattern in ("wood","bark","lacquer","carved","palm_trunk","date_bark"):
         distortion = .017*np.sin(9*v+4*u)+.022*cloud
         ring = np.sin(TAU*12*(u+distortion)+1.3*np.cos(6*u))
         fibre = np.sin(TAU*43*(u+distortion)+2*grit)
         tone += .023*ring+.016*fibre
         bump += .21*ring+.26*fibre
-        if pattern in ("bark","palm_trunk"):
+        if pattern in ("bark","palm_trunk","date_bark"):
             grooves = (1-abs(ring))**8
             tone -= grooves*.066
             bump -= grooves*.77
@@ -307,6 +348,12 @@ def maps(surface, n, seed):
             scar = np.exp(-125*((v*14+.03*cloud)%1-.25)**2)
             bump += .48*scar
             tone += .048*scar
+        if pattern=="date_bark":
+            left = np.cos(TAU*(u*13+v*22))
+            right = np.cos(TAU*(u*13-v*22))
+            scale = smooth((np.minimum(left,right)+.31)/1.20)
+            bump += .64*scale
+            tone += .066*scale
         if pattern=="lacquer":
             wear = smooth((cloud+.17*grain-.44)/.47)
             tone += .050*wear
@@ -385,7 +432,7 @@ def maps(surface, n, seed):
             rgb = rgb*(1-deposit[:,:,None])+accent*deposit[:,:,None]
             rough += .13*deposit
             bump *= 1-.54*deposit
-    elif pattern in ("needle","spruce","maple","maple_single","palm","broad"):
+    elif pattern in ("needle","spruce","maple","maple_single","palm","broad","bamboo_leaf"):
         alpha,ridge,pigment = blades(u,v,rng,pattern)
         bump += ridge
         if pattern=="spruce":
@@ -395,6 +442,62 @@ def maps(surface, n, seed):
             color = smooth((pigment-.19)/.64)
         rgb = rgb*(1-color[:,:,None])+accent*color[:,:,None]
         tone = .014*cloud+.008*grain+.011*ridge
+    elif pattern in ("sakura","petal_single","papyrus"):
+        alpha,form,pigment = flowering_mask(u,v,rng,pattern)
+        color = np.clip(pigment,0,1)
+        rgb = rgb*(1-color[:,:,None])+accent*color[:,:,None]
+        bump += form
+        tone = .016*cloud+.011*grain
+    elif pattern in ("stripe","sandstone","sand_moss","lava","slate","dune","brick","canvas","fuji","matterhorn"):
+        if pattern=="stripe":
+            band = smooth((np.sin(TAU*(2*u-4*v))+.14)/.26)
+            rgb = rgb*(1-band[:,:,None])+accent*band[:,:,None]
+            wet = 1-smooth((v-.24+.038*cloud)/.15)
+            rgb = rgb*(1-.48*wet[:,:,None])+np.array((.09,.122,.084))*wet[:,:,None]
+            rough -= .19*wet
+            tone -= .034*smooth((grain+cloud-.49)/.41)
+        elif pattern in ("fuji","matterhorn"):
+            # Mesh v encodes snow exposure, so gullies carry the line down
+            # below exposed shoulders without painterly stretched stripes.
+            fall = .47+.047*cloud+.026*grain
+            snow = smooth((v-fall)/(.105 if pattern=="fuji" else .085))
+            rgb = rgb*(1-snow[:,:,None])+accent*snow[:,:,None]
+            grooves = np.sin(TAU*(9.0*u+.19*v+.18*cloud))
+            tone += .019*grooves*(1-.63*snow)
+            bump += (.31*grooves+.18*grain)*(1-.73*snow)
+            rough += .085*snow
+        elif pattern=="brick":
+            y = v*15
+            x = u*8+.5*np.floor(y)
+            mortar = np.minimum(np.minimum(x%1,1-x%1),np.minimum(y%1,1-y%1))
+            joint = 1-smooth((mortar-.018)/.066)
+            rgb = rgb*(1-.45*joint[:,:,None])+accent*.45*joint[:,:,None]
+            tone += .019*np.sin(np.floor(x)*8.1+np.floor(y)*3.17)
+            bump -= .89*joint
+        elif pattern=="canvas":
+            warp = np.sin(TAU*51*u)*np.sin(TAU*57*v)
+            seams = np.exp(-81*((u*4.0+.04*cloud)%1-.3)**2)
+            tone += .024*warp-.054*seams
+            bump += .10*warp+.34*seams
+        elif pattern=="dune":
+            ripples = np.sin(TAU*(24*v+2*u+.20*cloud))
+            tone += .018*ripples+.035*cloud
+            bump += .23*ripples
+        else:
+            bedding = np.sin(TAU*((13 if pattern=="slate" else 8)*v+.08*cloud+.14*u))
+            fault = smooth((bedding-.57)/.31)
+            wet = 1-smooth((v-.28+.025*cloud)/.22)
+            rough -= .27*wet
+            tone += .027*bedding-.051*fault-.079*wet
+            bump += .24*bedding-.59*fault
+            if pattern=="lava":
+                cavity = smooth((grain+.46*grit-.23)/.42)
+                tone -= .090*cavity
+                bump -= 1.19*cavity
+            if pattern=="sand_moss":
+                coverage = smooth((v-.80+.11*cloud+.036*grain)/.12)
+                rgb = rgb*(1-coverage[:,:,None])+accent*coverage[:,:,None]
+                rough += .062*coverage
     elif pattern=="petal":
         pigment = smooth(v)
         rgb = rgb*(1-pigment[:,:,None])+accent*pigment[:,:,None]
@@ -436,8 +539,8 @@ def pbr_materials(model, asset, palette, seed):
     images = textures(model,asset,palette,seed)
     mats = []
     for group in range(max(model.groups)+1):
-        mat,shader = material(asset.name+" / "+("Surface","Amber lights","Cutout foliage")[group])
-        mat.use_backface_culling = group != MASK
+        mat,shader = material(asset.name+" / "+("Surface","Amber lights","Cutout foliage","Woven sail")[group])
+        mat.use_backface_culling = group not in (MASK,CLOTH)
         nodes = mat.node_tree.nodes
         link = mat.node_tree.links.new
         bc,r,nt = [nodes.new("ShaderNodeTexImage") for _ in images]
@@ -471,6 +574,8 @@ def normalize(model, asset):
     require(np.isfinite(coords).all() and np.all(hi>lo),f"{asset.name}: source geometry has invalid bounds")
     target = np.array([asset.bbox[0],asset.bbox[2],asset.bbox[1]])
     shift = np.array((0 if asset.x_start else -target[0]/2,-target[1]/2,asset.base))
+    if asset.anchor_xy is not None:
+        shift[:2] = (lo[:2]-asset.anchor_xy)*target[:2]/(hi-lo)[:2]
     model.xyz = ((coords-lo)*(target/(hi-lo))+shift).tolist()
 
 
@@ -567,6 +672,8 @@ def export(asset, build, palette, seed, assets, work):
     model = Model(asset.name)
     build(model,np.random.default_rng(seed))
     normalize(model,asset)
+    if callable(palette):
+        palette = palette(asset)
     obj = model.object(asset.size,pbr_materials(model,asset,palette,seed))
     select_only(obj)
     modifier = obj.modifiers.new("Explicit atlas triangles","TRIANGULATE")
@@ -607,16 +714,19 @@ def compose(job):
     paper, ink, muted, accent, plate = job["colors"]
     canvas = Image.new("RGB",(width,height),paper)
     draw = ImageDraw.Draw(canvas)
-    draw.text((43,18),job["english"].upper()+"   /   7 ASSETS",fill=accent,font=mono)
+    count = len(job["assets"])
+    first_row = (count+1)//2
+    draw.text((43,18),job["english"].upper()+f"   /   {count} ASSETS",fill=accent,font=mono)
     draw.text((40,49),job["title"] if cjk else job["english"],fill=ink,font=title)
     draw.text((43,133),"Cycles 暮色散光 · 独立取景 · 米制尺寸按 X × Y × Z" if cjk else
               "Soft dusk in Cycles   /   Individual framing   /   Metres, X × Y × Z",fill=muted,font=body)
     draw.line((43,161,width-43,161),fill=muted,width=2)
     for index,entry in enumerate(job["assets"]):
-        columns = 4 if index<4 else 3
+        second = index>=first_row
+        columns = count-first_row if second else first_row
         first = (width-(columns*card_x+(columns-1)*gutter))//2
-        x = first+(index if index<4 else index-4)*(card_x+gutter)
-        y = top+(card_y+18)*(index//4)
+        x = first+(index-first_row if second else index)*(card_x+gutter)
+        y = top+(card_y+18)*second
         card = Image.new("RGB",(card_x,484),plate)
         with Image.open(work/(entry["name"]+".png")) as rendered:
             rgba = rendered.convert("RGBA").resize(card.size,Image.Resampling.LANCZOS)
@@ -658,7 +768,7 @@ def generate(pack_id, title, english, colors, specs, builds, palette, seed):
     require(bpy.app.background and args.seed>=0,"Use background Blender (-b) and a non-negative seed")
     root = args.output_root.resolve()
     root.mkdir(parents=True,exist_ok=True)
-    require(len(specs)==len(builds)==7,"Expected all seven catalogue assets")
+    require(len(specs)==len(builds) and len(specs) in (6,7),"Expected six or seven catalogue assets")
     dest = Path("public/assets/scenes")/pack_id
     preview = Path("tools/blender")/f"preview_{pack_id}_assets.png"
     with tempfile.TemporaryDirectory(prefix=f".{pack_id}-",dir=root) as temp:
@@ -728,26 +838,29 @@ def glass_lamp(model,x,y,z,radius,height,slot=METAL):
         cylinder(model,(x+dx*.83,y+dy*.83,z-half),(x+dx,y+dy,z+half),radius*.061,5,slot)
 
 
-def watercraft(model,length,width,bottom,top,form):
+def watercraft(model,length,width,bottom,top,form,lamp=True):
     cedar = form=="cedar"
     clinker = form=="clinker"
     outrigger = form=="outrigger"
-    timber = PANEL if clinker or form=="skiff" else WOOD
+    gondola = form=="gondola"
+    timber = PANEL if clinker or form in ("skiff","rowboat","sailboat") else WOOD
     joinery = TRIM if form=="skiff" else WOOD
     half = length/2
     depth = abs(bottom)
     rise = .25 if outrigger else (.33 if cedar else .37)
+    if gondola:
+        rise = .39
     def hull(t,a,inner=False):
         profile = max(0,math.sin(math.pi*t))
         breadth = .021+(width*.5-.021)*profile**(.63 if cedar else .57)
-        sheer = .18+rise*abs(2*t-1)**3 + .048*(t-.5)
+        sheer = .18+rise*abs(2*t-1)**(3.5 if gondola else 3) + (.23 if gondola else .048)*(t-.5)
         if cedar or outrigger:
             sheer -= .10*(1-profile)**1.2
         draft = .062+(depth+.119)*profile**.85
         x = length*(t-.5)
         if inner:
             breadth = max(.012,breadth-.026)
-        y = breadth*math.sin(a)
+        y = breadth*math.sin(a)+(.108*profile*math.sin(math.pi*t+.32) if gondola else 0)
         roundness = .84 if cedar else .51
         z = sheer-draft*max(0,math.cos(a))**roundness+(.035 if inner else 0)
         return v3((x,y,z))
@@ -797,12 +910,12 @@ def watercraft(model,length,width,bottom,top,form):
             for j in range(3):
                 model.stack(x-.15+.031*j,y,[(.051,.079),(.069,.080),(.082,.079)],8,WEAVE)
         twig(model,[(half*.86,0,.32),(half*.966,0,.44),(half*.978,0,top)],[.022,.023,.008],8,TRIM)
-    if not cedar and not outrigger:
-        x = (-1 if clinker else 1)*half*.78
+    if not cedar and not outrigger and lamp:
+        x = (-1 if clinker or form=="felucca" else 1)*half*.78
         twig(model,[(x,-width*.30,.168),(x,-width*.32,top-.057),(x+.13,-width*.20,top-.056)],
              [.025,.017,.013],7,METAL if clinker else TRIM)
         glass_lamp(model,x+.132,-width*.20,top-.22,.060,.122)
-        if not clinker:
+        if form=="skiff":
             twig(model,[(-half*.76,-width*.48,.265),(half*.5,width*.18,.333)],[.014,.014],7,TRIM)
 
 
