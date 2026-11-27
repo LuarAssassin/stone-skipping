@@ -1,0 +1,349 @@
+{
+  "version": 1,
+  "packId": "alps",
+  "units": "metres",
+  "gltfAxes": [
+    "X",
+    "Y up",
+    "Z"
+  ],
+  "seed": 20261204,
+  "assets": [
+    {
+      "file": "matterhorn_peak.glb",
+      "name": "matterhorn_peak",
+      "title": "马特洪冰棱雪峰",
+      "use": "远景微弯角峰，岩壁和两侧雪沟，横向沿 X",
+      "bboxMeters": [
+        58.0,
+        35.000001549720764,
+        28.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -29.0,
+          -0.6000000238418579,
+          -14.0
+        ],
+        "max": [
+          29.0,
+          34.400001525878906,
+          14.0
+        ]
+      },
+      "origin": "groundContact",
+      "triangles": 3870,
+      "fileBytes": 247812,
+      "textureMaps": [
+        {
+          "name": "matterhorn_peak_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "matterhorn_peak_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "matterhorn_peak_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "990fb85760fedade166bb5ae17a8bf207544e7178d2b0c0f0275dbda270aaf66"
+    },
+    {
+      "file": "swiss_boathouse.glb",
+      "name": "swiss_boathouse",
+      "title": "布里恩茨临水船舍",
+      "use": "蜂蜜木墙、水桩、系泊船口与暖色窗光",
+      "bboxMeters": [
+        6.0,
+        6.200000047683716,
+        5.199999809265137
+      ],
+      "boundsMeters": {
+        "min": [
+          -3.0,
+          -1.2000000476837158,
+          -2.5999999046325684
+        ],
+        "max": [
+          3.0,
+          5.0,
+          2.5999999046325684
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 12360,
+      "fileBytes": 1119688,
+      "textureMaps": [
+        {
+          "name": "swiss_boathouse_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "swiss_boathouse_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "swiss_boathouse_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 3,
+      "emissive": true,
+      "alphaMask": true,
+      "sha256": "06b43e7d79e879a49cd03be7a2950d54115837fa2c93e92f9eabf9f88d704cc1"
+    },
+    {
+      "file": "alpine_sailboat.glb",
+      "name": "alpine_sailboat",
+      "title": "米白湖上小帆船",
+      "use": "船首朝 +X，布帆、桅杆和舵索独立建模",
+      "bboxMeters": [
+        4.599999904632568,
+        5.399999797344208,
+        1.5499999523162842
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.299999952316284,
+          -0.44999998807907104,
+          -0.7749999761581421
+        ],
+        "max": [
+          2.299999952316284,
+          4.949999809265137,
+          0.7749999761581421
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 6178,
+      "fileBytes": 441004,
+      "textureMaps": [
+        {
+          "name": "alpine_sailboat_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "alpine_sailboat_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "alpine_sailboat_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "bedaaaba028b61a186dccbf1e7369d473b2e095d432d42c509ed67f6776d9b7b"
+    },
+    {
+      "file": "swiss_lake_pier.glb",
+      "name": "swiss_lake_pier",
+      "title": "红白桩湖畔栈道",
+      "use": "沿 +X 的浅木码头，含水下桩与小栈灯",
+      "bboxMeters": [
+        5.800000190734863,
+        2.4000000953674316,
+        2.0999999046325684
+      ],
+      "boundsMeters": {
+        "min": [
+          0.0,
+          -1.2000000476837158,
+          -1.0499999523162842
+        ],
+        "max": [
+          5.800000190734863,
+          1.2000000476837158,
+          1.0499999523162842
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 5924,
+      "fileBytes": 654640,
+      "textureMaps": [
+        {
+          "name": "swiss_lake_pier_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "swiss_lake_pier_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "swiss_lake_pier_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "7b6aa9cde5d13558a06405d79918e58f29df3a199b8928dc1ebfe08c7e010bd2"
+    },
+    {
+      "file": "alpine_larch_tree.glb",
+      "name": "alpine_larch_tree",
+      "title": "金绿高山落叶松",
+      "use": "接地树冠，落叶松针叶呈层叠金绿",
+      "bboxMeters": [
+        4.3999998569488525,
+        9.800000458955765,
+        4.400000095367432
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.1998848915100098,
+          -0.2800000011920929,
+          -2.319756507873535
+        ],
+        "max": [
+          2.2001149654388428,
+          9.520000457763672,
+          2.0802435874938965
+        ]
+      },
+      "origin": "groundContact",
+      "triangles": 7782,
+      "fileBytes": 540800,
+      "textureMaps": [
+        {
+          "name": "alpine_larch_tree_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "alpine_larch_tree_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "alpine_larch_tree_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": false,
+      "alphaMask": true,
+      "sha256": "b2021b955d77fc0b955c11784f1ca702dc48dec7a7b93f9614c43d52b3d33bbb"
+    },
+    {
+      "file": "alpine_slate_rock.glb",
+      "name": "alpine_slate_rock",
+      "title": "青灰冰碛页岩",
+      "use": "半浸页岩，深湿底与松散层理",
+      "bboxMeters": [
+        2.799999952316284,
+        1.449999988079071,
+        2.299999952316284
+      ],
+      "boundsMeters": {
+        "min": [
+          -1.399999976158142,
+          -0.5,
+          -1.149999976158142
+        ],
+        "max": [
+          1.399999976158142,
+          0.949999988079071,
+          1.149999976158142
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 1800,
+      "fileBytes": 121372,
+      "textureMaps": [
+        {
+          "name": "alpine_slate_rock_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "alpine_slate_rock_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "alpine_slate_rock_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "6101a999c1c53925099de1a1d933c4af5893e9fd295edd1fa6cc0788798922a3"
+    }
+  ]
+}
