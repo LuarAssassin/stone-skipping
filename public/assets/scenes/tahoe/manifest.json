@@ -400,6 +400,175 @@
       "emissive": false,
       "alphaMask": false,
       "sha256": "b7fe5861246333399916b37cc99d373f9bbdb008f86e08b0a7f9a7ca22e7bc5a"
+    },
+    {
+      "file": "tahoe_emerald_isle_mid.glb",
+      "name": "tahoe_emerald_isle_mid",
+      "title": "太浩湖翡翠湾湖心石岛与石砌茶屋",
+      "use": "花岗岩松岛和石砌瞭望茶屋，临水面朝 +Z",
+      "bboxMeters": [
+        26.0,
+        14.00000011920929,
+        16.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -13.0,
+          -1.0800000429153442,
+          -8.0
+        ],
+        "max": [
+          13.0,
+          12.920000076293945,
+          8.0
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 7852,
+      "fileBytes": 929348,
+      "textureMaps": [
+        {
+          "name": "tahoe_emerald_isle_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "tahoe_emerald_isle_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "tahoe_emerald_isle_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "58ecc81502179057e560cf076930b73d742f64a96013ae27c1b8661d96534cca"
+    },
+    {
+      "file": "tahoe_lodge_point_mid.glb",
+      "name": "tahoe_lodge_point_mid",
+      "title": "北美松林湖岬原木度假屋与木栈码头",
+      "use": "原木湖畔庄园、雪松码头与花岗岩，临水面朝 +Z",
+      "bboxMeters": [
+        24.0,
+        11.499999523162842,
+        12.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -12.0,
+          -1.059999942779541,
+          -6.0
+        ],
+        "max": [
+          12.0,
+          10.4399995803833,
+          6.0
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 7608,
+      "fileBytes": 1007020,
+      "textureMaps": [
+        {
+          "name": "tahoe_lodge_point_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "tahoe_lodge_point_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "tahoe_lodge_point_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "e9e4199caef770ec69c030a1b701caa072f017fa8fa228a274dc20eb34670b19"
+    },
+    {
+      "file": "tahoe_wooden_cruiser_mid.glb",
+      "name": "tahoe_wooden_cruiser_mid",
+      "title": "太浩湖经典桃花心木古典游艇",
+      "use": "桃花心木巡航帆船，船首朝 +X",
+      "bboxMeters": [
+        12.5,
+        4.400000095367432,
+        3.4000000953674316
+      ],
+      "boundsMeters": {
+        "min": [
+          -6.25,
+          -1.0099999904632568,
+          -1.7000000476837158
+        ],
+        "max": [
+          6.25,
+          3.390000104904175,
+          1.7000000476837158
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 5024,
+      "fileBytes": 689824,
+      "textureMaps": [
+        {
+          "name": "tahoe_wooden_cruiser_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "tahoe_wooden_cruiser_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "tahoe_wooden_cruiser_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "e4355608548439290d6b9a38189fb52342d5723ec1c010c74ffc43627d3fff1e",
+      "motion": "boat"
     }
   ]
 }

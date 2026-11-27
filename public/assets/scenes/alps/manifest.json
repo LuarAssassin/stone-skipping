@@ -344,6 +344,175 @@
       "emissive": false,
       "alphaMask": false,
       "sha256": "6101a999c1c53925099de1a1d933c4af5893e9fd295edd1fa6cc0788798922a3"
+    },
+    {
+      "file": "alps_kapell_bridge_mid.glb",
+      "name": "alps_kapell_bridge_mid",
+      "title": "琉森卡佩尔木廊桥与八角水塔",
+      "use": "廊桥、水塔和石堤，临水面朝 +Z",
+      "bboxMeters": [
+        30.0,
+        13.499999523162842,
+        9.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -15.0,
+          -1.059999942779541,
+          -4.5
+        ],
+        "max": [
+          15.0,
+          12.4399995803833,
+          4.5
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 7936,
+      "fileBytes": 985424,
+      "textureMaps": [
+        {
+          "name": "alps_kapell_bridge_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "alps_kapell_bridge_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "alps_kapell_bridge_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "593c82f95a14e691417de5f920dff9896c5e3ff2dd61010d0fb77ce4a8e811e7"
+    },
+    {
+      "file": "alps_chalet_village_mid.glb",
+      "name": "alps_chalet_village_mid",
+      "title": "瑞士湖畔尖顶教堂与木屋村落",
+      "use": "湖畔木屋、挑檐、花箱和教堂，临水面朝 +Z",
+      "bboxMeters": [
+        26.0,
+        14.499999523162842,
+        11.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -13.0,
+          -1.059999942779541,
+          -5.5
+        ],
+        "max": [
+          13.0,
+          13.4399995803833,
+          5.5
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 7448,
+      "fileBytes": 1091312,
+      "textureMaps": [
+        {
+          "name": "alps_chalet_village_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "alps_chalet_village_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "alps_chalet_village_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "2bb13bfc470d24b2e13900a60f50e51dac47cffc7695b87f2cdd2679900d24f7"
+    },
+    {
+      "file": "alps_steam_paddleboat_mid.glb",
+      "name": "alps_steam_paddleboat_mid",
+      "title": "琉森湖百年蒸汽明轮游船",
+      "use": "双层明轮游船，船首朝 +X",
+      "bboxMeters": [
+        15.0,
+        5.199999809265137,
+        4.199999809265137
+      ],
+      "boundsMeters": {
+        "min": [
+          -7.5,
+          -1.059999942779541,
+          -2.0999999046325684
+        ],
+        "max": [
+          7.5,
+          4.139999866485596,
+          2.0999999046325684
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 5772,
+      "fileBytes": 750584,
+      "textureMaps": [
+        {
+          "name": "alps_steam_paddleboat_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "alps_steam_paddleboat_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "alps_steam_paddleboat_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "0a856d8087f8588f01eb0125b83977022b82bd7d9cf5d81b46910d0eba5bf365",
+      "motion": "boat"
     }
   ]
 }

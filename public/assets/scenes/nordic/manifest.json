@@ -400,6 +400,175 @@
       "emissive": false,
       "alphaMask": false,
       "sha256": "9bea66a706a388fcf2053fa08387549c585e8ae07202b5d8da3ede4c8a2f32e2"
+    },
+    {
+      "file": "nordic_lighthouse_skerry_mid.glb",
+      "name": "nordic_lighthouse_skerry_mid",
+      "title": "罗弗敦红白条纹峡湾灯塔礁岛",
+      "use": "条纹灯塔、积雪玄武岩和守塔人木屋，临水面朝 +Z",
+      "bboxMeters": [
+        18.0,
+        15.499999523162842,
+        12.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -9.0,
+          -1.059999942779541,
+          -6.0
+        ],
+        "max": [
+          9.0,
+          14.4399995803833,
+          6.0
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 4602,
+      "fileBytes": 798148,
+      "textureMaps": [
+        {
+          "name": "nordic_lighthouse_skerry_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nordic_lighthouse_skerry_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nordic_lighthouse_skerry_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "49cf8a8bd130cbb70ef3cf6be06ece06a64db2e91acd23cf9053944c196bc7ee"
+    },
+    {
+      "file": "nordic_rorbu_village_mid.glb",
+      "name": "nordic_rorbu_village_mid",
+      "title": "极夜木栈道红木渔村与晒鱼架",
+      "use": "红色渔屋、桩架木栈道与晒鱼架，临水面朝 +Z",
+      "bboxMeters": [
+        26.0,
+        9.799999713897705,
+        11.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -13.0,
+          -1.059999942779541,
+          -5.5
+        ],
+        "max": [
+          13.0,
+          8.739999771118164,
+          5.5
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 8000,
+      "fileBytes": 1112236,
+      "textureMaps": [
+        {
+          "name": "nordic_rorbu_village_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nordic_rorbu_village_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nordic_rorbu_village_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "bce97f2aeb513b7a05f709ae9d0015bc8e72fc52a67274e992de11a9b8641c8d"
+    },
+    {
+      "file": "nordic_trawler_mid.glb",
+      "name": "nordic_trawler_mid",
+      "title": "北欧峡湾木壳渔船",
+      "use": "木壳拖网渔船和带工作灯的桅架，船首朝 +X",
+      "bboxMeters": [
+        13.5,
+        6.400000095367432,
+        4.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -6.75,
+          -1.059999942779541,
+          -2.0
+        ],
+        "max": [
+          6.75,
+          5.340000152587891,
+          2.0
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 3872,
+      "fileBytes": 681172,
+      "textureMaps": [
+        {
+          "name": "nordic_trawler_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nordic_trawler_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nordic_trawler_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "a5c4f6dd3a14e84d23e64d97451d4b3cefffacc828349ded1a717a2011ae5923",
+      "motion": "boat"
     }
   ]
 }

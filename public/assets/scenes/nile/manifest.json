@@ -344,6 +344,175 @@
       "emissive": false,
       "alphaMask": true,
       "sha256": "44f1b723bf1cbc6edc95a4b46af66baeee816ef465a7588e4df5f438d5efcc73"
+    },
+    {
+      "file": "nile_colonnade_ruin_mid.glb",
+      "name": "nile_colonnade_ruin_mid",
+      "title": "尼罗河岸古埃及柱廊神庙遗迹",
+      "use": "双塔门、莲花柱、石像和火盆，临水面朝 +Z",
+      "bboxMeters": [
+        28.0,
+        13.999999523162842,
+        12.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -14.0,
+          -1.059999942779541,
+          -6.0
+        ],
+        "max": [
+          14.0,
+          12.9399995803833,
+          6.0
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 7744,
+      "fileBytes": 798364,
+      "textureMaps": [
+        {
+          "name": "nile_colonnade_ruin_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nile_colonnade_ruin_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nile_colonnade_ruin_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "1840e1ab19f849fd943ba1de44ff649463a8c3c20d29e3020a7a62d36c63570c"
+    },
+    {
+      "file": "nile_granite_oasis_isle_mid.glb",
+      "name": "nile_granite_oasis_isle_mid",
+      "title": "阿斯旺花岗岩巨石绿洲岛与古石塔",
+      "use": "棕榈、花岗岩和努比亚穹顶塔，临水面朝 +Z",
+      "bboxMeters": [
+        22.0,
+        12.00000011920929,
+        14.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -11.0,
+          -1.0800000429153442,
+          -7.0
+        ],
+        "max": [
+          11.0,
+          10.920000076293945,
+          7.0
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 6694,
+      "fileBytes": 893184,
+      "textureMaps": [
+        {
+          "name": "nile_granite_oasis_isle_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nile_granite_oasis_isle_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nile_granite_oasis_isle_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "2a3911f802c7eb2c84a1c5f6754187c59fb5e4f46e0283422dd58c346f581e73"
+    },
+    {
+      "file": "nile_royal_dahabiya_mid.glb",
+      "name": "nile_royal_dahabiya_mid",
+      "title": "尼罗河古典双桅帆船",
+      "use": "双桅拉丁帆和木雕船舱，船首朝 +X",
+      "bboxMeters": [
+        16.0,
+        9.499999523162842,
+        3.799999952316284
+      ],
+      "boundsMeters": {
+        "min": [
+          -8.0,
+          -1.059999942779541,
+          -1.899999976158142
+        ],
+        "max": [
+          8.0,
+          8.4399995803833,
+          1.899999976158142
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 5120,
+      "fileBytes": 678892,
+      "textureMaps": [
+        {
+          "name": "nile_royal_dahabiya_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nile_royal_dahabiya_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "nile_royal_dahabiya_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "0d2cecabbe4ef562c7374763b69e8aaab498643a6849d13b8efed1e975b20a77",
+      "motion": "boat"
     }
   ]
 }

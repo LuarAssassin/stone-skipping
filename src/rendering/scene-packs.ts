@@ -216,6 +216,34 @@ export function buildTahoePlacements(): ScenePropPlacement[] {
         // Majestic snow-capped alpine granite massifs rotated broadside across the distant horizon
         { asset: 'snow_peak_ridge.glb', position: [96.0, -0.35, -16.0], rotationY: Math.PI / 2 - 0.18, scale: 1.24, motion: 'static' },
         { asset: 'snow_peak_ridge.glb', position: [98.0, -0.45, 24.0], rotationY: Math.PI / 2 + 0.24, scale: 1.06, motion: 'static' },
+        // === MIDGROUND LAKE TAHOE ENSEMBLE (left timber lodge headland, right Emerald Bay tea-house island & mahogany sailboat) ===
+        {
+            asset: 'tahoe_lodge_point_mid.glb',
+            position: [45.5, 0.06, -19.2],
+            rotationY: -0.24,
+            scale: 1.02,
+            motion: 'static',
+            lanternLightOffset: [4.856, 4.328, 1.841],
+            lanternColor: '#ffc678',
+        },
+        {
+            asset: 'tahoe_emerald_isle_mid.glb',
+            position: [52.0, 0.06, 19.5],
+            rotationY: -2.64,
+            scale: 1.02,
+            motion: 'static',
+            lanternLightOffset: [1.253, 6.906, 2.819],
+            lanternColor: '#ffc87e',
+        },
+        {
+            asset: 'tahoe_wooden_cruiser_mid.glb',
+            position: [44.5, 0, 9.6],
+            rotationY: -2.68,
+            scale: 1.0,
+            motion: 'boat',
+            lanternLightOffset: [-4.730, 1.159, 0.468],
+            lanternColor: '#ffd296',
+        },
     ];
 }
 
@@ -360,6 +388,34 @@ export function buildNordicPlacements(): ScenePropPlacement[] {
         // Dramatic sheer Lofoten fjord snow walls rotated broadside, leaving a center aurora V-channel
         { asset: 'fjord_cliff_wall.glb', position: [96.0, -0.45, -26.0], rotationY: Math.PI / 2 - 0.22, scale: 1.20, motion: 'static' },
         { asset: 'fjord_cliff_wall.glb', position: [98.0, -0.50, 24.0], rotationY: Math.PI / 2 + 0.26, scale: 1.10, motion: 'static' },
+        // === MIDGROUND LOFOTEN FJORD ENSEMBLE (left glowing rorbu boardwalk village, right striped lighthouse skerry & trawler) ===
+        {
+            asset: 'nordic_rorbu_village_mid.glb',
+            position: [42.5, 0.06, -18.8],
+            rotationY: -0.22,
+            scale: 1.02,
+            motion: 'static',
+            lanternLightOffset: [5.941, 1.137, 3.075],
+            lanternColor: '#ffaa55',
+        },
+        {
+            asset: 'nordic_lighthouse_skerry_mid.glb',
+            position: [62.0, 0.06, 18.2],
+            rotationY: -2.52,
+            scale: 1.02,
+            motion: 'static',
+            lanternLightOffset: [0.733, 12.278, 0.832],
+            lanternColor: '#ffd27a',
+        },
+        {
+            asset: 'nordic_trawler_mid.glb',
+            position: [49.5, 0, 9.4],
+            rotationY: -2.70,
+            scale: 1.0,
+            motion: 'boat',
+            lanternLightOffset: [1.420, 3.058, 0.938],
+            lanternColor: '#ffba66',
+        },
     ];
 
     // Drifting arctic sea-ice floes flanking left & right coves (clear of z ∈ [-5.5, +5.5])
@@ -424,6 +480,32 @@ export function buildLagoonPlacements(): ScenePropPlacement[] {
         { asset: 'coral_reef_rock.glb', position: [29.4, 0, 11.2], rotationY: 1.8, scale: 1.15, motion: 'static' },
         // Iconic Moorea-style jagged volcanic island peak rotated broadside across the distant lagoon
         { asset: 'volcanic_island_peak.glb', position: [96.0, -0.35, -14.5], rotationY: Math.PI / 2 - 0.15, scale: 1.22, motion: 'static' },
+        // === MIDGROUND SOUTH PACIFIC ENSEMBLE (left linked overwater bungalows, right coral sea arch & Polynesian catamaran) ===
+        {
+            asset: 'lagoon_bungalow_walkway_mid.glb',
+            position: [46.5, 0.06, -18.6],
+            rotationY: -0.24,
+            scale: 1.02,
+            motion: 'static',
+            lanternLightOffset: [-0.200, 1.156, 5.127],
+            lanternColor: '#ffc266',
+        },
+        {
+            asset: 'lagoon_coral_arch_isle_mid.glb',
+            position: [55.0, 0.06, 17.8],
+            rotationY: -2.42,
+            scale: 1.04,
+            motion: 'static',
+        },
+        {
+            asset: 'lagoon_catamaran_mid.glb',
+            position: [45.0, 0, 9.4],
+            rotationY: -2.72,
+            scale: 1.0,
+            motion: 'boat',
+            lanternLightOffset: [-2.760, 1.480, 1.087],
+            lanternColor: '#ffc874',
+        },
     ];
 }
 
@@ -776,6 +858,44 @@ export function buildAlpsPlacements(): ScenePropPlacement[] {
         { asset: 'alpine_slate_rock.glb', position: [10.4, 0, -7.2], rotationY: 0.6, scale: 0.96, motion: 'static' },
         { asset: 'alpine_slate_rock.glb', position: [14.6, 0, 7.2], rotationY: -1.0, scale: 1.04, motion: 'static' },
         { asset: 'alpine_slate_rock.glb', position: [30.4, 0, 11.4], rotationY: 1.8, scale: 1.15, motion: 'static' },
+        // === MIDGROUND LUCERNE ENSEMBLE (left chalet village, right connected Kapellbrücke -> far village & paddle steamer) ===
+        {
+            asset: 'alps_chalet_village_mid.glb',
+            position: [46.5, 0.06, -20.5],
+            rotationY: -0.22,
+            scale: 1.02,
+            motion: 'static',
+            lanternLightOffset: [8.031, 2.007, 3.770],
+            lanternColor: '#ffc878',
+        },
+        // Iconic Kapellbrücke & octagonal Water Tower (Wasserturm) with far landing docked flush into the right chalet quay
+        {
+            asset: 'alps_kapell_bridge_mid.glb',
+            position: [49.5, 0.06, 18.2],
+            rotationY: -2.84,
+            scale: 1.0,
+            motion: 'static',
+            lanternLightOffset: [10.073, 7.759, 3.653],
+            lanternColor: '#ffc676',
+        },
+        {
+            asset: 'alps_chalet_village_mid.glb',
+            position: [75.8, 0.06, 12.2],
+            rotationY: -2.84,
+            scale: 1.0,
+            motion: 'static',
+            lanternLightOffset: [8.031, 2.007, 3.770],
+            lanternColor: '#ffc878',
+        },
+        {
+            asset: 'alps_steam_paddleboat_mid.glb',
+            position: [56.0, 0, 8.4],
+            rotationY: -2.74,
+            scale: 1.0,
+            motion: 'boat',
+            lanternLightOffset: [6.150, 1.308, 0.324],
+            lanternColor: '#ffca7a',
+        },
     ];
 }
 
@@ -824,6 +944,34 @@ export function buildNilePlacements(): ScenePropPlacement[] {
         { asset: 'nile_papyrus_clump.glb', position: [13.2, 0, -8.2], rotationY: 1.4, scale: 1.08, motion: 'lotus' },
         { asset: 'nile_papyrus_clump.glb', position: [9.4, 0, 6.2], rotationY: -0.7, scale: 0.96, motion: 'lotus' },
         { asset: 'nile_papyrus_clump.glb', position: [18.2, 0, 8.2], rotationY: 2.3, scale: 1.05, motion: 'lotus' },
+        // === MIDGROUND NILE ASWAN ENSEMBLE (left temple colonnade, right granite palm-oasis Qubba island & Royal Dahabiya) ===
+        {
+            asset: 'nile_colonnade_ruin_mid.glb',
+            position: [48.0, 0.06, -19.8],
+            rotationY: -0.24,
+            scale: 1.02,
+            motion: 'static',
+            lanternLightOffset: [2.246, 1.878, 4.713],
+            lanternColor: '#ff9638',
+        },
+        {
+            asset: 'nile_granite_oasis_isle_mid.glb',
+            position: [46.5, 0.06, 17.5],
+            rotationY: -2.68,
+            scale: 1.02,
+            motion: 'static',
+            lanternLightOffset: [5.964, 4.316, 1.796],
+            lanternColor: '#ffa242',
+        },
+        {
+            asset: 'nile_royal_dahabiya_mid.glb',
+            position: [58.0, 0, 9.4],
+            rotationY: -2.72,
+            scale: 1.0,
+            motion: 'boat',
+            lanternLightOffset: [-6.630, 1.586, 0.511],
+            lanternColor: '#ffaa4a',
+        },
     ];
 }
 

@@ -133,15 +133,15 @@ test('every registered 3D scene pack keeps throwing corridor and shore foraging 
 test('all 10 Blender scene packs and manifests exist and match exact byte sizes on disk', () => {
     const expectedPacks: Array<{ id: ScenePackId; count: number }> = [
         { id: 'jiangnan', count: 14 },
-        { id: 'tahoe', count: 7 },
+        { id: 'tahoe', count: 10 },
         { id: 'kyoto', count: 10 },
-        { id: 'nordic', count: 7 },
-        { id: 'lagoon', count: 7 },
+        { id: 'nordic', count: 10 },
+        { id: 'lagoon', count: 10 },
         { id: 'fuji', count: 10 },
         { id: 'zhangjiajie', count: 10 },
         { id: 'venice', count: 10 },
-        { id: 'alps', count: 6 },
-        { id: 'nile', count: 6 },
+        { id: 'alps', count: 9 },
+        { id: 'nile', count: 9 },
     ];
     for (const { id, count } of expectedPacks) {
         const dir = resolve('public/assets/scenes', id);

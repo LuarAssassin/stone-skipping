@@ -400,6 +400,175 @@
       "emissive": false,
       "alphaMask": false,
       "sha256": "d8906c3a5318fef38a26e21b1a35ad83e1eaf1b6b40fe29b7eb5facabb6477b7"
+    },
+    {
+      "file": "lagoon_bungalow_walkway_mid.glb",
+      "name": "lagoon_bungalow_walkway_mid",
+      "title": "南太平洋连廊水上茅草屋群",
+      "use": "茅草木屋、曲线栈桥和水桩，临水面朝 +Z",
+      "bboxMeters": [
+        28.0,
+        7.5,
+        11.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -14.0,
+          -1.059999942779541,
+          -5.5
+        ],
+        "max": [
+          14.0,
+          6.440000057220459,
+          5.5
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 7816,
+      "fileBytes": 1063228,
+      "textureMaps": [
+        {
+          "name": "lagoon_bungalow_walkway_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "lagoon_bungalow_walkway_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "lagoon_bungalow_walkway_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "d2f0106cd1be8d483eedfb469fe16b98c2d656a380a50299ae245f816ba1bec5"
+    },
+    {
+      "file": "lagoon_coral_arch_isle_mid.glb",
+      "name": "lagoon_coral_arch_isle_mid",
+      "title": "珊瑚石灰岩海蚀拱门与椰林礁岛",
+      "use": "海蚀通洞、白沙和椰树，临水面朝 +Z",
+      "bboxMeters": [
+        24.0,
+        13.499999761581421,
+        12.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -12.0,
+          -1.0499999523162842,
+          -6.0
+        ],
+        "max": [
+          12.0,
+          12.449999809265137,
+          6.0
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 7048,
+      "fileBytes": 948608,
+      "textureMaps": [
+        {
+          "name": "lagoon_coral_arch_isle_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "lagoon_coral_arch_isle_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "lagoon_coral_arch_isle_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "50aaf3d18f278a4831687f4182806be7a2d3bd6f07a29f3828b6013862bc3260"
+    },
+    {
+      "file": "lagoon_catamaran_mid.glb",
+      "name": "lagoon_catamaran_mid",
+      "title": "玻里尼西亚双体帆船",
+      "use": "双船身、捆扎梁和蟹钳帆，船首朝 +X",
+      "bboxMeters": [
+        12.5,
+        8.799999952316284,
+        5.199999809265137
+      ],
+      "boundsMeters": {
+        "min": [
+          -6.25,
+          -1.0499999523162842,
+          -2.5999999046325684
+        ],
+        "max": [
+          6.25,
+          7.75,
+          2.5999999046325684
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 5704,
+      "fileBytes": 630052,
+      "textureMaps": [
+        {
+          "name": "lagoon_catamaran_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "lagoon_catamaran_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "lagoon_catamaran_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "276983034fff5d3b8c1fff97e4999b1a40888b8f0c33efd7c066bc5b815c2f2a",
+      "motion": "boat"
     }
   ]
 }
