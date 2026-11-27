@@ -1,0 +1,349 @@
+{
+  "version": 1,
+  "packId": "venice",
+  "units": "metres",
+  "gltfAxes": [
+    "X",
+    "Y up",
+    "Z"
+  ],
+  "seed": 20261203,
+  "assets": [
+    {
+      "file": "venice_campanile_island.glb",
+      "name": "venice_campanile_island",
+      "title": "圣乔治水岸剪影",
+      "use": "远岸钟楼、古典教堂穹顶及低矮水岸街廓，横向沿 X",
+      "bboxMeters": [
+        50.0,
+        28.99999964237213,
+        18.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -25.0,
+          -0.6000000238418579,
+          -9.0
+        ],
+        "max": [
+          25.0,
+          28.399999618530273,
+          9.0
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 7180,
+      "fileBytes": 640072,
+      "textureMaps": [
+        {
+          "name": "venice_campanile_island_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "venice_campanile_island_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "venice_campanile_island_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "1300f7a48022eacc55ae1583668f08685c093c8e37e6b999aa1bea531cc29706"
+    },
+    {
+      "file": "venice_palazzo_corner.glb",
+      "name": "venice_palazzo_corner",
+      "title": "水巷哥特宅角",
+      "use": "临水宅邸的三叶拱窗、铁阳台和石水门",
+      "bboxMeters": [
+        5.800000190734863,
+        8.200000047683716,
+        5.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.9000000953674316,
+          -1.2000000476837158,
+          -2.5
+        ],
+        "max": [
+          2.9000000953674316,
+          7.0,
+          2.5
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 12268,
+      "fileBytes": 1012032,
+      "textureMaps": [
+        {
+          "name": "venice_palazzo_corner_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "venice_palazzo_corner_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "venice_palazzo_corner_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "87db8a8310f9e05551fbba784e1ebf79e83c5cb983e06ca5df4aa1611ed157ca"
+    },
+    {
+      "file": "venice_gondola.glb",
+      "name": "venice_gondola",
+      "title": "黑漆贡多拉",
+      "use": "船首朝 +X，六齿船首饰、红丝绒座和铜灯",
+      "bboxMeters": [
+        5.400000095367432,
+        1.149999976158142,
+        1.2799999713897705
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.700000047683716,
+          -0.3199999928474426,
+          -0.6399999856948853
+        ],
+        "max": [
+          2.700000047683716,
+          0.8299999833106995,
+          0.6399999856948853
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 5832,
+      "fileBytes": 516656,
+      "textureMaps": [
+        {
+          "name": "venice_gondola_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "venice_gondola_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "venice_gondola_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "bae9d63c69ae57690f90b4bf74fc080d5471247525584a82a28a6814bc421010"
+    },
+    {
+      "file": "venice_pali_cluster.glb",
+      "name": "venice_pali_cluster",
+      "title": "螺旋彩条木桩",
+      "use": "三根系船桩与缆绳，水线保留青苔",
+      "bboxMeters": [
+        1.350000023841858,
+        3.799999952316284,
+        1.25
+      ],
+      "boundsMeters": {
+        "min": [
+          -0.675000011920929,
+          -1.2000000476837158,
+          -0.625
+        ],
+        "max": [
+          0.675000011920929,
+          2.5999999046325684,
+          0.625
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 2930,
+      "fileBytes": 173376,
+      "textureMaps": [
+        {
+          "name": "venice_pali_cluster_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "venice_pali_cluster_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "venice_pali_cluster_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "90c697f8f25d282c5bfbf49190a40e08bc56f7cbf7a61b0065cfdc6fc3a69ccc"
+    },
+    {
+      "file": "venice_stone_arch.glb",
+      "name": "venice_stone_arch",
+      "title": "水巷白石拱桥",
+      "use": "桥洞留空、石栏和古典铸铁路灯",
+      "bboxMeters": [
+        7.199999809265137,
+        4.599999904632568,
+        2.799999952316284
+      ],
+      "boundsMeters": {
+        "min": [
+          -3.5999999046325684,
+          -1.0,
+          -1.399999976158142
+        ],
+        "max": [
+          3.5999999046325684,
+          3.5999999046325684,
+          1.399999976158142
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 9740,
+      "fileBytes": 999032,
+      "textureMaps": [
+        {
+          "name": "venice_stone_arch_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "venice_stone_arch_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "venice_stone_arch_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "a3480ef22de19cdffb0535d1040193c5418c1eae7e5c1280d08c9fa398f6e4c1"
+    },
+    {
+      "file": "venice_stone_steps.glb",
+      "name": "venice_stone_steps",
+      "title": "伊斯特拉石码头阶梯",
+      "use": "近岸宽石阶、潮线湿藻及系船环",
+      "bboxMeters": [
+        3.799999952316284,
+        1.550000011920929,
+        2.4000000953674316
+      ],
+      "boundsMeters": {
+        "min": [
+          -1.899999976158142,
+          -0.6000000238418579,
+          -1.2000000476837158
+        ],
+        "max": [
+          1.899999976158142,
+          0.949999988079071,
+          1.2000000476837158
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 2572,
+      "fileBytes": 229892,
+      "textureMaps": [
+        {
+          "name": "venice_stone_steps_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "venice_stone_steps_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "venice_stone_steps_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "847ce5b87e1cf9d858da67a272dc266083dcb0f347ff4ec72d7db758e2a4cde9"
+    }
+  ]
+}
