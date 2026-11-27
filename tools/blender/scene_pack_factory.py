@@ -709,7 +709,7 @@ def compose(job):
     body = font(names+"NotoSansCJK-Regular.ttc" if cjk else "DejaVuSans.ttf",19)
     mono = font("DejaVuSansMono.ttf",18)
     mono_small = font("DejaVuSansMono.ttf",16)
-    width, height = 2550, 1367
+    width, height = job.get("width",2550), 1367
     card_x, card_y, gutter, top = 606, 570, 13, 174
     paper, ink, muted, accent, plate = job["colors"]
     canvas = Image.new("RGB",(width,height),paper)

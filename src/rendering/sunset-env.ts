@@ -360,18 +360,27 @@ function createHorizonPanorama(initialTheme: SceneTheme) {
                 vec3 fogCol = mix(uFogBase, uFogSun, pow(sunAlign, 2.2));
 
                 // Heavier misty air right above the lagoon waterline, crisper up at spires/domes
-                float lowMist = exp(-max(0.0, vWorldY) * 0.16);
-                float haze = clamp(uHazeStrength + lowMist * 0.20 + uOvercast * 0.36 + uFogExtra, 0.0, 0.88);
+                float lowMist = exp(-max(0.0, vWorldY) * 0.17);
+                float haze = clamp(uHazeStrength + lowMist * 0.22 + uOvercast * 0.36 + uFogExtra, 0.0, 0.90);
 
                 // Warm sunset light modulation & subtle backlit silhouette wrap near the solar corridor
-                vec3 buildingCol = tex.rgb * mix(vec3(0.90, 0.90, 0.96), vec3(1.10, 0.98, 0.88), sunAlign);
+                vec3 buildingCol = tex.rgb * mix(vec3(0.88, 0.89, 0.96), vec3(1.10, 0.98, 0.88), sunAlign);
                 float backSil = pow(sunAlign, 4.0) * (1.0 - uOvercast * 0.68);
-                buildingCol *= 1.0 - backSil * 0.24;
+                buildingCol *= 1.0 - backSil * 0.22;
 
-                // Preserve warm sunlit terracotta & window glints slightly through distance haze
-                float warmth = clamp((tex.r - tex.b) * 1.4, 0.0, 1.0) * smoothstep(0.28, 0.72, tex.r);
-                vec3 col = mix(buildingCol, fogCol, haze * (1.0 - warmth * 0.22));
-                col += uFogSun * backSil * (0.12 + 0.14 * lowMist);
+                // Lift deep dark shadows slightly into theme mist so 2D far skyline matches 3D midground fog cohesion
+                buildingCol = mix(buildingCol, fogCol * 0.62, 0.16);
+
+                // Preserve warm sunlit terracotta & golden dusk window highlights gently through distance haze
+                float warmth = clamp((tex.r - tex.b) * 1.45, 0.0, 1.0) * smoothstep(0.30, 0.74, tex.r);
+                float duskGlint = smoothstep(0.56, 0.90, tex.r) * warmth * (1.0 - uOvercast * 0.65);
+                vec3 col = mix(buildingCol, fogCol, haze * (1.0 - warmth * 0.24));
+                col += vec3(0.24, 0.14, 0.05) * duskGlint * (1.0 - lowMist * 0.55);
+                col += uFogSun * backSil * (0.13 + 0.15 * lowMist);
+
+                // Soft atmospheric cushion right along y=0..0.7m waterline for seamless water-reflection contact
+                float waterlineVeil = exp(-max(0.0, vWorldY) * 2.4) * 0.24;
+                col = mix(col, fogCol, waterlineVeil);
 
                 gl_FragColor = vec4(col, alpha);
             }

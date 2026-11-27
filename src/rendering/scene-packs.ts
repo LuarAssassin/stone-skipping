@@ -524,6 +524,51 @@ export function buildVenicePlacements(): ScenePropPlacement[] {
         // Mossy Istrian limestone waterfront landing steps
         { asset: 'venice_stone_steps.glb', position: [15.4, 0, -11.4], rotationY: -0.6, scale: 1.05, motion: 'static' },
         { asset: 'venice_stone_steps.glb', position: [19.2, 0, 10.8], rotationY: 2.5, scale: 1.02, motion: 'static' },
+
+        // Keep the left quay oblique so its far end clears the campanile and the sunset path.
+        { asset: 'venice_canal_row_mid.glb', position: [60.5, -0.35, -17.2], rotationY: -0.315, scale: 1, motion: 'static' },
+        { asset: 'venice_rialto_arcade_mid.glb', position: [48.5, -0.35, 18.2], rotationY: -2.27, scale: 1, motion: 'static' },
+        { asset: 'venice_canal_row_mid.glb', position: [64.0, -0.35, 27.8], rotationY: -2.20, scale: 1, motion: 'static' },
+        // The beacons mark the fairway. The nearer pair also light neighboring geometry.
+        {
+            asset: 'venice_bricola_beacon_mid.glb',
+            position: [37.5, 0, -10.5],
+            rotationY: 0.47,
+            scale: 1,
+            motion: 'static',
+            lanternLightOffset: [0.04, 3.43, 0.06],
+            lanternColor: '#ffbd66',
+        },
+        {
+            asset: 'venice_bricola_beacon_mid.glb',
+            position: [41.5, 0, 11.0],
+            rotationY: 1.25,
+            scale: 1,
+            motion: 'static',
+            lanternLightOffset: [0.04, 3.43, 0.06],
+            lanternColor: '#ffbd66',
+        },
+        { asset: 'venice_bricola_beacon_mid.glb', position: [54.7, 0, -8.5], rotationY: -0.38, scale: 1, motion: 'static' },
+        { asset: 'venice_bricola_beacon_mid.glb', position: [64.0, 0, 16.0], rotationY: 0.92, scale: 1, motion: 'static' },
+        // Bring the left sail in front of the palazzetti and leave the right bridge opening clear.
+        {
+            asset: 'venice_bragozzo_boat_mid.glb',
+            position: [46.0, 0, -12.0],
+            rotationY: -0.83,
+            scale: 1,
+            motion: 'boat',
+            lanternLightOffset: [-4.17, 1.97, 0.58],
+            lanternColor: '#ffbd66',
+        },
+        {
+            asset: 'venice_bragozzo_boat_mid.glb',
+            position: [70.0, 0, 6.5],
+            rotationY: -1.70,
+            scale: 1,
+            motion: 'boat',
+            lanternLightOffset: [-4.17, 1.97, 0.58],
+            lanternColor: '#ffbd66',
+        },
     ];
 }
 

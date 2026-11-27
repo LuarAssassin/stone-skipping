@@ -130,7 +130,7 @@ test('all 10 Blender scene packs and manifests exist and match exact byte sizes 
         { id: 'lagoon', count: 7 },
         { id: 'fuji', count: 7 },
         { id: 'zhangjiajie', count: 7 },
-        { id: 'venice', count: 6 },
+        { id: 'venice', count: 10 },
         { id: 'alps', count: 6 },
         { id: 'nile', count: 6 },
     ];

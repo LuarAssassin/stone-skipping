@@ -344,6 +344,230 @@
       "emissive": false,
       "alphaMask": false,
       "sha256": "847ce5b87e1cf9d858da67a272dc266083dcb0f347ff4ec72d7db758e2a4cde9"
+    },
+    {
+      "file": "venice_canal_row_mid.glb",
+      "name": "venice_canal_row_mid",
+      "title": "威尼斯水岸彩宅联排",
+      "use": "彩色灰泥、水门、石阳台与漏斗形烟囱",
+      "bboxMeters": [
+        28.0,
+        13.5,
+        10.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -14.0,
+          -1.0,
+          -5.0
+        ],
+        "max": [
+          14.0,
+          12.5,
+          5.0
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 8112,
+      "fileBytes": 1215952,
+      "textureMaps": [
+        {
+          "name": "venice_canal_row_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "venice_canal_row_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "venice_canal_row_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "34eace530d09270a011976300fa9bc488c0098c142fc76fddb1086afb7172516"
+    },
+    {
+      "file": "venice_rialto_arcade_mid.glb",
+      "name": "venice_rialto_arcade_mid",
+      "title": "里亚托风格石拱廊桥",
+      "use": "伊斯特拉石拱跨水，阶梯石廊与双灯",
+      "bboxMeters": [
+        24.0,
+        11.5,
+        8.5
+      ],
+      "boundsMeters": {
+        "min": [
+          -12.0,
+          -1.0,
+          -4.25
+        ],
+        "max": [
+          12.0,
+          10.5,
+          4.25
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 6904,
+      "fileBytes": 878460,
+      "textureMaps": [
+        {
+          "name": "venice_rialto_arcade_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "venice_rialto_arcade_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "venice_rialto_arcade_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "522aff7618dcc2fa21b582f025f12004c15b51b777160acd6658ea64e81b003f"
+    },
+    {
+      "file": "venice_bricola_beacon_mid.glb",
+      "name": "venice_bricola_beacon_mid",
+      "title": "威尼斯泻湖航标",
+      "use": "四根橡木桩、缆绳、铁箍与暖色航标灯",
+      "bboxMeters": [
+        2.799999952316284,
+        5.200000047683716,
+        2.799999952316284
+      ],
+      "boundsMeters": {
+        "min": [
+          -1.399999976158142,
+          -1.2000000476837158,
+          -1.399999976158142
+        ],
+        "max": [
+          1.399999976158142,
+          4.0,
+          1.399999976158142
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 2556,
+      "fileBytes": 248304,
+      "textureMaps": [
+        {
+          "name": "venice_bricola_beacon_mid_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "venice_bricola_beacon_mid_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "venice_bricola_beacon_mid_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "92bc0960efa990923de8eb4f0537b8b93a19a6959594a453f4dae0e8b601a916"
+    },
+    {
+      "file": "venice_bragozzo_boat_mid.glb",
+      "name": "venice_bragozzo_boat_mid",
+      "title": "布拉戈佐彩帆木船",
+      "use": "平底木船、双桅赭红条纹帆与船尾灯，船首朝 +X",
+      "bboxMeters": [
+        11.0,
+        7.199999809265137,
+        3.200000047683716
+      ],
+      "boundsMeters": {
+        "min": [
+          -5.5,
+          -0.5,
+          -1.600000023841858
+        ],
+        "max": [
+          5.5,
+          6.699999809265137,
+          1.600000023841858
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 3730,
+      "fileBytes": 683700,
+      "textureMaps": [
+        {
+          "name": "venice_bragozzo_boat_mid_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "venice_bragozzo_boat_mid_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "venice_bragozzo_boat_mid_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "de8f49108f11cdbf67f24ba281244246197df1b9e7128d26e316c901181049fc"
     }
   ]
 }
