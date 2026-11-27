@@ -1,0 +1,405 @@
+{
+  "version": 1,
+  "packId": "fuji",
+  "units": "metres",
+  "gltfAxes": [
+    "X",
+    "Y up",
+    "Z"
+  ],
+  "seed": 20261201,
+  "assets": [
+    {
+      "file": "mount_fuji_peak.glb",
+      "name": "mount_fuji_peak",
+      "title": "富士雪冠",
+      "use": "湖对岸的对称逆富士轮廓，横向沿 X",
+      "bboxMeters": [
+        68.0,
+        31.99999964237213,
+        36.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -34.0,
+          -0.6000000238418579,
+          -18.0
+        ],
+        "max": [
+          34.0,
+          31.399999618530273,
+          18.0
+        ]
+      },
+      "origin": "groundContact",
+      "triangles": 4158,
+      "fileBytes": 239584,
+      "textureMaps": [
+        {
+          "name": "mount_fuji_peak_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "mount_fuji_peak_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "mount_fuji_peak_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "c92040837111dbe6ddba4793a4440362a81e18a0769fd6951cb0132b8c44af75"
+    },
+    {
+      "file": "fuji_boat_pier.glb",
+      "name": "fuji_boat_pier",
+      "title": "河口红顶栈桥",
+      "use": "沿 +X 的观景桥，桥面 +0.5 m，朱顶小门廊与木灯",
+      "bboxMeters": [
+        6.199999809265137,
+        3.799999952316284,
+        2.4000000953674316
+      ],
+      "boundsMeters": {
+        "min": [
+          0.0,
+          -1.2000000476837158,
+          -1.2000000476837158
+        ],
+        "max": [
+          6.199999809265137,
+          2.5999999046325684,
+          1.2000000476837158
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 9884,
+      "fileBytes": 938940,
+      "textureMaps": [
+        {
+          "name": "fuji_boat_pier_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "fuji_boat_pier_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "fuji_boat_pier_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "91e601fa3fbc836e53fe81ed6f3342db46a97746630ce7b570ef9deeda39e3ec"
+    },
+    {
+      "file": "kawaguchi_rowboat.glb",
+      "name": "kawaguchi_rowboat",
+      "title": "河口湖木划舟",
+      "use": "浅色素木手划舟，船首朝 +X，配双桨和暖灯",
+      "bboxMeters": [
+        4.199999809265137,
+        0.8799999952316284,
+        1.1799999475479126
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.0999999046325684,
+          -0.3199999928474426,
+          -0.5899999737739563
+        ],
+        "max": [
+          2.0999999046325684,
+          0.5600000023841858,
+          0.5899999737739563
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 5366,
+      "fileBytes": 408292,
+      "textureMaps": [
+        {
+          "name": "kawaguchi_rowboat_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "kawaguchi_rowboat_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "kawaguchi_rowboat_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "3e83ad9300d6491de30ef5fd0562caa108609a6dadc4ee069b67a832627227df"
+    },
+    {
+      "file": "sakura_tree_bloom.glb",
+      "name": "sakura_tree_bloom",
+      "title": "染井吉野盛樱",
+      "use": "前岸主树，淡粉白樱花层叠树冠",
+      "bboxMeters": [
+        7.200000047683716,
+        6.799999982118607,
+        6.799999952316284
+      ],
+      "boundsMeters": {
+        "min": [
+          -3.5153303146362305,
+          -0.2800000011920929,
+          -3.602651596069336
+        ],
+        "max": [
+          3.6846697330474854,
+          6.519999980926514,
+          3.1973483562469482
+        ]
+      },
+      "origin": "groundContact",
+      "triangles": 7280,
+      "fileBytes": 472360,
+      "textureMaps": [
+        {
+          "name": "sakura_tree_bloom_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "sakura_tree_bloom_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "sakura_tree_bloom_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": false,
+      "alphaMask": true,
+      "sha256": "1a3b07fb8cf1b89ad6b94aa5d89dd8f2cc7064d6498c32a1a4d1cde8ef034f92"
+    },
+    {
+      "file": "sakura_tree_leaning.glb",
+      "name": "sakura_tree_leaning",
+      "title": "临水垂枝樱",
+      "use": "朝 +X 伸向水面，根颈定位前景岸线",
+      "bboxMeters": [
+        7.0,
+        6.200000077486038,
+        5.3999998569488525
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.2030067443847656,
+          -0.2800000011920929,
+          -2.9672892093658447
+        ],
+        "max": [
+          4.796993255615234,
+          5.920000076293945,
+          2.432710647583008
+        ]
+      },
+      "origin": "groundContact",
+      "triangles": 7280,
+      "fileBytes": 473992,
+      "textureMaps": [
+        {
+          "name": "sakura_tree_leaning_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "sakura_tree_leaning_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "sakura_tree_leaning_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": false,
+      "alphaMask": true,
+      "sha256": "42b38d413ea0eec87212040d3ac52056ebc7ea274448311164dc4097a116c754"
+    },
+    {
+      "file": "fuji_lava_rock.glb",
+      "name": "fuji_lava_rock",
+      "title": "多孔玄武湖石",
+      "use": "半浸岸礁，暗黑岩架保留火山气孔",
+      "bboxMeters": [
+        2.4000000953674316,
+        1.149999976158142,
+        1.899999976158142
+      ],
+      "boundsMeters": {
+        "min": [
+          -1.2000000476837158,
+          -0.44999998807907104,
+          -0.949999988079071
+        ],
+        "max": [
+          1.2000000476837158,
+          0.699999988079071,
+          0.949999988079071
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 1580,
+      "fileBytes": 109452,
+      "textureMaps": [
+        {
+          "name": "fuji_lava_rock_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "fuji_lava_rock_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "fuji_lava_rock_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "3fd91ef3194d81438e3150191471abc8694a904503c12ea64985ce75624600bd"
+    },
+    {
+      "file": "sakura_floating_petals.glb",
+      "name": "sakura_floating_petals",
+      "title": "漂浮春樱花瓣",
+      "use": "二十八片贴水粉白落瓣",
+      "bboxMeters": [
+        2.0,
+        0.029999999329447746,
+        1.899999976158142
+      ],
+      "boundsMeters": {
+        "min": [
+          -1.0,
+          0.0,
+          -0.949999988079071
+        ],
+        "max": [
+          1.0,
+          0.029999999329447746,
+          0.949999988079071
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 336,
+      "fileBytes": 30876,
+      "textureMaps": [
+        {
+          "name": "sakura_floating_petals_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "sakura_floating_petals_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "sakura_floating_petals_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": true,
+      "sha256": "b8ec1f0439baa4f9fd9ed070105b93e1d4ddbc09b7eded3a1823e143171e6b9d"
+    }
+  ]
+}
