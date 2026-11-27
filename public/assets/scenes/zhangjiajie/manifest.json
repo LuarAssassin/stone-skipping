@@ -1,0 +1,405 @@
+{
+  "version": 1,
+  "packId": "zhangjiajie",
+  "units": "metres",
+  "gltfAxes": [
+    "X",
+    "Y up",
+    "Z"
+  ],
+  "seed": 20261202,
+  "assets": [
+    {
+      "file": "zjj_pillar_cluster.glb",
+      "name": "zjj_pillar_cluster",
+      "title": "武陵砂岩峰林",
+      "use": "远岸六根错落峰柱和柱顶奇松，横向沿 X",
+      "bboxMeters": [
+        54.0,
+        34.00000077486038,
+        22.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -27.0,
+          -0.800000011920929,
+          -11.0
+        ],
+        "max": [
+          27.0,
+          33.20000076293945,
+          11.0
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 6120,
+      "fileBytes": 649140,
+      "textureMaps": [
+        {
+          "name": "zjj_pillar_cluster_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "zjj_pillar_cluster_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "zjj_pillar_cluster_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": false,
+      "alphaMask": true,
+      "sha256": "34169218148778e4efa2f55d6126fb292bb3c4bffb35fefff3ed9a5ef51b5c2f"
+    },
+    {
+      "file": "zjj_pillar_tall.glb",
+      "name": "zjj_pillar_tall",
+      "title": "水上孤峰",
+      "use": "近中景细高石英砂岩柱，崖顶生松",
+      "bboxMeters": [
+        6.400000095367432,
+        21.999999284744263,
+        5.800000190734863
+      ],
+      "boundsMeters": {
+        "min": [
+          -3.200000047683716,
+          -1.2000000476837158,
+          -2.9000000953674316
+        ],
+        "max": [
+          3.200000047683716,
+          20.799999237060547,
+          2.9000000953674316
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 4660,
+      "fileBytes": 482184,
+      "textureMaps": [
+        {
+          "name": "zjj_pillar_tall_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "zjj_pillar_tall_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "zjj_pillar_tall_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": false,
+      "alphaMask": true,
+      "sha256": "db3c2df30916c10dc899029f2c6c35e2a6e94ddbae03dd87b9a869fcf73159f7"
+    },
+    {
+      "file": "tujia_diaojiaolou.glb",
+      "name": "tujia_diaojiaolou",
+      "title": "土家临水吊脚楼",
+      "use": "高架木廊与双红灯笼，一层约 +1.1 m",
+      "bboxMeters": [
+        6.199999809265137,
+        7.000000238418579,
+        4.800000190734863
+      ],
+      "boundsMeters": {
+        "min": [
+          -3.0999999046325684,
+          -1.2000000476837158,
+          -2.4000000953674316
+        ],
+        "max": [
+          3.0999999046325684,
+          5.800000190734863,
+          2.4000000953674316
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 12928,
+      "fileBytes": 1101088,
+      "textureMaps": [
+        {
+          "name": "tujia_diaojiaolou_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "tujia_diaojiaolou_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "tujia_diaojiaolou_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "bb3fab10ec126fb16bbc5e20ca76ea5dc52486ae4f648a175d1a6ce97dd91b21"
+    },
+    {
+      "file": "bamboo_raft.glb",
+      "name": "bamboo_raft",
+      "title": "宝峰湖青竹筏",
+      "use": "朝 +X 的捆扎竹排，配撑篙、竹篷和渔灯",
+      "bboxMeters": [
+        4.800000190734863,
+        0.9200000166893005,
+        1.4500000476837158
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.4000000953674316,
+          -0.18000000715255737,
+          -0.7250000238418579
+        ],
+        "max": [
+          2.4000000953674316,
+          0.7400000095367432,
+          0.7250000238418579
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 6472,
+      "fileBytes": 453156,
+      "textureMaps": [
+        {
+          "name": "bamboo_raft_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "bamboo_raft_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "bamboo_raft_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": true,
+      "alphaMask": false,
+      "sha256": "31b7be0b5552dd5c89c0caf49d26e5c0b522f5882712ccfd11c786d031340b6e"
+    },
+    {
+      "file": "cliff_pine_gnarled.glb",
+      "name": "cliff_pine_gnarled",
+      "title": "武陵迎客崖松",
+      "use": "朝 +X 横探水面，接地根颈与水平松盖",
+      "bboxMeters": [
+        6.6000001430511475,
+        6.400000125169754,
+        5.200000047683716
+      ],
+      "boundsMeters": {
+        "min": [
+          -2.19454026222229,
+          -0.27000001072883606,
+          -2.702913999557495
+        ],
+        "max": [
+          4.405459880828857,
+          6.130000114440918,
+          2.4970860481262207
+        ]
+      },
+      "origin": "groundContact",
+      "triangles": 7776,
+      "fileBytes": 483520,
+      "textureMaps": [
+        {
+          "name": "cliff_pine_gnarled_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "cliff_pine_gnarled_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "cliff_pine_gnarled_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": false,
+      "alphaMask": true,
+      "sha256": "61234675675796bea2c2c2ebf561e28e2f206f826f659b5d2399686e7fe2f8c1"
+    },
+    {
+      "file": "mountain_bamboo_clump.glb",
+      "name": "mountain_bamboo_clump",
+      "title": "岸边楠竹",
+      "use": "八根修长竹竿和分层狭长叶簇",
+      "bboxMeters": [
+        3.1999999284744263,
+        7.799999952316284,
+        3.0
+      ],
+      "boundsMeters": {
+        "min": [
+          -1.6380188465118408,
+          -0.25999999046325684,
+          -1.4942972660064697
+        ],
+        "max": [
+          1.5619810819625854,
+          7.539999961853027,
+          1.5057027339935303
+        ]
+      },
+      "origin": "groundContact",
+      "triangles": 7344,
+      "fileBytes": 468692,
+      "textureMaps": [
+        {
+          "name": "mountain_bamboo_clump_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "mountain_bamboo_clump_basecolor",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "mountain_bamboo_clump_roughness",
+          "size": [
+            1024,
+            1024
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 2,
+      "emissive": false,
+      "alphaMask": true,
+      "sha256": "3e5fdd255bd507894ef8320d2c5643ccb6594a7ec076dc0366c57db6d2b510c2"
+    },
+    {
+      "file": "wuling_cliff_rock.glb",
+      "name": "wuling_cliff_rock",
+      "title": "武陵层理岸礁",
+      "use": "半浸阶梯砂岩，顶面覆苔",
+      "bboxMeters": [
+        3.200000047683716,
+        1.8000000715255737,
+        2.5
+      ],
+      "boundsMeters": {
+        "min": [
+          -1.600000023841858,
+          -0.6000000238418579,
+          -1.25
+        ],
+        "max": [
+          1.600000023841858,
+          1.2000000476837158,
+          1.25
+        ]
+      },
+      "origin": "waterline",
+      "triangles": 2320,
+      "fileBytes": 208316,
+      "textureMaps": [
+        {
+          "name": "wuling_cliff_rock_normal",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "wuling_cliff_rock_basecolor",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        },
+        {
+          "name": "wuling_cliff_rock_roughness",
+          "size": [
+            512,
+            512
+          ],
+          "mimeType": "image/webp"
+        }
+      ],
+      "materialCount": 1,
+      "emissive": false,
+      "alphaMask": false,
+      "sha256": "e979d1b6ae1ddf4aea8e8766d4d61e94f6089b43b94ab5882bde64e88580b5dd"
+    }
+  ]
+}
