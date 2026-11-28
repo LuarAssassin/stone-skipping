@@ -5,9 +5,9 @@ import { CameraRig, cameraPose, blendPose, DEFAULT_VIEW } from '../src/camera/ri
 import { Session, PLAYBACK_RATE, presentationTick, type ReplayMode } from '../src/app/session';
 import { DEFAULT } from '../src/simulation/physics';
 const origin = new Vector3();
-test('默认全景在出手点后方抬高，固定构图不随石子移动', () => {
+test('默认全景在出手点后方抬高，同时框入岸边石子、落点与地平线远景', () => {
     const first = cameraPose('overview', DEFAULT_VIEW, origin);
-    assert.ok(first.position.x < 0 && first.position.y > 2 && first.target.x > 0);
+    assert.ok(first.position.x < 0 && first.position.y > 1 && first.target.x > 0);
     assert.deepEqual(first, cameraPose('overview', DEFAULT_VIEW, new Vector3(20, 1, 2)));
     for (const aspect of [980 / 688, 390 / 524]) {
         const camera = new PerspectiveCamera(first.fov, aspect, 0.01, 180);
@@ -18,6 +18,11 @@ test('默认全景在出手点后方抬高，固定构图不随石子移动', ()
             const screen = new Vector3(distance, 0, 0).project(camera);
             assert.ok(Math.abs(screen.x) < 1 && Math.abs(screen.y) < 1 && screen.z < 1);
         }
+        // Horizon and distant waterfront landmarks (e.g. Venice campanile at x=90, y=14) stay uncropped
+        const horizon = new Vector3(120, 0, 0).project(camera);
+        assert.ok(horizon.y > 0.15 && horizon.y < 0.75, `expected balanced horizon height, got ndc y=${horizon.y.toFixed(3)}`);
+        const landmark = new Vector3(90, 14, -15).project(camera);
+        assert.ok(landmark.y < 0.95, `expected distant tall landmark uncropped, got ndc y=${landmark.y.toFixed(3)}`);
     }
 });
 test('五个全景参数生效且重置不改变用户选择', () => {

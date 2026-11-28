@@ -8,6 +8,33 @@ export const SWEET_SPOT_MIN = 0.70;
 export const SWEET_SPOT_MAX = 0.92;
 
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
+const MIN_WRIST_POWER = 0.12;
+export type ReleaseTiming = 'early' | 'hit' | 'late';
+export interface WristRelease {
+    cursor: number;
+    timing: ReleaseTiming;
+}
+
+// The cursor visits the band twice per cycle. Between visits, coach against the
+// nearer visit in time, including the space across the wrap at phase 2.
+const wristWindow = (cursor: number) => Math.acos(1 - 2 * cursor) / Math.PI;
+const ENTER_PHASE = wristWindow(SWEET_SPOT_MIN);
+const EXIT_PHASE = wristWindow(SWEET_SPOT_MAX);
+const WRIST_WINDOWS = [
+    [ENTER_PHASE, EXIT_PHASE],
+    [2 - EXIT_PHASE, 2 - ENTER_PHASE],
+] as const;
+function wristRelease(phase: number, cursor: number): WristRelease {
+    let previousEnd = -ENTER_PHASE;
+    for (const [start, end] of WRIST_WINDOWS) {
+        if (phase < start) {
+            return { cursor, timing: phase - previousEnd <= start - phase ? 'late' : 'early' };
+        }
+        if (phase <= end) return { cursor, timing: 'hit' };
+        previousEnd = end;
+    }
+    return { cursor, timing: phase - previousEnd <= 2 + ENTER_PHASE - phase ? 'late' : 'early' };
+}
 
 export interface PullPreview {
     target: Launch;
@@ -15,6 +42,7 @@ export interface PullPreview {
     duration: number;
     wristCursor: number;
     sweetQuality: number;
+    wristRelease?: WristRelease;
     temperatureScale: number;
     isPullActive: boolean;
 }
@@ -83,7 +111,7 @@ export class PullThrowGesture {
         const sweetCenter = (SWEET_SPOT_MIN + SWEET_SPOT_MAX) * 0.5;
         const sweetHalf = (SWEET_SPOT_MAX - SWEET_SPOT_MIN) * 0.5;
         const sweetDist = Math.abs(wristCursor - sweetCenter);
-        const sweetQuality = power > 0.12 ? clamp(1 - Math.max(0, sweetDist - sweetHalf * 0.45) / (sweetHalf * 1.15), 0, 1) : 0;
+        const sweetQuality = power > MIN_WRIST_POWER ? clamp(1 - Math.max(0, sweetDist - sweetHalf * 0.45) / (sweetHalf * 1.15), 0, 1) : 0;
 
         // Launch speed 6.5 .. 25.5 m/s (covers gentle drops up to pro long-course throws!)
         const speed = 6.5 + 19.0 * Math.pow(power, 1.05);
@@ -104,7 +132,10 @@ export class PullThrowGesture {
             spin,
         };
 
-        return { target, power, duration, wristCursor, sweetQuality, temperatureScale, isPullActive };
+        return {
+            target, power, duration, wristCursor, sweetQuality, temperatureScale, isPullActive,
+            wristRelease: isPullActive && power > MIN_WRIST_POWER ? wristRelease(phase, wristCursor) : undefined,
+        };
     }
 
     release(event: GesturePoint): PullPreview | undefined {

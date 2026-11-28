@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { loadOptionalAsset } from './optional-asset';
 import { getSceneTheme, themeSunDirection, type SceneTheme } from './themes';
 import { getWeatherPreset, type WeatherPreset } from './weather';
 
@@ -393,7 +394,7 @@ function createHorizonPanorama(initialTheme: SceneTheme) {
 
     const loader = new THREE.TextureLoader();
     const cache = new Map<string, THREE.Texture>();
-    const pending = new Set<string>();
+    const pending = new Map<string, Promise<void>>();
     let activeUrl: string | null = null;
 
     function configure(theme: SceneTheme) {
@@ -429,31 +430,28 @@ function createHorizonPanorama(initialTheme: SceneTheme) {
         }
 
         mesh.visible = false;
-        if (typeof document === 'undefined' || pending.has(cfg.textureUrl)) return;
-        pending.add(cfg.textureUrl);
+        if (typeof document === 'undefined') return;
         const url = cfg.textureUrl;
-        loader.load(
-            url,
-            tex => {
-                pending.delete(url);
-                tex.wrapS = THREE.RepeatWrapping;
-                tex.wrapT = THREE.ClampToEdgeWrapping;
-                tex.colorSpace = THREE.SRGBColorSpace;
-                tex.minFilter = THREE.LinearMipmapLinearFilter;
-                tex.magFilter = THREE.LinearFilter;
-                tex.anisotropy = 8;
-                tex.needsUpdate = true;
-                cache.set(url, tex);
-                if (activeUrl === url) {
-                    material.uniforms.uMap.value = tex;
-                    mesh.visible = true;
-                }
-            },
-            undefined,
-            () => {
-                pending.delete(url);
+        const existing = pending.get(url);
+        if (existing) return existing;
+        const loading = loadOptionalAsset(loader.loadAsync(url)).then(tex => {
+            pending.delete(url);
+            if (!tex) return;
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.ClampToEdgeWrapping;
+            tex.colorSpace = THREE.SRGBColorSpace;
+            tex.minFilter = THREE.LinearMipmapLinearFilter;
+            tex.magFilter = THREE.LinearFilter;
+            tex.anisotropy = 8;
+            tex.needsUpdate = true;
+            cache.set(url, tex);
+            if (activeUrl === url) {
+                material.uniforms.uMap.value = tex;
+                mesh.visible = true;
             }
-        );
+        });
+        pending.set(url, loading);
+        return loading;
     }
 
     configure(initialTheme);
@@ -667,81 +665,73 @@ function hydrateBlenderShoreBed(
     outerColors: THREE.Color[]
 ) {
     if (typeof fetch === 'undefined') return;
-    void fetch('/assets/shore/manifest.json')
-        .then(res => (res.ok ? (res.json() as Promise<ShoreBedManifest>) : null))
-        .then(manifest => {
+    return loadOptionalAsset(fetch('/assets/shore/manifest.json')
+        .then(res => res.ok ? res.json() as Promise<ShoreBedManifest> : undefined))
+        .then(async manifest => {
             if (!manifest) return;
             const tileMeters = Math.max(0.4, manifest.tileSizeMeters ?? 1.2);
             const repX = widthX / tileMeters;
             const repZ = widthZ / tileMeters;
             const texLoader = new THREE.TextureLoader();
 
-            const loadTile = (url: string | undefined, isSrgb: boolean, apply: (t: THREE.Texture) => void) => {
+            const loadTile = async (url: string | undefined, isSrgb: boolean, apply: (t: THREE.Texture) => void) => {
                 if (!url) return;
-                texLoader.load(url, tex => {
-                    tex.wrapS = THREE.RepeatWrapping;
-                    tex.wrapT = THREE.RepeatWrapping;
-                    tex.repeat.set(repX, repZ);
-                    tex.magFilter = THREE.LinearFilter;
-                    tex.minFilter = THREE.LinearMipmapLinearFilter;
-                    tex.anisotropy = 8;
-                    if (isSrgb) tex.colorSpace = THREE.SRGBColorSpace;
-                    tex.needsUpdate = true;
-                    apply(tex);
-                    shoreMat.needsUpdate = true;
-                });
+                const tex = await loadOptionalAsset(texLoader.loadAsync(url));
+                if (!tex) return;
+                tex.wrapS = THREE.RepeatWrapping;
+                tex.wrapT = THREE.RepeatWrapping;
+                tex.repeat.set(repX, repZ);
+                tex.magFilter = THREE.LinearFilter;
+                tex.minFilter = THREE.LinearMipmapLinearFilter;
+                tex.anisotropy = 8;
+                if (isSrgb) tex.colorSpace = THREE.SRGBColorSpace;
+                tex.needsUpdate = true;
+                apply(tex);
+                shoreMat.needsUpdate = true;
             };
 
+            const assets: Promise<void>[] = [];
             if (manifest.textures) {
-                loadTile(manifest.textures.albedo, true, t => {
+                assets.push(loadTile(manifest.textures.albedo, true, t => {
                     shoreMat.map?.dispose();
                     shoreMat.map = t;
-                });
-                loadTile(manifest.textures.normal, false, t => {
+                }));
+                assets.push(loadTile(manifest.textures.normal, false, t => {
                     shoreMat.normalMap?.dispose();
                     shoreMat.normalMap = t;
                     shoreMat.normalScale.set(1.25, 1.25);
-                });
-                loadTile(manifest.textures.roughness, false, t => {
+                }));
+                assets.push(loadTile(manifest.textures.roughness, false, t => {
                     shoreMat.roughnessMap?.dispose();
                     shoreMat.roughnessMap = t;
                     shoreMat.roughness = 0.96;
-                });
-                loadTile(manifest.textures.ao, false, t => {
+                }));
+                assets.push(loadTile(manifest.textures.ao, false, t => {
                     shoreMat.aoMap?.dispose();
                     shoreMat.aoMap = t;
                     shoreMat.aoMapIntensity = 0.85;
-                });
+                }));
             }
 
             if (Array.isArray(manifest.pebbles) && manifest.pebbles.length > 0 && outerMatrices.length > 0) {
                 const gltfLoader = new GLTFLoader();
-                Promise.all(
-                    manifest.pebbles.map(
-                        p =>
-                            new Promise<{ geom: THREE.BufferGeometry; mat: THREE.MeshStandardMaterial } | null>(resolve => {
-                                gltfLoader.load(
-                                    p.glbPath,
-                                    gltf => {
-                                        let found: { geom: THREE.BufferGeometry; mat: THREE.MeshStandardMaterial } | null = null;
-                                        gltf.scene.traverse(obj => {
-                                            if (!found && obj instanceof THREE.Mesh && obj.material instanceof THREE.MeshStandardMaterial) {
-                                                const mat = obj.material.clone();
-                                                mat.color.setHex(0xffffff);
-                                                mat.envMapIntensity = 0.36;
-                                                mat.roughness = Math.max(0.76, mat.roughness);
-                                                found = { geom: obj.geometry, mat };
-                                            }
-                                        });
-                                        resolve(found);
-                                    },
-                                    undefined,
-                                    () => resolve(null)
-                                );
-                            })
-                    )
+                assets.push(Promise.all(
+                    manifest.pebbles.map(async p => {
+                        const gltf = await loadOptionalAsset(gltfLoader.loadAsync(p.glbPath));
+                        let found: { geom: THREE.BufferGeometry; mat: THREE.MeshStandardMaterial } | undefined;
+                        gltf?.scene.traverse(obj => {
+                            if (!found && obj instanceof THREE.Mesh && obj.material instanceof THREE.MeshStandardMaterial) {
+                                const mat = obj.material.clone();
+                                mat.color.setHex(0xffffff);
+                                mat.envMapIntensity = 0.36;
+                                mat.roughness = Math.max(0.76, mat.roughness);
+                                found = { geom: obj.geometry, mat };
+                            }
+                        });
+                        return found;
+                    })
                 ).then(loaded => {
-                    const valid = loaded.filter((v): v is { geom: THREE.BufferGeometry; mat: THREE.MeshStandardMaterial } => v !== null);
+                    const valid = loaded.filter(v => v !== undefined);
                     if (valid.length === 0) return;
 
                     const buckets: number[][] = valid.map(() => []);
@@ -768,8 +758,9 @@ function hydrateBlenderShoreBed(
                         group.add(inst);
                     }
                     fallbackOuterCobbles.visible = false;
-                });
+                }));
             }
+            await Promise.all(assets);
         })
         .catch(() => {
             // Optional Blender shore pack not generated yet; smooth procedural shore remains active
@@ -906,7 +897,7 @@ function createShoreAndReeds() {
     if (cobbles.instanceColor) cobbles.instanceColor.needsUpdate = true;
     group.add(cobbles);
 
-    hydrateBlenderShoreBed(shoreMat, widthX, widthZ, group, cobbles, outerMatrices, outerColors);
+    const shoreReady = hydrateBlenderShoreBed(shoreMat, widthX, widthZ, group, cobbles, outerMatrices, outerColors);
 
     // 3. Swaying lakeside reeds along left & right shore margins (safely clear of throw corridor & camera)
     const bladeGeom = new THREE.PlaneGeometry(0.024, 1.0, 1, 6);
@@ -998,7 +989,7 @@ function createShoreAndReeds() {
     reeds.instanceMatrix.needsUpdate = true;
     group.add(reeds);
 
-    return { group, shoreMesh, reedsMaterial };
+    return { group, shoreMesh, reedsMaterial, shoreReady };
 }
 
 export function createSunsetEnvironment(
@@ -1017,7 +1008,7 @@ export function createSunsetEnvironment(
     const horizonPanorama = createHorizonPanorama(initialTheme);
     scene.add(horizonPanorama.mesh);
 
-    const { group: shoreGroup, shoreMesh, reedsMaterial } = createShoreAndReeds();
+    const { group: shoreGroup, shoreMesh, reedsMaterial, shoreReady } = createShoreAndReeds();
     scene.add(shoreGroup);
 
     // Bake PMREM environment map from procedural sky; rebaked cleanly whenever user switches scene theme
@@ -1070,7 +1061,7 @@ export function createSunsetEnvironment(
             m.uSunAzimuth.value = sunAz;
             m.uHorizonMode.value = modeIdx;
         }
-        horizonPanorama.configure(theme);
+        const horizonReady = horizonPanorama.configure(theme);
 
         reedsMaterial.uniforms.uSunDir.value.copy(sunDir);
         reedsMaterial.uniforms.uBaseCol.value.set(...theme.reeds.base);
@@ -1080,6 +1071,7 @@ export function createSunsetEnvironment(
 
         currentEnvIntensity = theme.envIntensity;
         rebakeEnvironment(currentEnvIntensity);
+        return horizonReady;
     }
 
     function applyWeather(weather: WeatherPreset = getWeatherPreset()) {
@@ -1097,6 +1089,7 @@ export function createSunsetEnvironment(
         horizonPanorama: horizonPanorama.mesh,
         shoreGroup,
         shoreMesh,
+        shoreReady,
         applyTheme,
         applyWeather,
         update(time: number) {

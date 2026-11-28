@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import type { StoneSpec } from '../simulation/stones';
+import { loadOptionalAsset } from './optional-asset';
 
 const loader = new GLTFLoader();
 const glbCache = new Map<string, THREE.Group | null>();
@@ -106,21 +107,11 @@ function loadGlbTemplate(path: string): Promise<THREE.Group | null> {
     if (glbCache.has(path)) return Promise.resolve(glbCache.get(path) ?? null);
     const pending = glbInFlight.get(path);
     if (pending) return pending;
-    const promise = new Promise<THREE.Group | null>(resolve => {
-        loader.load(
-            path,
-            gltf => {
-                glbCache.set(path, gltf.scene);
-                glbInFlight.delete(path);
-                resolve(gltf.scene);
-            },
-            undefined,
-            () => {
-                glbCache.set(path, null);
-                glbInFlight.delete(path);
-                resolve(null);
-            }
-        );
+    const promise = loadOptionalAsset(loader.loadAsync(path)).then(gltf => {
+        const template = gltf?.scene ?? null;
+        glbCache.set(path, template);
+        glbInFlight.delete(path);
+        return template;
     });
     glbInFlight.set(path, promise);
     return promise;
@@ -248,11 +239,11 @@ export function populateStoneGroup(
         return;
     }
 
-    void loadGlbTemplate(stone.glbPath).then(template => {
+    return loadGlbTemplate(stone.glbPath).then(template => {
         if (template) {
             applyGlb(template);
         } else if (group.userData.loadToken === token) {
-            onStatus?.(`✓ 程序化米制模型（待 Blender 替换）· ${stone.name}`);
+            onStatus?.(`✓ 程序化米制模型 · ${stone.name}`);
         }
     });
 }

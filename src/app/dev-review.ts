@@ -83,7 +83,7 @@ export function setupDevReview(deps: DevReviewDeps) {
             waterReview: Object.assign(review, {
                 surfaceOnly(enabled: boolean) {
                     world.waterField.mesh.material.uniforms.surfaceInspection.value = enabled ? 1 : 0;
-                    world.post.setBypass(enabled);
+                    world.post.setBypass(enabled || world.graphicsQuality.tier === 'low');
                     setMarkersEnabled(!enabled);
                 },
                 calibrationBed(enabled: boolean) {

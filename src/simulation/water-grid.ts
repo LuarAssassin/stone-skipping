@@ -13,6 +13,8 @@ export function waterGrid(width=2048,height=1024,sizeX=16,sizeZ=8){
 export type WaterGrid=ReturnType<typeof waterGrid>;
 export const BASE_GRID=waterGrid(512,256),FINE_GRID=waterGrid();
 export const COURSE_GRID=waterGrid(4096,1024,64,32);
+export const BALANCED_COURSE_GRID=waterGrid(2048,512,64,32);
+export const MOBILE_COURSE_GRID=waterGrid(1024,256,64,32);
 export const dryFootprint=():Footprint=>({x:0,z:0,y:1,radius:.075,depth:.009});
 export function validFootprint(p:Footprint):Footprint {
  return [p.x,p.z,p.y,p.radius,p.depth,p.aspect??1,p.angle??0].every(Number.isFinite)&&p.radius>0&&p.depth>0&&(p.aspect??1)>0?p:dryFootprint();

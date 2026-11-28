@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { shoreElevation, shorelineCurveX, shoreNormal, SUN_DIRECTION } from './sunset-env';
 import { populateStoneGroup, setStoneHighlight, setStoneInspectLook } from './stone-mesh';
+import { loadOptionalAsset } from './optional-asset';
 import {
     forageShoreStones,
     formatStoneDimensions,
@@ -10,6 +11,7 @@ import {
     type StoneBox,
     type StoneSpec,
 } from '../simulation/stones';
+import { compareStoneProfiles } from '../simulation/stone-profile';
 import type { Launch } from '../simulation/physics';
 import type { Pose } from '../camera/rig';
 
@@ -33,7 +35,10 @@ interface ShoreStoneItem {
 }
 
 export interface ShoreForagingCallbacks {
+    onLoading(assets: Promise<unknown>): void;
     onEquipAndStandUp(stone: StoneSpec): void;
+    onTakeAndCompare?(stone: StoneSpec): void;
+    hasCompareBaseline?(): boolean;
     onEquipStay(stone: StoneSpec): void;
     onClink(mass: number): void;
     onExit(): void;
@@ -157,12 +162,15 @@ export function createShoreForaging(
         <div class="forage-cap-head">
           <strong id="forage-stone-name"></strong>
           <span id="forage-stone-rarity" class="rarity-tag"></span>
+          <span id="forage-stone-style" class="forage-style-tag"></span>
           <span id="forage-stone-dims" class="forage-dims"></span>
           <div class="tune-mode-seg" role="group" aria-label="交互模式">
             <button id="mode-tune" class="seg active" type="button">调姿</button>
             <button id="mode-flip" class="seg" type="button">360°</button>
           </div>
         </div>
+        <div id="forage-traits" class="forage-traits" aria-label="手感维度对比"></div>
+        <p id="forage-stone-guide" class="forage-guide"></p>
         <p id="forage-stone-feel" class="forage-feel"></p>
         <div id="forage-inspect-actions" class="forage-inspect-actions">
           <div class="tune-grid">
@@ -182,6 +190,7 @@ export function createShoreForaging(
           </div>
           <div class="inspect-btns">
             <button id="forage-take" class="forage-action primary" type="button">拿去投 <kbd>↵</kbd></button>
+            <button id="forage-compare" class="forage-action compare hidden" type="button" title="用上一次手动投掷的相同力度立刻试投这块石子">同力试投</button>
             <button id="forage-collect" class="forage-action" type="button">收入石匣</button>
             <button id="forage-putback" class="forage-action ghost" type="button">放回</button>
           </div>
@@ -201,7 +210,9 @@ export function createShoreForaging(
 
     let active = false;
     let catalog: ManifestStoneEntry[] = [];
-    let manifestLoaded = false;
+    const manifestReady = loadOptionalAsset(loadStoneManifest()).then(list => {
+        catalog = list ?? [];
+    });
     let items: ShoreStoneItem[] = [];
     let hovered: ShoreStoneItem | undefined;
     let inspected: ShoreStoneItem | undefined;
@@ -316,6 +327,7 @@ export function createShoreForaging(
 
     function populateShore(seed: number, avoidPrevious = false) {
         disposeItems();
+        const stoneLoads: Promise<void>[] = [];
         const targetCount = catalog.length > 0 ? Math.min(SHORE_STONE_COUNT, catalog.length) : 28;
         const specs = forageShoreStones(
             box.careerSkips,
@@ -464,7 +476,8 @@ export function createShoreForaging(
             root.quaternion.copy(restQuat);
 
             const visual = new THREE.Group();
-            populateStoneGroup(visual, spec, undefined, { shoreWetness });
+            const loading = populateStoneGroup(visual, spec, undefined, { shoreWetness });
+            if (loading) stoneLoads.push(loading);
             root.add(visual);
 
             const hitRadius = Math.max(spec.a, spec.b) * 1.12 + 0.009;
@@ -512,6 +525,7 @@ export function createShoreForaging(
         syncBannerCount();
         renderPocket();
         syncCaption();
+        return Promise.allSettled(stoneLoads);
     }
 
     function renderPocket() {
@@ -553,6 +567,17 @@ export function createShoreForaging(
         }
     }
 
+    const compareBtn = hud.querySelector<HTMLButtonElement>('#forage-compare')!;
+    const traitsEl = hud.querySelector<HTMLElement>('#forage-traits')!;
+    const styleTagEl = hud.querySelector<HTMLElement>('#forage-stone-style')!;
+    const guideEl = hud.querySelector<HTMLElement>('#forage-stone-guide')!;
+
+    function formatDeltaBadge(delta: number, isSameStone: boolean): string {
+        if (isSameStone || Math.abs(delta) < 2) return '';
+        const cls = delta > 0 ? 'up' : 'down';
+        return `<em class="trait-delta ${cls}">${delta > 0 ? '+' : ''}${delta}</em>`;
+    }
+
     function syncCaption() {
         const target = inspected ?? hovered;
         hud.classList.toggle('is-inspecting', Boolean(inspected));
@@ -561,12 +586,36 @@ export function createShoreForaging(
             return;
         }
         const s = target.spec;
+        const equipped = box.equipped;
+        const isSameStone = s.id === equipped.id;
+        const cmp = compareStoneProfiles(s, equipped);
+
         hud.querySelector('#forage-stone-name')!.textContent = s.name;
         const rarityEl = hud.querySelector<HTMLElement>('#forage-stone-rarity')!;
         rarityEl.textContent = s.rarityLabel;
         rarityEl.className = `rarity-tag rarity-${s.rarity}`;
+        styleTagEl.textContent = cmp.profile.styleTag;
         hud.querySelector('#forage-stone-dims')!.textContent = formatStoneDimensions(s);
         hud.querySelector('#forage-stone-feel')!.textContent = s.feel;
+        guideEl.textContent = isSameStone
+            ? `${cmp.profile.guide}`
+            : `对比当前「${equipped.name}」 · ${cmp.profile.guide}`;
+
+        const rows: [string, number, number][] = [
+            ['起漂', cmp.profile.lift, cmp.deltaLift],
+            ['耐力', cmp.profile.glide, cmp.deltaGlide],
+            ['稳度', cmp.profile.stability, cmp.deltaStability],
+        ];
+        traitsEl.innerHTML = rows.map(([label, score, delta]) => `
+          <div class="trait-item">
+            <div class="trait-head">
+              <span>${label}</span>
+              <b>${score}${formatDeltaBadge(delta, isSameStone)}</b>
+            </div>
+            <div class="trait-bar"><i style="width:${score}%"></i></div>
+          </div>
+        `).join('');
+
         captionEl.classList.add('visible');
         captionEl.classList.toggle('inspecting', Boolean(inspected));
 
@@ -576,6 +625,8 @@ export function createShoreForaging(
             collectBtn.disabled = alreadySaved;
             collectBtn.textContent = alreadySaved ? '已收录' : '收入石匣';
             putbackBtn.textContent = inspected.isTemporaryTune ? '返回' : '放回';
+            const canCompare = Boolean(callbacks.onTakeAndCompare && callbacks.hasCompareBaseline?.());
+            compareBtn.classList.toggle('hidden', !canCompare);
         }
     }
 
@@ -623,8 +674,8 @@ export function createShoreForaging(
         canvas.style.cursor = 'grab';
     }
 
-    function confirmTakeAndStandUp() {
-        if (!inspected) return;
+    function equipInspectedAndClose(): StoneSpec | undefined {
+        if (!inspected) return undefined;
         const picked = inspected.spec;
         setStoneInspectLook(inspected.visual, false);
         if (inspected.isTemporaryTune) {
@@ -639,7 +690,20 @@ export function createShoreForaging(
         closeAfterPutBack = false;
         callbacks.onClink(picked.mass);
         close();
-        callbacks.onEquipAndStandUp(box.equipped);
+        return box.equipped;
+    }
+
+    function confirmTakeAndStandUp() {
+        const equipped = equipInspectedAndClose();
+        if (equipped) callbacks.onEquipAndStandUp(equipped);
+    }
+
+    function confirmTakeAndCompare() {
+        const equipped = equipInspectedAndClose();
+        if (equipped) {
+            if (callbacks.onTakeAndCompare) callbacks.onTakeAndCompare(equipped);
+            else callbacks.onEquipAndStandUp(equipped);
+        }
     }
 
     function putBackInspected() {
@@ -825,11 +889,12 @@ export function createShoreForaging(
     };
     hud.querySelector<HTMLButtonElement>('#forage-walk-more')!.onclick = () => {
         forageSeed = Math.floor(Math.random() * 0xffffffff);
-        populateShore(forageSeed, true);
+        callbacks.onLoading(populateShore(forageSeed, true));
         setMsg('沿着砾石浅滩换了一处，露出新一批不重样的天然河石');
     };
     putbackBtn.onclick = putBackInspected;
     hud.querySelector<HTMLButtonElement>('#forage-take')!.onclick = confirmTakeAndStandUp;
+    compareBtn.onclick = confirmTakeAndCompare;
     collectBtn.onclick = () => {
         if (!inspected) return;
         const picked = inspected.spec;
@@ -846,13 +911,11 @@ export function createShoreForaging(
     };
 
     async function ensureManifestAndPopulate() {
-        if (!manifestLoaded) {
-            manifestLoaded = true;
-            catalog = await loadStoneManifest();
-        }
+        await manifestReady;
+        if (!active || closeAfterPutBack) return;
         if (items.filter(it => !it.isTemporaryTune).length < 12) {
             forageSeed = Math.floor(Math.random() * 0xffffffff);
-            populateShore(forageSeed);
+            await populateShore(forageSeed);
         } else {
             renderPocket();
             syncCaption();
@@ -867,7 +930,7 @@ export function createShoreForaging(
         document.body.classList.add('forage-open');
         canvas.style.cursor = 'default';
         setMsg('');
-        void ensureManifestAndPopulate();
+        callbacks.onLoading(ensureManifestAndPopulate());
     }
 
     /** Open the lifted center-stage posture-tuning view directly for the currently equipped stone. */
@@ -879,46 +942,43 @@ export function createShoreForaging(
             setMsg('');
         }
         closeAfterPutBack = true;
-        void ensureManifestAndPopulate().then(() => {
-            if (!active) return;
-            // Remove any previous temporary tune item
-            for (const old of items.filter(it => it.isTemporaryTune)) removeTakenItem(old);
+        // Remove any previous temporary tune item
+        for (const old of items.filter(it => it.isTemporaryTune)) removeTakenItem(old);
 
-            const { focusX, focusY } = computeForageCameraFrame();
-            const restPos = new THREE.Vector3(focusX, focusY + 0.04, 0);
-            const restQuat = new THREE.Quaternion();
+        const { focusX, focusY } = computeForageCameraFrame();
+        const restPos = new THREE.Vector3(focusX, focusY + 0.04, 0);
+        const restQuat = new THREE.Quaternion();
 
-            const root = new THREE.Group();
-            root.position.copy(restPos);
-            const visual = new THREE.Group();
-            populateStoneGroup(visual, stone);
-            root.add(visual);
-            const collider = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 6), colliderMat);
-            root.add(collider);
+        const root = new THREE.Group();
+        root.position.copy(restPos);
+        const visual = new THREE.Group();
+        populateStoneGroup(visual, stone);
+        root.add(visual);
+        const collider = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 6), colliderMat);
+        root.add(collider);
 
-            const shadowMat = new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, opacity: 0, depthWrite: false });
-            const shadow = new THREE.Mesh(shadowGeom, shadowMat);
-            shadow.visible = false;
-            rootGroup.add(root);
-            rootGroup.add(shadow);
+        const shadowMat = new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, opacity: 0, depthWrite: false });
+        const shadow = new THREE.Mesh(shadowGeom, shadowMat);
+        shadow.visible = false;
+        rootGroup.add(root);
+        rootGroup.add(shadow);
 
-            const tempItem: ShoreStoneItem = {
-                spec: stone,
-                root,
-                visual,
-                collider,
-                shadow,
-                shadowMat,
-                restPos,
-                restQuat,
-                hoverAmount: 0,
-                inspectBlend: 0,
-                isTemporaryTune: true,
-            };
-            collider.userData.shoreItem = tempItem;
-            items.push(tempItem);
-            pickUpItem(tempItem);
-        });
+        const tempItem: ShoreStoneItem = {
+            spec: stone,
+            root,
+            visual,
+            collider,
+            shadow,
+            shadowMat,
+            restPos,
+            restQuat,
+            hoverAmount: 0,
+            inspectBlend: 0,
+            isTemporaryTune: true,
+        };
+        collider.userData.shoreItem = tempItem;
+        items.push(tempItem);
+        pickUpItem(tempItem);
     }
 
     function close() {
@@ -944,12 +1004,6 @@ export function createShoreForaging(
         captionEl.classList.remove('visible', 'inspecting');
         canvas.style.cursor = 'crosshair';
     }
-
-    // Preload manifest quietly in the background on startup so first F press is instant!
-    void loadStoneManifest().then(list => {
-        catalog = list;
-        manifestLoaded = true;
-    });
 
     return {
         open,

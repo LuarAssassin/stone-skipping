@@ -1,28 +1,23 @@
 import * as THREE from 'three';
 import { Water } from 'three/addons/objects/Water.js';
-import { CoherentWater, FINE_GRID, type WaterGrid, type WaterTick } from './coherent';
+import { CoherentWater, FINE_GRID, type CoherentWaterOptions, type WaterGrid, type WaterTick } from './coherent';
 import { SUN_DIRECTION } from './sunset-env';
 import { themeSunDirection, type SceneTheme } from './themes';
 import type { WeatherPreset } from './weather';
 import { MAX_RIPPLE_PACKETS, RIPPLE_LIFETIME, type RipplePacket } from '../simulation/ripples';
 
-export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=null){
+export interface WaterQualityOptions extends CoherentWaterOptions {
+ reflectionSize?: number;
+ transmissionSize?: number;
+ maxMeshColumns?: number;
+ maxMeshRows?: number;
+}
+
+function buildWaterGeometry(grid: WaterGrid, options: WaterQualityOptions) {
  const {width,height:depth}=grid;
- const solver=new CoherentWater(grid);
- const state=solver.texture;
- const normals=new THREE.DataTexture(new Uint8Array([128,128,255,255]),1,1);normals.needsUpdate=true;
-
- // 48 × 2 RGBA32F table packing active physical Contact dispersive ripple packets
- const rippleBuffer=new Float32Array(MAX_RIPPLE_PACKETS*2*4);
- const rippleTexture=new THREE.DataTexture(rippleBuffer,MAX_RIPPLE_PACKETS,2,THREE.RGBAFormat,THREE.FloatType);
- rippleTexture.minFilter=THREE.NearestFilter;
- rippleTexture.magFilter=THREE.NearestFilter;
- rippleTexture.generateMipmaps=false;
- rippleTexture.needsUpdate=true;
-
  // State resolution and visible mesh resolution are independent. Keep the
  // original fine mesh for the calibration domain; cap the long-course mesh.
- const columns=Math.min(width,2048),rows=Math.min(depth,512);
+ const columns=Math.min(width,options.maxMeshColumns??2048),rows=Math.min(depth,options.maxMeshRows??512);
  const axesX=[-200,-30,-5,-1,0,...Array.from({length:columns},(_,i)=>(i+.5)*grid.sizeX/columns),grid.sizeX,Math.max(200,grid.sizeX+1)];
  const half=grid.sizeZ/2;
  const outerZ=Math.max(200,half+2);
@@ -34,16 +29,35 @@ export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=nu
   if(row<axesZ.length-1&&col<axesX.length-1){const next=vertex+axesX.length;indices[cursor++]=vertex;indices[cursor++]=next;indices[cursor++]=vertex+1;indices[cursor++]=vertex+1;indices[cursor++]=next;indices[cursor++]=next+1;}
  }
  const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.BufferAttribute(positions,3));geometry.setAttribute('normal',new THREE.BufferAttribute(normalsData,3));geometry.setIndex(new THREE.BufferAttribute(indices,1));
- const mesh=new Water(geometry,{
-  textureWidth:1024,textureHeight:1024,waterNormals:normals,
+ return geometry;
+}
+
+export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=null,options:WaterQualityOptions={}){
+ let solver=new CoherentWater(grid,options);
+ const normals=new THREE.DataTexture(new Uint8Array([128,128,255,255]),1,1);normals.needsUpdate=true;
+
+ // 48 × 2 RGBA32F table packing active physical Contact dispersive ripple packets
+ const rippleBuffer=new Float32Array(MAX_RIPPLE_PACKETS*2*4);
+ const rippleTexture=new THREE.DataTexture(rippleBuffer,MAX_RIPPLE_PACKETS,2,THREE.RGBAFormat,THREE.FloatType);
+ rippleTexture.minFilter=THREE.NearestFilter;
+ rippleTexture.magFilter=THREE.NearestFilter;
+ rippleTexture.generateMipmaps=false;
+ rippleTexture.needsUpdate=true;
+
+ const reflectionSize=options.reflectionSize??1024;
+ const transmissionSize=options.transmissionSize??1024;
+ const mesh=new Water(buildWaterGeometry(grid,options),{
+  textureWidth:reflectionSize,textureHeight:reflectionSize,waterNormals:normals,
   sunDirection:SUN_DIRECTION.clone(),sunColor:0xffb066,waterColor:0x132531,
   distortionScale:.35,fog:false
  });
  mesh.rotation.x=-Math.PI/2;
  const material=mesh.material;
- const transmission=new THREE.WebGLRenderTarget(1024,1024,{depthTexture:new THREE.DepthTexture(1024,1024)});
+ const transmission=new THREE.WebGLRenderTarget(transmissionSize,transmissionSize,{depthTexture:new THREE.DepthTexture(transmissionSize,transmissionSize)});
  Object.assign(material.uniforms,{
-  heightState:{value:state},
+  heightState:{value:solver.texture},
+  gridSpacing:{value:new THREE.Vector2(grid.dx,grid.dz)},
+  fieldStrength:{value:1},
   churnMap:{value:churn},
   transmission:{value:transmission.texture},
   transmissionDepth:{value:transmission.depthTexture},
@@ -65,11 +79,12 @@ export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=nu
   uFogRange:{value:new THREE.Vector2(34.0,152.0)},
  });
 
- const rippleGLSL=`uniform sampler2D heightState;uniform vec2 domainSize;
+ const localHeightGLSL=`uniform sampler2D heightState;uniform vec2 domainSize;uniform float fieldStrength;
+ float localHeight(vec2 point){if(fieldStrength<=0.0)return 0.0;vec2 coord=vec2(point.x/domainSize.x,point.y/domainSize.y+.5);if(any(lessThan(coord,vec2(0.0)))||any(greaterThan(coord,vec2(1.0))))return 0.0;return texture2D(heightState,coord).r*fieldStrength;}`;
+ const rippleGLSL=localHeightGLSL+`uniform vec2 gridSpacing;
  uniform sampler2D rippleData;uniform int rippleCount;uniform float rippleTime;uniform float surfaceInspection;
  uniform vec3 uWaterScatter,uRimCatch,uFoamDark,uFoamLit,uFogBase,uFogSun;
  uniform float uRainIntensity,uBreezeScale;uniform vec2 uFogRange;
- float localHeight(vec2 point){vec2 coord=vec2(point.x/domainSize.x,point.y/domainSize.y+.5);if(any(lessThan(coord,vec2(0.0)))||any(greaterThan(coord,vec2(1.0))))return 0.0;return texture2D(heightState,coord).r;}
  // Cauchy-Poisson deep-water dispersive multi-ring wave packets driven by real Contact impulses.
  // Returns vec3(height, dh/dx, dh/dz) analytically with zero grid aliasing.
  vec3 dispersiveRipples(vec2 point){
@@ -117,12 +132,8 @@ export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=nu
  }
  `;
 
- const vertexHeightGLSL=`uniform sampler2D heightState;uniform vec2 domainSize;
- float localHeight(vec2 point){vec2 coord=vec2(point.x/domainSize.x,point.y/domainSize.y+.5);if(any(lessThan(coord,vec2(0.0)))||any(greaterThan(coord,vec2(1.0))))return 0.0;return texture2D(heightState,coord).r;}
- `;
-
  material.vertexShader=material.vertexShader
-  .replace('void main() {',vertexHeightGLSL+'varying vec4 transmissionCoord;\nvoid main() {\nvec2 wPt=vec2(position.x,-position.y); vec3 displaced=position; displaced.z=localHeight(wPt);')
+  .replace('void main() {',localHeightGLSL+'\nvarying vec4 transmissionCoord;\nvoid main() {\nvec2 wPt=vec2(position.x,-position.y); vec3 displaced=position; displaced.z=localHeight(wPt);')
   .replaceAll('vec4( position, 1.0 )','vec4( displaced, 1.0 )')
   .replace('gl_Position = projectionMatrix * mvPosition;','gl_Position = projectionMatrix * mvPosition; transmissionCoord=gl_Position;');
  material.fragmentShader=material.fragmentShader
@@ -181,7 +192,7 @@ export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=nu
   return (r1 * 0.65 + r2 * 0.45) * (0.048 * uRainIntensity * lod);
  }
  `+'uniform mat4 textureMatrix; uniform sampler2D churnMap; uniform sampler2D transmission; uniform sampler2D transmissionDepth; uniform vec2 cameraRange; uniform float uTime; varying vec4 transmissionCoord;\nvoid main() {')
-  .replace('vec3 surfaceNormal = normalize( noise.xzy * vec3( 1.5, 1.0, 1.5 ) );',`vec2 spacing=vec2(${grid.dx},${grid.dz});
+  .replace('vec3 surfaceNormal = normalize( noise.xzy * vec3( 1.5, 1.0, 1.5 ) );',`vec2 spacing=gridSpacing;
  vec2 point=worldPosition.xz;
  float camDistNow=length(cameraPosition-worldPosition.xyz);
  vec2 gradient=vec2(localHeight(point+vec2(spacing.x,0.0))-localHeight(point-vec2(spacing.x,0.0)),localHeight(point+vec2(0.0,spacing.y))-localHeight(point-vec2(0.0,spacing.y)))/(2.0*spacing);
@@ -254,9 +265,27 @@ export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=nu
   for(let i=0;i<transmissionHidden.length;i++)transmissionHidden[i].visible=saved[i];
   renderer.setRenderTarget(target);mesh.visible=visible;
  };
- let generation=-1;
+ let generation=-1, sleeping=false;
  return {
-  mesh,solver,
+  mesh,
+  get solver(){return solver;},
+  setQuality(nextGrid: WaterGrid, nextOptions: WaterQualityOptions) {
+   const nextSolver=new CoherentWater(nextGrid,nextOptions);
+   const nextGeometry=buildWaterGeometry(nextGrid,nextOptions);
+   solver.dispose();
+   mesh.geometry.dispose();
+   solver=nextSolver;
+   mesh.geometry=nextGeometry;
+   generation=-1;
+   material.uniforms.heightState.value=solver.texture;
+   material.uniforms.domainSize.value.set(nextGrid.sizeX,nextGrid.sizeZ);
+   material.uniforms.gridSpacing.value.set(nextGrid.dx,nextGrid.dz);
+   const reflections=nextOptions.reflectionSize??1024;
+   const refractions=nextOptions.transmissionSize??1024;
+   const reflectionTexture=material.uniforms.mirrorSampler.value as THREE.Texture;
+   reflectionTexture.renderTarget?.setSize(reflections,reflections);
+   transmission.setSize(refractions,refractions);
+  },
   setTime(time:number){material.uniforms.uTime.value=time;},
   applyTheme(theme:SceneTheme){
    material.uniforms.sunDirection.value.copy(themeSunDirection(theme));
@@ -287,13 +316,16 @@ export function createWater(grid:WaterGrid=FINE_GRID,churn:THREE.Texture|null=nu
    material.uniforms.rippleCount.value=n;
    material.uniforms.rippleTime.value=time;
   },
-  update(renderer:THREE.WebGLRenderer,ticks:WaterTick[],version:number){
-   const changed=version!==generation||ticks.length>0;
-   if(version!==generation){solver.clear(renderer);generation=version;}
-   for(const tick of ticks)solver.step(renderer,tick,false);
-   if(changed){solver.updateNormals(renderer);solver.updateCaustics(renderer);}
+  update(renderer:THREE.WebGLRenderer,ticks:WaterTick[],version:number,strength=1){
+   const resting=strength===0;
+   const reset=version!==generation||resting&&!sleeping;
+   if(reset){solver.clear(renderer);generation=version;}
+   if(!resting)for(const tick of ticks)solver.step(renderer,tick,false);
+   if(reset||!resting&&ticks.length){solver.updateNormals(renderer);solver.updateCaustics(renderer);}
+   sleeping=resting;
    ticks.length=0;
    material.uniforms.heightState.value=solver.texture;
+   material.uniforms.fieldStrength.value=strength;
   }
  };
 }

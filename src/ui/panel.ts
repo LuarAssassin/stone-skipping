@@ -16,6 +16,12 @@ export function mountUI() {
           </button>`
     ).join('');
     app.innerHTML = `
+<div id="lake-loading" class="lake-loading">
+  <div class="lake-loading-status" role="status">
+    <span class="lake-loading-spinner" aria-hidden="true"></span>
+    <span id="lake-loading-label">正在准备湖面…</span>
+  </div>
+</div>
 <header class="cinema-header">
   <div class="title-row">
     <h1>掠水</h1>
@@ -25,7 +31,8 @@ export function mountUI() {
   <div class="best-badge" id="best-record">最佳 <strong>0</strong> 跳 · <span>0.0</span> m</div>
 </header>
 
-<div class="hud-score" aria-live="polite">
+<div class="hud-score" id="hud-score" aria-live="polite">
+  <span class="score-mode-tag" id="score-mode-tag"></span>
   <div class="metric">
     <strong id="skips">0</strong>
     <small>弹跳</small>
@@ -62,7 +69,7 @@ export function mountUI() {
     <span id="audio-icon" aria-hidden="true">🔊</span><span id="audio-label">声音</span>
   </button>
   <button id="lab-toggle" class="glass-pill" type="button" title="切换物理实验室面板 (Tab)">
-    <span class="pill-dot"></span>实验室 <kbd>Tab</kbd>
+    <span class="pill-dot"></span><span class="pill-text">实验室</span> <kbd>Tab</kbd>
   </button>
 </div>
 
@@ -80,6 +87,7 @@ export function mountUI() {
     </div>
   </div>
   <div class="stone-pill-actions">
+    <button id="hand-same-throw" class="forage-btn compare hidden" type="button" title="沿用上一次手动投掷的初速与方向（无扰动），对比当前石头或姿态">同力试投</button>
     <button id="open-tune" class="forage-btn subtle" type="button" title="抬起当前石子放大调姿">调姿</button>
     <button id="open-stones" class="forage-btn" type="button" title="低头在暮色岸滩拣石头 (F)">
       拣石 <kbd>F</kbd>
@@ -93,20 +101,42 @@ export function mountUI() {
     <span class="result-record" id="result-record">★ 新纪录</span>
   </div>
   <div class="result-stats" id="result-stats">0 跳 · 0.0 m</div>
-  <div class="result-replay-bar" role="group" aria-label="回放视角">
-    <button id="result-replay-course" class="seg active" type="button">航道回放 · 0.25×</button>
-    <button id="result-replay-bullet" class="seg" type="button">子弹跟随 · 0.25×</button>
-  </div>
+  <button id="result-detail-toggle" class="glass-pill" type="button" aria-controls="result-details" aria-expanded="false">详情</button>
   <div class="result-actions">
-    <button id="result-throw-again" class="primary" type="button">再投一次</button>
+    <button id="result-same-power" class="primary" type="button" title="用相同力度无扰动再投一次，验证调姿或换石效果">同力度复投</button>
+    <button id="result-throw-again" type="button" aria-describedby="result-best-gap">回岸待投</button>
     <button id="result-change-stone" type="button">换个石头</button>
   </div>
+  <div class="result-details" id="result-details">
+    <div class="result-metrics" id="result-metrics"></div>
+    <div class="result-compare" id="result-compare"></div>
+    <div class="result-release" id="result-release" hidden>
+      <span id="result-release-label"></span>
+      <div class="wrist-track" aria-hidden="true">
+        <div class="wrist-sweet-zone"></div>
+        <div class="wrist-cursor" id="result-release-cursor"></div>
+      </div>
+    </div>
+    <div class="result-coach" id="result-coach">
+      <p class="result-cause" id="result-cause"></p>
+      <p class="result-tip" id="result-tip"></p>
+    </div>
+    <div class="result-replay-bar" role="group" aria-label="回放视角">
+      <button id="result-replay-course" class="seg" type="button">航道慢放 · 0.25×</button>
+      <button id="result-replay-bullet" class="seg" type="button">子弹跟随 · 0.25×</button>
+    </div>
+    <p class="result-best-gap" id="result-best-gap"></p>
+    <p class="result-hint" id="result-hint">直接按住湖面向下拉即可投出下一颗</p>
+  </div>
 </section>
+<button id="replay-return" class="glass-pill" type="button">回岸待投</button>
 
+<div id="first-pull-hint" class="first-pull-hint" role="status" hidden></div>
 <section id="gesture-hud">
   <div class="gesture-top">
     <strong id="gesture-title">在湖面向下拉蓄力 · 左右瞄准 · 松手甩出</strong>
     <span id="sweet-badge" class="sweet-badge">★ 切旋甜蜜区</span>
+    <span id="pull-cue" class="pull-cue" aria-hidden="true">↓</span>
     <span id="aim-arrow" aria-hidden="true">↑</span>
   </div>
   <progress id="power" max="1" value="0" aria-label="蓄力"></progress>
@@ -125,6 +155,15 @@ export function mountUI() {
     </div>
     <button id="lab-close" class="icon-btn" type="button" aria-label="关闭实验室面板">✕</button>
   </div>
+  <label class="graphics-setting" for="graphics-mode">
+    <span>画质 <output id="graphics-status" aria-live="polite"></output></span>
+    <select id="graphics-mode">
+      <option value="auto">自动</option>
+      <option value="high">高画质</option>
+      <option value="balanced">均衡</option>
+      <option value="low">流畅</option>
+    </select>
+  </label>
   <div class="actions">
     <button id="throw" type="button">投出石子 ↗</button>
     <button id="pause" type="button">继续</button>
@@ -146,7 +185,7 @@ export function mountUI() {
       <pre id="diagnostics"></pre>
       <div id="history"></div>
     </details>
-    <p class="note">空格暂停 · R 重投 · F 拣石 · Tab 实验室 · M 静音<br>跳数仅在完整触水后离水计入；最终沉水不计。</p>
+    <p class="note"><span class="desktop-keys">空格暂停 · R 重投 · F 拣石 · Tab 实验室 · M 静音<br></span>跳数仅在完整触水后离水计入；最终沉水不计。</p>
     <p id="asset">正在加载石头…</p>
   </details>
   <footer>

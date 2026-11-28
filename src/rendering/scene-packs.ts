@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { loadOptionalAsset } from './optional-asset';
 import { shoreElevation } from './sunset-env';
 
 export type ScenePackId =
@@ -1066,7 +1067,7 @@ export function createScenePackManager(scene: THREE.Scene) {
     const loader = new GLTFLoader();
     const packGroups = new Map<ScenePackId, THREE.Group>();
     const packAnimations = new Map<ScenePackId, AnimatedProp[]>();
-    const packLoading = new Set<ScenePackId>();
+    const packLoading = new Map<ScenePackId, Promise<void>>();
     let activePack: ScenePackId = 'none';
 
     function prepareModel(model: THREE.Object3D, castShadow: boolean) {
@@ -1090,33 +1091,18 @@ export function createScenePackManager(scene: THREE.Scene) {
     }
 
     async function loadPack(packId: ScenePackId) {
-        if (packId === 'none' || packGroups.has(packId) || packLoading.has(packId)) return;
-        packLoading.add(packId);
-
         const baseUrl = `/assets/scenes/${packId}`;
-        try {
-            const res = await fetch(`${baseUrl}/manifest.json`, { cache: 'no-cache' });
-            if (!res.ok) {
-                packLoading.delete(packId);
-                return;
-            }
-            await res.json() as ScenePackManifest;
-        } catch {
-            packLoading.delete(packId);
-            return;
-        }
+        const manifest = await loadOptionalAsset(fetch(`${baseUrl}/manifest.json`, { cache: 'no-cache' })
+            .then(res => res.ok ? res.json() as Promise<ScenePackManifest> : undefined));
+        if (!manifest) return;
 
         const placements = getPlacementsForPack(packId);
         const uniqueFiles = Array.from(new Set(placements.map(p => p.asset)));
         const prototypes = new Map<string, THREE.Object3D>();
 
         await Promise.all(uniqueFiles.map(async file => {
-            try {
-                const gltf = await loader.loadAsync(`${baseUrl}/${file}`);
-                prototypes.set(file, gltf.scene);
-            } catch {
-                // Skip individual missing assets cleanly
-            }
+            const gltf = await loadOptionalAsset(loader.loadAsync(`${baseUrl}/${file}`));
+            if (gltf) prototypes.set(file, gltf.scene);
         }));
 
         const group = new THREE.Group();
@@ -1175,7 +1161,6 @@ export function createScenePackManager(scene: THREE.Scene) {
         rootGroup.add(group);
         packGroups.set(packId, group);
         packAnimations.set(packId, animated);
-        packLoading.delete(packId);
     }
 
     function setPack(packId: ScenePackId) {
@@ -1183,9 +1168,12 @@ export function createScenePackManager(scene: THREE.Scene) {
         for (const [id, group] of packGroups) {
             group.visible = id === packId;
         }
-        if (packId !== 'none' && !packGroups.has(packId)) {
-            void loadPack(packId);
-        }
+        if (packId === 'none' || packGroups.has(packId)) return;
+        const pending = packLoading.get(packId);
+        if (pending) return pending;
+        const loading = loadPack(packId).finally(() => packLoading.delete(packId));
+        packLoading.set(packId, loading);
+        return loading;
     }
 
     function update(time: number, breezeScale = 1.0) {

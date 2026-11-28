@@ -61,6 +61,11 @@ export class SurfaceChurn {
     }
     get texture() { return this.target.texture; }
 
+    setResolution(grid: WaterGrid) {
+        this.target.setSize(Math.min(2048, grid.width), Math.min(1024, grid.height));
+        this.generation = -1;
+    }
+
     private deposit(tick: WaterTick) {
         const m=tick.momentum;
         if (!m) return;

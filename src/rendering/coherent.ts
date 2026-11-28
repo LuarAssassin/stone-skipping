@@ -2,9 +2,15 @@ import * as THREE from 'three';
 import {FINE_GRID,validFootprint,interpolateFootprint,displacementScale,displacedRim,momentumSource,slipSources,sweptPressure,reactionFraction,type WaterGrid,type Footprint,type WaterTick} from '../simulation/water-grid';
 export * from '../simulation/water-grid';
 
+export interface CoherentWaterOptions {
+ targetType?: THREE.TextureDataType;
+ causticWidth?: number;
+ causticHeight?: number;
+}
+
 export class CoherentWater {
  readonly targets:THREE.WebGLRenderTarget[];
- readonly caustics=new THREE.WebGLRenderTarget(1024,512,{type:THREE.HalfFloatType,depthBuffer:false});
+ readonly caustics:THREE.WebGLRenderTarget;
  private causticScene=new THREE.Scene();
  private causticMaterial=new THREE.ShaderMaterial({depthTest:false,depthWrite:false,side:THREE.DoubleSide,uniforms:{state:{value:null},domainSize:{value:new THREE.Vector2()}},vertexShader:`uniform sampler2D state;uniform vec2 domainSize;varying vec3 oldPos,newPos;void main(){vec4 info=texture2D(state,uv);vec3 normal=vec3(info.b,sqrt(max(.001,1.-dot(info.ba,info.ba))),info.a);vec3 light=normalize(vec3(.45,-.82,.35));vec3 flatRay=refract(light,vec3(0.,1.,0.),1./1.333);vec3 ray=refract(light,normal,1./1.333);vec3 origin=vec3(uv.x*domainSize.x,0.,(uv.y-.5)*domainSize.y);oldPos=origin+flatRay*(-.65/flatRay.y);origin.y=info.r;newPos=origin+ray*((-.65-origin.y)/ray.y);gl_Position=vec4(newPos.x/domainSize.x*2.-1.,newPos.z/domainSize.y*2.,0.,1.);}`,fragmentShader:`varying vec3 oldPos,newPos;void main(){float oldArea=length(dFdx(oldPos))*length(dFdy(oldPos));float newArea=length(dFdx(newPos))*length(dFdy(newPos));gl_FragColor=vec4(clamp(oldArea/max(newArea,1e-9),0.,8.),0.,0.,1.);}`});
  private index=0;
@@ -75,8 +81,12 @@ export class CoherentWater {
   }
   gl_FragColor=info;
  }`});
- constructor(readonly grid:WaterGrid=FINE_GRID){
-  this.targets=[0,1].map(()=>new THREE.WebGLRenderTarget(grid.width,grid.height,{type:THREE.FloatType,minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter,depthBuffer:false}));
+ constructor(readonly grid:WaterGrid=FINE_GRID, options:CoherentWaterOptions={}){
+  const targetType=options.targetType??THREE.FloatType;
+  const causticWidth=options.causticWidth??1024;
+  const causticHeight=options.causticHeight??512;
+  this.caustics=new THREE.WebGLRenderTarget(causticWidth,causticHeight,{type:THREE.HalfFloatType,depthBuffer:false});
+  this.targets=[0,1].map(()=>new THREE.WebGLRenderTarget(grid.width,grid.height,{type:targetType,minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter,depthBuffer:false}));
   this.material.uniforms.resolution.value.set(grid.width,grid.height);
   this.material.uniforms.domainSize.value.set(grid.sizeX,grid.sizeZ);
   this.causticMaterial.uniforms.domainSize.value.set(grid.sizeX,grid.sizeZ);
@@ -87,7 +97,7 @@ export class CoherentWater {
   const diffusion=Math.min(.0018*grid.dt,stableDiffusion);
   this.material.uniforms.viscosity.value.set(diffusion*inverseDxSquared,diffusion*inverseDzSquared);
   this.scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),this.material));
-  this.causticScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2,511,255),this.causticMaterial));
+  this.causticScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2,Math.max(31,Math.floor(causticWidth/2)-1),Math.max(15,Math.floor(causticHeight/2)-1)),this.causticMaterial));
  }
  updateCaustics(renderer:THREE.WebGLRenderer){const target=renderer.getRenderTarget();this.causticMaterial.uniforms.state.value=this.texture;renderer.setRenderTarget(this.caustics);renderer.clear();renderer.render(this.causticScene,this.camera);renderer.setRenderTarget(target);}
  get texture(){return this.targets[this.index].texture;}

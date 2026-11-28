@@ -5,6 +5,7 @@ import { replayLaunch, sampleThrow, type ThrowSnapshot } from '../simulation/lau
 import { VISUAL_DEFAULTS, visualHash, validateVisual, type VisualSettings } from '../simulation/visual-variation';
 import { COURSE_GRID, dryFootprint, type Footprint, type WaterTick } from '../simulation/water-grid';
 import { STANDARD_STONE, type StoneSpec } from '../simulation/stones';
+import { RIPPLE_LIFETIME } from '../simulation/ripples';
 export type ReplayMode = 'normal' | 'slow' | 'bullet';
 export const PLAYBACK_RATE: Record<ReplayMode, number> = { normal: 1, slow: 0.25, bullet: 0.05 };
 export function presentationTick(time: number, seconds: number, paused: boolean): number {
@@ -17,6 +18,7 @@ export class Session {
     mouseMode = false;
     private previousSource = dryFootprint();
     private waterTime = 0;
+    private waterIdleSince?: number;
     private measuredImpulse = new Vector3();
     private totalImpulse = new Vector3();
     private pendingSlip = new Vector3();
@@ -38,6 +40,12 @@ export class Session {
     mode: ReplayMode = 'normal';
     visualTime = 0;
     presentationTime = 0;
+    get waterStrength() {
+        if (this.waterIdleSince === undefined) return this.sim.ticks || this.mouseMode ? 1 : 0;
+        const age = this.visualTime - this.waterIdleSince;
+        const fade = Math.min(1, Math.max(0, RIPPLE_LIFETIME - age));
+        return fade * fade * (3 - 2 * fade);
+    }
     constructor(private seed = () => crypto.getRandomValues(new Uint32Array(1))[0]) { }
     start(target: Launch, temperature = 1, visual: Omit<VisualSettings, 'seed'> = VISUAL_DEFAULTS, stone?: StoneSpec) {
         this.snapshot = sampleThrow(target, temperature, this.seed(), stone);
@@ -56,6 +64,7 @@ export class Session {
         this.waterTicks = [];
         this.waterGeneration++;
         this.waterTime = 0;
+        this.waterIdleSince = undefined;
         this.measuredImpulse.set(0, 0, 0);
         this.pendingSlip.set(0, 0, 0);
         this.pendingImpulseY = this.pendingWeight = this.pendingX = this.pendingZ = this.pendingArea = this.pendingLast = 0;
@@ -74,6 +83,7 @@ export class Session {
         this.waterTicks = [];
         this.waterGeneration++;
         this.waterTime = 0;
+        this.waterIdleSince = undefined;
         this.measuredImpulse.set(0, 0, 0);
         this.pendingSlip.set(0, 0, 0);
         this.pendingImpulseY = this.pendingWeight = this.pendingX = this.pendingZ = this.pendingArea = this.pendingLast = 0;
@@ -113,6 +123,15 @@ export class Session {
             }
             this.visualTime += this.sim.dt;
             if (this.visualTime + 1e-10 >= this.waterTime + 1 / 120) {
+                const activeWater = this.mouseMode ? Boolean(this.mouse)
+                    : !this.sim.ended || this.pendingWeight > 0 || this.spray.drops.length > 0 || this.spray.ribbons.length > 0;
+                if (activeWater) this.waterIdleSince = undefined;
+                else this.waterIdleSince ??= this.visualTime;
+                if (this.waterIdleSince !== undefined && this.visualTime - this.waterIdleSince >= RIPPLE_LIFETIME) {
+                    this.waterTime += 1 / 120;
+                    this.accumulator -= this.sim.dt;
+                    continue;
+                }
                 const { a, b, h } = this.sim.stone;
                 const axes = [new Vector3(a, 0, 0), new Vector3(0, h, 0), new Vector3(0, 0, b)].map(axis => axis.applyQuaternion(this.sim.q));
                 const xx = axes.reduce((sum, axis) => sum + axis.x ** 2, 0), zz = axes.reduce((sum, axis) => sum + axis.z ** 2, 0), xz = axes.reduce((sum, axis) => sum + axis.x * axis.z, 0);

@@ -17,7 +17,7 @@ export function createFeedback(world: ReturnType<typeof createWorld>) {
         update(session: Session, helpers: boolean) {
             const { sim } = session;
             world.churn.update(world.renderer,session.waterTicks,session.waterGeneration,session.visualTime);
-            waterField.update(world.renderer, session.waterTicks, session.waterGeneration);
+            waterField.update(world.renderer, session.waterTicks, session.waterGeneration, session.waterStrength);
             const ripples = session.mouseMode ? [] : extractRipplePackets(sim.contacts, sim.stone, session.visualTime);
             waterField.updateRipples(ripples, session.visualTime);
 
